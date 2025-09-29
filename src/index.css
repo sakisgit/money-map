@@ -1,50 +1,70 @@
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  background-color: #0080ff;  
-}
-
+/* ---------- Global ---------- */
 body {
-  font-family: Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #0080ff;
-}
-
-.rating-container {
-  text-align: center;
-  padding: 40px 30px;
-  border: 1px solid #ddd;
-  width: 400px;
-  border-radius: 8px;
-  background-color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.stars {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  font-size: 2rem;
-  cursor: pointer;
-  margin: 15px;
-}
-
-.star {
-  transition: color 0.2s ease-in-out;
-  color: #ccc;
-}
-
-.star.active {
-  color: gold;
-}
-
-.feedback {
-  font-size: 1.2rem;
-  font-weight: bold;
+  background: #f5f7fa;
+  font-family: "Inter", system-ui, sans-serif;
   color: #333;
+  line-height: 1.6;
+}
+
+/* ---------- Header ---------- */
+header {
+  background: linear-gradient(135deg, #0d6efd, #6610f2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border-bottom: none;
+}
+header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+/* ---------- Cards ---------- */
+.card {
+  border: none;
+  border-radius: 1.2rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease-in-out;
+}
+.card:hover {
+  transform: translateY(-5px);
+}
+.card-body p {
+  margin: 0;
+  color: #555;
+}
+
+/* ---------- Stat Numbers ---------- */
+.fs-1 {
+  font-size: 2.3rem !important;
+  font-weight: 700;
+}
+
+/* ---------- Progress Bar ---------- */
+.progress {
+  height: 28px;
+  border-radius: 1.2rem;
+  overflow: hidden;
+  background: #e9ecef;
+}
+.progress-bar {
+  background: linear-gradient(90deg, #0d6efd, #20c997);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* ---------- Section Titles ---------- */
+h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+/* ---------- Buttons ---------- */
+button {
+  border-radius: 0.75rem !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease-in-out;
+}
+button:hover {
+  transform: scale(1.05);
 }
