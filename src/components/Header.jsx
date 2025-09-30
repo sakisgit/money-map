@@ -11,12 +11,15 @@ const Header = () => {
           data-bs-toggle="modal"
           data-bs-target="#limit-modal"
         >
-          Set Monthly Limit
+          Set Monthly Income
         </button>
         <button id="reset" className="btn btn-outline-light">
           Reset Month
         </button>
       </div>
+        <button id="work-hours" className="btn btn-outline-light">
+          Work Hours
+        </button>
     </header>
   );
 };

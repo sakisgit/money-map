@@ -5,15 +5,15 @@ const Stats = () => {
       <section className="stats my-5 px-5">
         <div className="row g-3 my-3">
           <div className="col-md-6">
-            <div className="card text-center bg-dark text-white">
+            <div className="card text-center bg-secondary text-white">
               <div className="card-body">
                 <div id="money-limit" className="fs-1 fw-bold">2000€</div>
-                <p className="fs-4">Monthly Money Limit</p>
+                <p className="fs-4">Monthly Money Income</p>
               </div>
             </div>
           </div>
           <div className="col-md-6">
-            <div className="card text-center bg-primary text-white">
+            <div className="card text-center bg-dark text-white">
               <div className="card-body">
                 <div id="profit-loss" className="fs-1 fw-bold">400€</div>
                 <p className="fs-4">Profit / Loss</p>
@@ -40,7 +40,7 @@ const Stats = () => {
             </div>
           </div>
           <div className="col-md-4">
-            <div className="card bg-light">
+            <div className="card bg-primary text-white">
               <div className="card-body">
                 <div id="money-remaining" className="fs-1 fw-bold">1600€</div>
                 <p className="fs-4">Money Remaining</p>
