@@ -1,5 +1,8 @@
 
+import { useState } from "react";
+
 const Header = () => {
+
   return (
     <header className="d-sm-flex justify-content-between align-items-center bg-primary text-white text-center py-2 px-5">
       <h1>
@@ -11,10 +14,10 @@ const Header = () => {
           data-bs-toggle="modal"
           data-bs-target="#limit-modal"
         >
-          Set Monthly Income
+          Payment Day
         </button>
         <button id="reset" className="btn btn-outline-light">
-          Reset Month
+          Reset Stats
         </button>
       </div>
         <button id="work-hours" className="btn btn-outline-light">

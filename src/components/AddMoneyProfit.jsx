@@ -1,8 +1,7 @@
 
 import { useState } from "react"; 
 
-const AddMoneyProfit = () => {
-  const [incomeItems, setIncomeItems]= useState([]);
+const AddMoneyProfit = ({incomeItems, setIncomeItems}) => {
   const [incomeText, setIncomeText] = useState ('');
   const [incomeAmount, setIncomeAmount] = useState('');
 
@@ -14,7 +13,7 @@ const AddMoneyProfit = () => {
     }
 
     const newItem = {
-      text: incomeText,
+      text: incomeText, 
       amount: parseFloat(incomeAmount),
     };
     setIncomeItems([...incomeItems, newItem]);
@@ -82,18 +81,6 @@ const AddMoneyProfit = () => {
           <div className="card-body d-flex justify-content-between align-items-center">
             <span>Salary</span>
             <span className="fw-bold">1500€</span>
-          </div>
-        </div>
-        <div className="card my-2">
-          <div className="card-body d-flex justify-content-between align-items-center">
-            <span>Freelance</span>
-            <span className="fw-bold">400€</span>
-          </div>
-        </div>
-        <div className="card my-2">
-          <div className="card-body d-flex justify-content-between align-items-center">
-            <span>Investment</span>
-            <span className="fw-bold">200€</span>
           </div>
         </div>
       </div>
