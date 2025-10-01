@@ -10,13 +10,18 @@ import { useState } from "react";
 const App = () => {
   const [incomeItems,setIncomeItems] = useState([]);
   const [lossItems, setLossItems] = useState([]);
-
+  const [payment, setPayment] = useState(0);
+  const [showPaymentFields, setPaymentFields] = useState(false);  
   return (
     <>
-      <Header/>
+      <Header 
+        payment={payment} 
+        setPayment={setPayment} 
+      />
       <Stats 
         incomeItems={incomeItems}
         lossItems={lossItems}
+        payment={payment}
       />
       <Filter/>
       <Items 

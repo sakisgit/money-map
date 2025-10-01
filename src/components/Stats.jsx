@@ -1,7 +1,8 @@
 
+import Header from "./Header";
 import { useState } from "react";
 
-const Stats = ({incomeItems,lossItems}) => {
+const Stats = ({incomeItems,lossItems,payment}) => {
   const totalIncome=incomeItems.reduce((acc,item) => acc + item.amount, 0);
   const totalLoss= lossItems.reduce((acc,item) => acc + item.amount, 0);
   const balance= totalIncome-totalLoss;
@@ -13,7 +14,7 @@ const Stats = ({incomeItems,lossItems}) => {
           <div className="col-md-6">
             <div className="card text-center bg-secondary text-white">
               <div className="card-body">
-                <div id="money-limit" className="fs-1 fw-bold">2000€</div>
+                <div id="money-limit" className="fs-1 fw-bold">{payment}€</div>
                 <p className="fs-4">Monthly Money Income</p>
               </div>
             </div>
