@@ -47,9 +47,9 @@ const Stats = ({incomeItems,lossItems,payment}) => {
             </div>
           </div>
           <div className="col-md-4">
-            <div className={`card text-center ${balance < 0 ? 'bg-danger text-white' : 'bg-dark text-white'}`}>
+            <div className={`card text-center ${payment + balance< 0 ? 'bg-danger text-white' : 'bg-dark text-white'}`}>
               <div className="card-body">
-                <div id="money-remaining" className="fs-1 fw-bold">{balance}</div>
+                <div id="money-remaining" className="fs-1 fw-bold">{payment + balance}</div>
                 <p className="fs-4">Money Remaining</p>
               </div>
             </div>
