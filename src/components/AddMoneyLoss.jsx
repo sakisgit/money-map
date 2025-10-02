@@ -75,14 +75,7 @@ const AddMoneyLoss = ({lossItems, setLossItems}) =>  {
       </div>
 
       {/* Fake Items / Expense List */}
-      <div className="mt-3">
-        <div className="card my-2">
-          <div className="card-body d-flex justify-content-between align-items-center">
-            <span>Rent</span>
-            <span className="fw-bold">500€</span>
-          </div>
-        </div>
-      </div>
+      
     </div>
   );
 };

@@ -76,14 +76,6 @@ const AddMoneyProfit = ({incomeItems, setIncomeItems}) => {
       </div>
 
       {/* Fake Items / Income List */}
-      <div className="mt-3">
-        <div className="card my-2">
-          <div className="card-body d-flex justify-content-between align-items-center">
-            <span>Salary</span>
-            <span className="fw-bold">1500€</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
