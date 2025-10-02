@@ -1,7 +1,7 @@
 
 import { useState } from "react"; 
 
-const AddMoneyProfit = ({incomeItems, setIncomeItems}) => {
+const AddMoneyProfit = ({incomeItems, setIncomeItems, filterProfit }) => {
   const [incomeText, setIncomeText] = useState ('');
   const [incomeAmount, setIncomeAmount] = useState('');
 
@@ -20,6 +20,10 @@ const AddMoneyProfit = ({incomeItems, setIncomeItems}) => {
     setIncomeText('');
     setIncomeAmount('');
   };
+
+  const filteredItems = incomeItems.filter(item =>
+    item.text.toLowerCase().includes(filterProfit.toLowerCase())
+  );
 
   return (
     <div className="mb-5">
@@ -65,7 +69,7 @@ const AddMoneyProfit = ({incomeItems, setIncomeItems}) => {
       
       {/* Dynamic Expense List */}
       <div className="mt-3">
-        {incomeItems.map((item, index) => (
+        {filteredItems.map((item, index) => (
           <div className="card my-2" key={index}>
             <div className="card-body d-flex justify-content-between align-items-center">
               <span>{item.text}</span>

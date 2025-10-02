@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 
-const AddMoneyLoss = ({lossItems, setLossItems}) =>  {
+const AddMoneyLoss = ({lossItems, setLossItems , filterLoss}) =>  {
   const  [lossText, setLossText] = useState('');
   const [lossAmount,setLossAmount] = useState('');
 
@@ -19,6 +19,11 @@ const AddMoneyLoss = ({lossItems, setLossItems}) =>  {
     setLossAmount('');
     setLossText('');
     };
+
+  const filteredItems = lossItems.filter(item =>
+    item.text.toLowerCase().includes(filterLoss.toLowerCase())
+  );
+
 
   return (
     <div className="mb-5">
@@ -64,7 +69,7 @@ const AddMoneyLoss = ({lossItems, setLossItems}) =>  {
 
       {/* Dynamic Expense List */}
       <div className="mt-3">
-        {lossItems.map((item, index) => (
+        {filteredItems.map((item, index) => (
           <div className="card my-2" key={index}>
             <div className="card-body d-flex justify-content-between align-items-center">
               <span>{item.text}</span>

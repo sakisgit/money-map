@@ -2,7 +2,7 @@
 import AddMoneyLoss from "./AddMoneyLoss";
 import AddMoneyProfit from "./AddMoneyProfit";
 
-const Items = ({incomeItems, setIncomeItems, lossItems, setLossItems}) => {
+const Items = ({incomeItems, setIncomeItems, lossItems, setLossItems, filterLoss, filterProfit}) => {
   return (
     <section className="items mx-5">
       <div className="row g-4">
@@ -21,10 +21,10 @@ const Items = ({incomeItems, setIncomeItems, lossItems, setLossItems}) => {
             </button>
           </div>
 
-          {/* Προσθέτουμε το component */}
           <AddMoneyLoss 
             lossItems={lossItems}
             setLossItems={setLossItems}
+            filterLoss={filterLoss}
           />
         </div>
 
@@ -43,10 +43,10 @@ const Items = ({incomeItems, setIncomeItems, lossItems, setLossItems}) => {
             </button>
           </div>
 
-          {/* Προσθέτουμε το component */}
           <AddMoneyProfit 
             incomeItems={incomeItems}
             setIncomeItems={setIncomeItems}
+            filterProfit={filterProfit}
           />
         </div>
       </div>

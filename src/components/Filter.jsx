@@ -1,6 +1,6 @@
 
 
-const Filter = () => {
+const Filter = ({ filterLoss, setFilterLoss, filterProfit, setFilterProfit }) => {
   return (
     <section className="filter my-5 px-5">
       <div className="row g-3">
@@ -11,6 +11,8 @@ const Filter = () => {
               id="filter-loss"
               className="form-control"
               placeholder="Filter Loss..."
+              value={filterLoss}
+              onChange={(e) => setFilterLoss(e.target.value)}
             />
           </div>
         </div>
@@ -21,6 +23,8 @@ const Filter = () => {
               id="filter-profit"
               className="form-control"
               placeholder="Filter Profit..."
+              value={filterProfit}
+              onChange={(e) => setFilterProfit(e.target.value)}
             />
           </div>
         </div>

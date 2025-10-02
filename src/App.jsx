@@ -11,6 +11,8 @@ const App = () => {
   const [incomeItems,setIncomeItems] = useState([]);
   const [lossItems, setLossItems] = useState([]);
   const [payment, setPayment] = useState(0);
+  const [filterLoss, setFilterLoss] = useState('');
+  const [filterProfit, setFilterProfit] = useState('');
    
   return (
     <>
@@ -23,12 +25,19 @@ const App = () => {
         lossItems={lossItems}
         payment={payment}
       />
-      <Filter/>
+      <Filter
+        filterLoss={filterLoss}
+        setFilterLoss={setFilterLoss}
+        filterProfit={filterProfit}
+        setFilterProfit={setFilterProfit}
+      />
       <Items 
         incomeItems={incomeItems}
         setIncomeItems={setIncomeItems}
         lossItems={lossItems}
         setLossItems={setLossItems}
+        filterLoss={filterLoss}
+        filterProfit={filterProfit}
       >
         <AddMoneyLoss 
           lossItems={lossItems}
