@@ -11,7 +11,7 @@ const App = () => {
   const [incomeItems,setIncomeItems] = useState([]);
   const [lossItems, setLossItems] = useState([]);
   const [payment, setPayment] = useState(0);
-  const [showPaymentFields, setPaymentFields] = useState(false);  
+   
   return (
     <>
       <Header 
