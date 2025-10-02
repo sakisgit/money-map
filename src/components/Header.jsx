@@ -1,11 +1,38 @@
-
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const Header = ({ payment, setPayment }) => {
   const [inputValue, setInputValue] = useState('');
   const [showPaymentFields, setPaymentFields] = useState(false);
 
+  const paymentRef = useRef(null);
+
   const handleClick = () => setPaymentFields(!showPaymentFields);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (paymentRef.current && !paymentRef.current.contains(event.target)) {
+        setPaymentFields(false);
+      }
+    };
+
+    if (showPaymentFields) {
+      document.addEventListener("mousedown", handleOutsideClick);
+    } else {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    }
+
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [showPaymentFields]);
+
+  const handleSave = () => {
+    if (inputValue <= 0) {
+      alert("Enter a valid payment amount!");
+      return;
+    }
+    setPayment(inputValue);
+    setInputValue('');
+    setPaymentFields(false);
+  };
 
   return (
     <header className="d-sm-flex justify-content-between align-items-center bg-primary text-white text-center py-2 px-5 position-relative">
@@ -13,7 +40,7 @@ const Header = ({ payment, setPayment }) => {
         <i className="fa-solid fa-coins"></i> Money Map
       </h1>
 
-      <div className="d-flex align-items-center position-relative">
+      <div className="d-flex align-items-center position-relative" ref={paymentRef}>
         {/* Payment Day Button */}
         <div className="me-2 position-relative">
           <button
@@ -36,7 +63,7 @@ const Header = ({ payment, setPayment }) => {
                 borderRadius: '8px',
                 boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
                 zIndex: 1000,
-                width: '200px'
+                width: '220px'
               }}
             >
               <h6 className="mb-2">Set Your Payment</h6>
@@ -56,11 +83,7 @@ const Header = ({ payment, setPayment }) => {
               <button
                 type="button"
                 className="btn btn-primary text-white w-100"
-                onClick={() => {
-                  setPayment(inputValue);  
-                  setPaymentFields(false);
-                  setInputValue('');
-                }}
+                onClick={handleSave}
               >
                 Save
               </button>
