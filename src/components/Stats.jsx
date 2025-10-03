@@ -1,55 +1,68 @@
 
-import Header from "./Header";
-import { useState } from "react";
 
 const Stats = ({incomeItems,lossItems,payment}) => {
   const totalIncome=incomeItems.reduce((acc,item) => acc + item.amount, 0);
   const totalLoss= lossItems.reduce((acc,item) => acc + item.amount, 0);
   const balance= totalIncome-totalLoss;
 
+  const progressBar =  payment > 0 ? Math.min((totalLoss / payment) * 100, 100) : 0;
+
+  // Fixed Money
+  const formatMoney = (num) => 
+    num.toLocaleString("el-GR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+
   return (
     <>
+      {/* Salary */}
       <section className="stats my-5 px-5">
         <div className="row g-3 my-3">
           <div className="col-md-6">
             <div className="card text-center bg-secondary text-white">
               <div className="card-body">
-                <div id="money-limit" className="fs-1 fw-bold">{payment} €</div>
+                <div id="money-limit" className="fs-1 fw-bold">{formatMoney(payment)} €</div>
                 <p className="fs-4">Monthly Money Income</p>
               </div>
             </div>
           </div>
+
+          {/* Profit / Loss */}
           <div className="col-md-6">
             <div className={`card text-center ${balance < 0 ? 'bg-danger text-white' : 'bg-dark text-white'}`}>
               <div className="card-body">
-                <div id="profit-loss" className="fs-1 fw-bold">{payment + balance} €</div>
+                <div id="profit-loss" className="fs-1 fw-bold">{formatMoney(payment + balance)} €</div>
                 <p className="fs-4">Profit / Loss</p>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Income */}
         <div className="row g-3 text-center">
           <div className="col-md-4">
             <div className="card bg-light">
               <div className="card-body">
-                <div id="income" className="fs-1 fw-bold">{totalIncome} €</div>
+                <div id="income" className="fs-1 fw-bold">{formatMoney(totalIncome)} €</div>
                 <p className="fs-4">Income</p>
               </div>
             </div>
           </div>
+
+          {/* Expenses */}
           <div className="col-md-4">
             <div className="card bg-light">
               <div className="card-body">
-                <div id="expenses" className="fs-1 fw-bold">{totalLoss} €</div>
+                <div id="expenses" className="fs-1 fw-bold">{formatMoney(totalLoss)} €</div>
                 <p className="fs-4">Expenses</p>
               </div>
             </div>
           </div>
+
+          {/* Money Remaining */}
           <div className="col-md-4">
             <div className={`card text-center ${payment + balance< 0 ? 'bg-danger text-white' : 'bg-dark text-white'}`}>
               <div className="card-body">
-                <div id="money-remaining" className="fs-1 fw-bold">{payment + balance} €</div>
+                <div id="money-remaining" className="fs-1 fw-bold">{formatMoney(payment + balance)} €</div>
                 <p className="fs-4">Money Remaining</p>
               </div>
             </div>
@@ -57,15 +70,16 @@ const Stats = ({incomeItems,lossItems,payment}) => {
         </div>
       </section>
 
+      {/* Progress Bar */}
       <section className="px-5">
         <div className="progress">
           <div
             id="money-progress"
             className="progress-bar"
             role="progressbar"
-            style={{ width: "40%" }}
+            style={{width: `${progressBar.toFixed(1)}%`}}
           >
-            40%
+            {progressBar.toFixed(1)}%
           </div>
         </div>
       </section>
