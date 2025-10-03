@@ -1,108 +1,38 @@
-import { useState, useEffect, useRef } from "react";
 
-const Header = ({ payment, setPayment }) => {
-  const [inputValue, setInputValue] = useState('');
-  const [showPaymentFields, setPaymentFields] = useState(false);
+  import PaymentDropdown from "./PaymentDropdown";
+  import ResetButton from "./ResetButton";
 
-  const paymentRef = useRef(null);
+  const Header = ({ payment, 
+    setPayment,
+    setLossItems,
+    setIncomeItems,
+    setBalance,
+    setTotalIncome,
+    setTotalLoss }) => {
+    return (
+      <header className="d-sm-flex justify-content-between align-items-center bg-primary text-white text-center py-2 px-5 position-relative">
+        <h1>
+          <i className="fa-solid fa-coins"></i> Money Map
+        </h1>
 
-  const handleClick = () => setPaymentFields(!showPaymentFields);
+        <div className="d-flex align-items-center">
+          <PaymentDropdown payment={payment} setPayment={setPayment} />
 
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (paymentRef.current && !paymentRef.current.contains(event.target)) {
-        setPaymentFields(false);
-      }
-    };
+          <ResetButton 
+            setLossItems={setLossItems}
+            setIncomeItems={setIncomeItems}
+            setPayment={setPayment}
+            setBalance={setBalance}
+            setTotalIncome={setTotalIncome} 
+            setTotalLoss={setTotalLoss} 
+          />
 
-    if (showPaymentFields) {
-      document.addEventListener("mousedown", handleOutsideClick);
-    } else {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    }
-
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [showPaymentFields]);
-
-  const handleSave = () => {
-    if (inputValue <= 0) {
-      alert("Enter a valid payment amount!");
-      return;
-    }
-    setPayment(inputValue);
-    setInputValue('');
-    setPaymentFields(false);
+          <button id="work-hours" className="btn btn-outline-light">
+            Work Hours
+          </button>
+        </div>
+      </header>
+    );
   };
 
-  return (
-    <header className="d-sm-flex justify-content-between align-items-center bg-primary text-white text-center py-2 px-5 position-relative">
-      <h1>
-        <i className="fa-solid fa-coins"></i> Money Map
-      </h1>
-
-      <div className="d-flex align-items-center position-relative" ref={paymentRef}>
-        {/* Payment Day Button */}
-        <div className="me-2 position-relative">
-          <button
-            id="payment"
-            className="btn btn-outline-light"
-            onClick={handleClick}
-          >
-            Payment Day
-          </button>
-
-          {showPaymentFields && (
-            <div
-              style={{
-                position: 'absolute',
-                top: '110%',
-                left: '0',
-                backgroundColor: 'white',
-                color: 'black',
-                padding: '15px',
-                borderRadius: '8px',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                zIndex: 1000,
-                width: '220px'
-              }}
-            >
-              <h6 className="mb-2">Set Your Payment</h6>
-              <div className="mb-3">
-                <label htmlFor="payment-input" className="form-label">
-                  Payment (€)
-                </label>
-                <input
-                  type="number"
-                  className="form-control"
-                  id="payment-input"
-                  placeholder="Enter Amount (€)"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(Number(e.target.value))}
-                />
-              </div>
-              <button
-                type="button"
-                className="btn btn-primary text-white w-100"
-                onClick={handleSave}
-              >
-                Save
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Reset Button */}
-        <button id="reset" className="btn btn-outline-light me-2">
-          Reset Stats
-        </button>
-
-        {/* Work Hours Button */}
-        <button id="work-hours" className="btn btn-outline-light">
-          Work Hours
-        </button>
-      </div>
-    </header>
-  );
-};
-
-export default Header;
+  export default Header;
