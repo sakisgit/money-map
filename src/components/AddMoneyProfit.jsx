@@ -8,10 +8,12 @@ const AddMoneyProfit = ({incomeItems, setIncomeItems, filterProfit }) => {
   const handleSubmit= (e) => {
     e.preventDefault();
     if(!incomeAmount || !incomeText) {
-      alert('You have to complete the field...');
+      alert('Please complete all fields before adding an income.');
       return; 
-    }
-
+    } else if(incomeAmount<=0){
+      alert('The income amount must be greater than zero.');
+    };
+    
     const newItem = {
       text: incomeText, 
       amount: parseFloat(incomeAmount),

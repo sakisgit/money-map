@@ -47,9 +47,17 @@ header h1 {
   background: #e9ecef;
 }
 .progress-bar {
-  background: linear-gradient(90deg, #0d6efd, #20c997);
   font-weight: 600;
   font-size: 0.95rem;
+  transition: width 0.5s ease-in-out;
+}
+
+.progress .progress-bar.bg-danger {
+  background: linear-gradient(90deg, #ff6b6b, #dc3545);
+}
+
+.progress .progress-bar.bg-light {
+  background-color: #f8f9fa !important; /* Bootstrap ανοιχτόχρωμο */
 }
 
 /* ---------- Section Titles ---------- */

@@ -1,16 +1,23 @@
 
 import { useState } from "react";
 
-const AddMoneyLoss = ({lossItems, setLossItems , filterLoss}) =>  {
+const AddMoneyLoss = ({lossItems, setLossItems , filterLoss, payment, balance}) =>  {
   const  [lossText, setLossText] = useState('');
   const [lossAmount,setLossAmount] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if(!lossText || !lossAmount ) {
-      alert('You have to complete the fields first...');
+      alert('Please complete all fields before adding an expense.');
       return;
-    };
+    } else if (lossAmount<=0) {
+      alert('The expense amount must be greater than zero.');
+      return;
+    } else if(!payment || !balance) {
+      alert('You dont have money to spent.')
+      return;
+    }
+    
     const newItem = {
       text: lossText,
       amount: parseFloat(lossAmount),
