@@ -1,6 +1,7 @@
-
-  import PaymentDropdown from "./PaymentDropdown";
-  import ResetButton from "./ResetButton";
+ 
+  import { Link } from 'react-router-dom';
+  import PaymentDropdown from "../buttons/PaymentDropdown";
+  import ResetButton from "../buttons/ResetButton";
 
   const Header = ({ payment, 
     setPayment,
@@ -27,9 +28,12 @@
             setTotalLoss={setTotalLoss} 
           />
 
-          <button id="work-hours" className="btn btn-outline-light">
+          <Link 
+            to="/work-hours" 
+            className="btn btn-outline-light"
+          >
             Work Hours
-          </button>
+          </Link>
         </div>
       </header>
     );

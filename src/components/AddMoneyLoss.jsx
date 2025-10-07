@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 
-const AddMoneyLoss = ({lossItems, setLossItems , filterLoss, payment, balance}) =>  {
+const AddMoneyLoss = ({lossItems, setLossItems , filterLoss}) =>  {
   const  [lossText, setLossText] = useState('');
   const [lossAmount,setLossAmount] = useState('');
 
@@ -13,10 +13,7 @@ const AddMoneyLoss = ({lossItems, setLossItems , filterLoss, payment, balance}) 
     } else if (lossAmount<=0) {
       alert('The expense amount must be greater than zero.');
       return;
-    } else if(!payment || !balance) {
-      alert('You dont have money to spent.')
-      return;
-    }
+    };
     
     const newItem = {
       text: lossText,
