@@ -3,11 +3,10 @@
   const Stats = ({incomeItems,lossItems,payment}) => {
     const totalIncome=incomeItems.reduce((acc,item) => acc + item.amount, 0);
     const totalLoss= lossItems.reduce((acc,item) => acc + item.amount, 0);
-    const balance= totalIncome-totalLoss;
+    const moneyRemaining = (payment + totalIncome) - totalLoss; 
 
     const progressBar =  payment > 0 ? Math.min((totalLoss / payment) * 100, 100) : 0;
 
-    // Fixed Money
     const formatMoney = (num) => 
       num.toLocaleString("el-GR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -29,13 +28,13 @@
             {/* Profit / Loss */}
             <div className="col-md-6">
               <div className={`card text-center ${
-                  payment + balance < 0 ? 'bg-danger text-white' :
-                  payment + balance === 0 ? 'bg-secondary text-white' :
+                  moneyRemaining < 0 ? 'bg-danger text-white' :
+                  moneyRemaining === 0 ? 'bg-secondary text-white' :
                   'bg-success text-white'
                 }`}
               >
                 <div className="card-body">
-                  <div id="profit-loss" className="fs-1 fw-bold">{formatMoney(payment + balance)} €</div>
+                  <div id="profit-loss" className="fs-1 fw-bold">{formatMoney(moneyRemaining)} €</div>
                   <p className="fs-4">Profit / Loss</p>
                 </div>
               </div>
@@ -66,12 +65,12 @@
             {/* Money Remaining */}
             <div className="col-md-4">
               <div className={`card text-center ${
-                payment + balance < 0 ? 'bg-danger text-white' :
-                payment + balance === 0 ? 'bg-secondary text-white' :
+                moneyRemaining < 0 ? 'bg-danger text-white' :
+                moneyRemaining === 0 ? 'bg-secondary text-white' :
                 'bg-success text-white'
               }`}>
                 <div className="card-body">
-                  <div id="money-remaining" className="fs-1 fw-bold">{formatMoney(payment + balance)} €</div>
+                  <div id="money-remaining" className="fs-1 fw-bold">{formatMoney(moneyRemaining)} €</div>
                   <p className="fs-4">Money Remaining</p>
                 </div>
               </div>

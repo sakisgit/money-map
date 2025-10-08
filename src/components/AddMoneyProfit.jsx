@@ -1,5 +1,6 @@
 
 import { useState } from "react"; 
+import DeleteButton from "../buttons/DeleteButton";
 
 const AddMoneyProfit = ({incomeItems, setIncomeItems, filterProfit }) => {
   const [incomeText, setIncomeText] = useState ('');
@@ -75,7 +76,8 @@ const AddMoneyProfit = ({incomeItems, setIncomeItems, filterProfit }) => {
           <div className="card my-2" key={index}>
             <div className="card-body d-flex justify-content-between align-items-center">
               <span>{item.text}</span>
-              <span className="fw-bold">{item.amount}€</span>
+              <span className="fw-bold">{item.amount} €</span>
+              <DeleteButton/>
             </div>
           </div>
         ))}

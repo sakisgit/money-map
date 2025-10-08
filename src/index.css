@@ -76,3 +76,13 @@ button {
 button:hover {
   transform: scale(1.05);
 }
+/* Make the Link button exactly like other buttons */
+.rounded-work-hours {
+  border-radius: 0.75rem !important; /* ίδιο με τα button */
+  font-weight: 600 !important;       /* ίδιο font */
+  transition: all 0.2s ease-in-out;
+}
+
+.rounded-work-hours:hover {
+  transform: scale(1.05);
+}

@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Header from "../components/Header";
 import Stats from "../components/Stats";
 import Filter from "../components/Filter";

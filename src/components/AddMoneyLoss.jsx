@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import DeleteButton from "../buttons/DeleteButton";
 
 const AddMoneyLoss = ({lossItems, setLossItems , filterLoss}) =>  {
   const  [lossText, setLossText] = useState('');
@@ -14,7 +15,6 @@ const AddMoneyLoss = ({lossItems, setLossItems , filterLoss}) =>  {
       alert('The expense amount must be greater than zero.');
       return;
     };
-    
     const newItem = {
       text: lossText,
       amount: parseFloat(lossAmount),
@@ -77,7 +77,8 @@ const AddMoneyLoss = ({lossItems, setLossItems , filterLoss}) =>  {
           <div className="card my-2" key={index}>
             <div className="card-body d-flex justify-content-between align-items-center">
               <span>{item.text}</span>
-              <span className="fw-bold">{item.amount}€</span>
+              <span className="fw-bold">{item.amount} €</span>
+              <DeleteButton/>
             </div>
           </div>
         ))}

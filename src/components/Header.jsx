@@ -30,7 +30,7 @@
 
           <Link 
             to="/work-hours" 
-            className="btn btn-outline-light"
+            className="btn btn-outline-light rounded-work-hours"
           >
             Work Hours
           </Link>
