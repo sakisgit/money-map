@@ -6,10 +6,19 @@ const HoursInput = () => {
     const handleClick= (e) => {
         e.preventDefault();
         if(!hoursInput) {
-            alert('You have to complete how many hours did you work today...');
+            alert('Please enter the number of hours you worked today before continuing.');
             return;
         };
+
+        parseFloat(hoursInput);
+
+        if (isNaN(hoursInput) || hoursInput<= 0) {
+            alert("Please provide a valid positive number for your worked hours.");
+            return;
+        };
+
         setHoursInput('');
+        alert("Your worked hours have been successfully recorded.");
     };
   return (
     <div className="col-md-6">
@@ -21,7 +30,14 @@ const HoursInput = () => {
                 className="form-control text-center"
                 placeholder="Hours"
                 value={hoursInput}
-                onChange={(e)=> setHoursInput(e.target.value)}
+                onChange={(e)=> {
+                    let val = e.target.value;
+                    if (val.includes('.')) {
+                        const [intPart, decPart] = val.split('.');
+                        val = intPart + '.' + decPart.slice(0,2); // κρατάει μόνο 2 δεκαδικά
+                    }
+                    setHoursInput(val);
+                }}
                 style={{ width: '120px', height: '38px' }}
             />
             <button

@@ -4,18 +4,29 @@ const RateInput = () => {
     const [rateInput, setRateInput]=useState('');
 
     const handleClick= (e) => {
-         e.preventDefault();
-        if (!rateInput) {
-        alert('You have to write the exact payment per hour!');
-        return;
-        }
+        e.preventDefault()
 
-        const confirmed = window.confirm(`Your rate is set to ${rateInput} € per hour`);
+        if (!rateInput) {
+            alert('Please enter your hourly rate before proceeding.');
+            return;
+        };
+
+        parseFloat(rateInput).toFixed(2);
+
+        if (isNaN(rateInput) || rateInput<= 0) {
+            alert("Your hourly rate must be a valid positive number.");
+            return;
+        };
+
+        const confirmed = window.confirm
+            (`You have set your hourly rate to €${rateInput}.\nDo you want to confirm this amount?`
+        );
 
         if (confirmed) {
-        // later you can lift this value up to parent
-        alert("Rate saved successfully!");
+            alert("✅ Your hourly rate has been successfully saved!");
         };
+
+        setRateInput('');
     };
             
   return (
@@ -28,7 +39,14 @@ const RateInput = () => {
                     className="form-control text-center"
                     placeholder="€/hour"
                     value={rateInput}
-                    onChange={(e)=> setRateInput(e.target.value)}
+                    onChange={(e)=> {
+                        let val = e.target.value;
+                        if (val.includes('.')) {
+                            const [intPart, decPart] = val.split('.');
+                            val = intPart + '.' + decPart.slice(0,2); // κρατάει μόνο 2 δεκαδικά
+                        }
+                        setRateInput(val);
+                    }}
                     style={{ width: '120px', height: '38px' }}
                 />
                 <button
