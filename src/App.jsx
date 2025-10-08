@@ -6,10 +6,10 @@ import WorkHoursPage from "./pages/WorkHoursPage";
 const App = () => {
   return (
       <Routes>
-        {/* Αρχική σελίδα */}
+        {/* HOMEPAGE */}
         <Route path="/" element={<HomePage />} />
 
-        {/* Σελίδα με τις ώρες εργασίας */}
+        {/* WORK HOURS PAGE */}
         <Route path="/work-hours" element={<WorkHoursPage />} />
       </Routes>
   );

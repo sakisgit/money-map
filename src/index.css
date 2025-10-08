@@ -76,6 +76,7 @@ button {
 button:hover {
   transform: scale(1.05);
 }
+
 /* Make the Link button exactly like other buttons */
 .rounded-work-hours {
   border-radius: 0.75rem !important; /* ίδιο με τα button */
