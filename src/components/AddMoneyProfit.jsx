@@ -77,7 +77,11 @@ const AddMoneyProfit = ({incomeItems, setIncomeItems, filterProfit }) => {
             <div className="card-body d-flex justify-content-between align-items-center">
               <span>{item.text}</span>
               <span className="fw-bold">{item.amount} €</span>
-              <DeleteButton/>
+              <DeleteButton onDelete={()=> {
+                  const updatedItems=incomeItems.filter((_, i) => i!==index);
+                  setIncomeItems(updatedItems);
+                }}
+              />
             </div>
           </div>
         ))}
