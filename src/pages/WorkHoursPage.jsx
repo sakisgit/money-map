@@ -1,11 +1,15 @@
 
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'
+import { useState } from 'react';
 import WorkHeader from '../components/WorkHeader';
 import RateInput from '../components/RateInput';
 import HoursInput from '../components/HoursInput';
 import TotalEarnings from '../components/TotalEarnings';
 
 const WorkHoursPage = () => {
+  const [rateInput, setRateInput]=useState('');
+  const [hoursInput, setHoursInput] = useState('');
+
   return (
     <div className="container my-5">
 
@@ -16,15 +20,24 @@ const WorkHoursPage = () => {
       <div className="row g-4 mb-4">
         
         {/* Rate Input */}
-        <RateInput/>
+        <RateInput
+          rateInput={rateInput}
+          setRateInput={setRateInput}
+        />
 
         {/* Hours Input */}
-        <HoursInput/>
+        <HoursInput
+          hoursInput={hoursInput}
+          setHoursInput={setHoursInput}
+        />
 
       </div>
 
       {/* Earnings Display */}
-      <TotalEarnings/>
+      <TotalEarnings 
+        rateInput={rateInput}
+        hoursInput={hoursInput}
+      />
 
       {/* Back Button */}
       <div className="text-center">

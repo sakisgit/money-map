@@ -1,7 +1,6 @@
 import { useState } from "react"
 
-const RateInput = () => {
-    const [rateInput, setRateInput]=useState('');
+const RateInput = ({rateInput, setRateInput}) => {
     const [isConfirmed, setIsConfirmed] = useState(false);
 
     const handleClick= (e) => {
