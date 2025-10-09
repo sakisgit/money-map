@@ -14,7 +14,10 @@ const WorkHoursPage = () => {
     <div className="container my-5">
 
       {/* Header */}
-      <WorkHeader/>
+      <WorkHeader
+        rateInput={rateInput}
+        hoursInput={hoursInput}
+      />
 
       {/* Input Section */}
       <div className="row g-4 mb-4">
@@ -33,11 +36,7 @@ const WorkHoursPage = () => {
 
       </div>
 
-      {/* Earnings Display */}
-      <TotalEarnings 
-        rateInput={rateInput}
-        hoursInput={hoursInput}
-      />
+
 
       {/* Back Button */}
       <div className="text-center">
