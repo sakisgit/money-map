@@ -2,6 +2,7 @@ import { useState } from "react"
 
 const RateInput = () => {
     const [rateInput, setRateInput]=useState('');
+    const [isConfirmed, setIsConfirmed] = useState(false);
 
     const handleClick= (e) => {
         e.preventDefault()
@@ -24,9 +25,9 @@ const RateInput = () => {
 
         if (confirmed) {
             alert("✅ Your hourly rate has been successfully saved!");
+            setIsConfirmed(true);
         };
 
-        setRateInput('');
     };
             
   return (
@@ -34,27 +35,49 @@ const RateInput = () => {
         <div className="card shadow-sm border-0 rounded-3 p-4 text-center">
             <h6 className="mb-3 text-muted fw-bold">Hourly Rate (€)</h6>
             <div className="d-flex justify-content-center gap-2">
-                <input 
-                    type="number" 
-                    className="form-control text-center"
-                    placeholder="€/hour"
-                    value={rateInput}
-                    onChange={(e)=> {
-                        let val = e.target.value;
-                        if (val.includes('.')) {
-                            const [intPart, decPart] = val.split('.');
-                            val = intPart + '.' + decPart.slice(0,2); // κρατάει μόνο 2 δεκαδικά
-                        }
-                        setRateInput(val);
-                    }}
-                    style={{ width: '120px', height: '38px' }}
-                />
-                <button
-                    onClick={handleClick}  
-                    className="btn btn-success fw-bold px-3 py-1"
-                >
-                    Add
-                </button>
+
+                {isConfirmed ? (
+                    <>
+                    <p className="fw-bold m-0">
+                        Your wage is €{Number(rateInput).toFixed(2)}
+                    </p>
+                    <button
+                        onClick={() => {
+                            const confirmChange = window.confirm('Are you sure you want to change your hourly rate?');
+                            if (confirmChange) {
+                            setIsConfirmed(false);
+                            }
+                        }}
+                        className="btn btn-warning fw-bold px-3 py-1"
+                    >
+                        Change
+                    </button>
+                    </>
+                ) : (
+                    <>
+                        <input 
+                            type="number" 
+                            className="form-control text-center"
+                            placeholder="€/hour"
+                            value={rateInput}
+                            onChange={(e)=> {
+                                let val = e.target.value;
+                                if (val.includes('.')) {
+                                    const [intPart, decPart] = val.split('.');
+                                    val = intPart + '.' + decPart.slice(0,2); // κρατάει μόνο 2 δεκαδικά
+                                }
+                                setRateInput(val);
+                            }}
+                            style={{ width: '120px', height: '38px' }}
+                        />
+                        <button
+                            onClick={handleClick}  
+                            className="btn btn-success fw-bold px-3 py-1"
+                        >
+                            Add
+                        </button>
+                    </>
+                )}
             </div>
         </div>
     </div>
