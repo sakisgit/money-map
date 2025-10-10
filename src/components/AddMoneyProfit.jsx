@@ -31,14 +31,20 @@ const AddMoneyProfit = ({incomeItems, setIncomeItems, filterProfit }) => {
   return (
     <div className="mb-5">
       {/* Add Income Form */}
-      <div className="collapse " id="collapse-profit">
+      <div 
+        className="collapse " 
+        id="collapse-profit"
+      >
         <div className="card card-body bg-light">
           <form 
             id="profit-form" 
             onSubmit={handleSubmit}
           >
             <div className="mb-3">
-              <label htmlFor="profit-name" className="form-label">
+              <label 
+                htmlFor="profit-name" 
+                className="form-label"
+              >
                 Income Source
               </label>
               <input

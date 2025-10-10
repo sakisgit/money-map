@@ -73,7 +73,7 @@ const RateInput = ({rateInput, setRateInput}) => {
                             onClick={handleClick}  
                             className="btn btn-success fw-bold px-3 py-1"
                         >
-                            Add
+                            <i className="fa-solid fa-plus"></i>Add
                         </button>
                     </>
                 )}

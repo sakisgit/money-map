@@ -1,6 +1,6 @@
     import { useState } from "react";
 
-    const HoursInput = ({hoursInput, setHoursInput}) => {
+    const HoursInput = ({hoursInput, setHoursInput, totalHours, setTotalHours}) => {
 
         const handleClick= (e) => {
             e.preventDefault();
@@ -17,6 +17,8 @@
             };
 
             alert("Your worked hours have been successfully recorded.");
+            setTotalHours(totalHours + parseFloat(hoursInput));
+            setHoursInput('');
         };
     return (
         <div className="col-md-6">
@@ -39,9 +41,11 @@
                     style={{ width: '120px', height: '38px' }}
                 />
                 <button
+                    type="submit"
                     onClick={handleClick}
                     className="btn btn-success fw-bold px-3 py-1"
                 >
+                    <i className="fa-solid fa-plus"></i> 
                     Add
                 </button>
                 </div>
