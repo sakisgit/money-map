@@ -12,11 +12,12 @@ const Filter = () => {
       <div className="row g-3">
         <div className="col-md-6">
           <div className="mt-3">
+            
             <input
               type="text"
               id="filter-loss"
               className="form-control"
-              placeholder="Filter Loss..."
+              placeholder="🔍  Search expenses..."
               value={filterLoss}
               onChange={(e) => setFilterLoss(e.target.value)}
             />
@@ -28,7 +29,7 @@ const Filter = () => {
               type="text"
               id="filter-profit"
               className="form-control"
-              placeholder="Filter Profit..."
+              placeholder="🔍  Search income..."
               value={filterProfit}
               onChange={(e) => setFilterProfit(e.target.value)}
             />

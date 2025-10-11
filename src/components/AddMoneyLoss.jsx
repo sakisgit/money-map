@@ -5,12 +5,20 @@ import { useState } from "react";
 import DeleteButton from "../buttons/DeleteButton";
 
 const AddMoneyLoss = () =>  {
-  const {lossItems, setLossItems , filterLoss} = useContext(AppContext);
+  const {lossItems, setLossItems , 
+    filterLoss,payment,
+    moneyRemaining
+  } = useContext(AppContext);
   const  [lossText, setLossText] = useState('');
   const [lossAmount,setLossAmount] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (payment === 0 || moneyRemaining === 0) {
+    alert("Please set your monthly income before adding any expenses.");
+    return;
+  }
+
     if(!lossText || !lossAmount ) {
       alert('Please complete all fields before adding an expense.');
       return;
