@@ -1,7 +1,9 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
+import { AppContext } from "../context/AppContext";
 
-const PaymentDropdown = ({ payment, setPayment }) => {
+const PaymentDropdown = () => {
+  const {payment, setPayment} = useContext(AppContext);
   const [inputValue, setInputValue] = useState('');
   const [show, setShow] = useState(false);
   const ref = useRef(null);

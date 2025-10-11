@@ -1,6 +1,10 @@
+
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 import { useState } from "react"
 
-const RateInput = ({rateInput, setRateInput}) => {
+const RateInput = () => {
+    const {rateInput, setRateInput} = useContext(AppContext);
     const [isConfirmed, setIsConfirmed] = useState(false);
 
     const handleClick= (e) => {

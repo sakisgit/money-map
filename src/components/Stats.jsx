@@ -1,6 +1,9 @@
 
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 
-  const Stats = ({incomeItems,lossItems,payment}) => {
+  const Stats = () => {
+    const {incomeItems,lossItems,payment} = useContext(AppContext);
     const totalIncome=incomeItems.reduce((acc,item) => acc + item.amount, 0);
     const totalLoss= lossItems.reduce((acc,item) => acc + item.amount, 0);
     const moneyRemaining = (payment + totalIncome) - totalLoss; 

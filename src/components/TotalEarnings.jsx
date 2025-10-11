@@ -1,5 +1,9 @@
 
-const TotalEarnings = ({ rateInput, totalHours, minimal }) => {
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
+
+const TotalEarnings = ({ minimal = true }) => {
+  const { rateInput, totalHours} = useContext(AppContext);
   const totalEarnings = (parseFloat(rateInput) || 0) * (parseFloat(totalHours) || 0);
 
   return (

@@ -1,8 +1,11 @@
 
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 import { useState } from "react";
 import DeleteButton from "../buttons/DeleteButton";
 
-const AddMoneyLoss = ({lossItems, setLossItems , filterLoss}) =>  {
+const AddMoneyLoss = () =>  {
+  const {lossItems, setLossItems , filterLoss} = useContext(AppContext);
   const  [lossText, setLossText] = useState('');
   const [lossAmount,setLossAmount] = useState('');
 
@@ -73,19 +76,22 @@ const AddMoneyLoss = ({lossItems, setLossItems , filterLoss}) =>  {
 
       {/* Dynamic Expense List */}
       <div className="mt-3">
-        {filteredItems.map((item, index) => (
-          <div className="card my-2" key={index}>
-            <div className="card-body d-flex justify-content-between align-items-center">
-              <span>{item.text}</span>
-              <span className="fw-bold">{item.amount} €</span>
-              <DeleteButton onDelete={()=> {
-                  const updatedItems=lossItems.filter((_, i) => i!==index);
+        {filterLoss && filteredItems.length === 0 ? (
+          <p className="text-center text-muted fst-italic">❌ No matching expenses found.</p>
+        ) : (
+          filteredItems.map((item, index) => (
+            <div className="card my-2" key={index}>
+              <div className="card-body d-flex justify-content-between align-items-center">
+                <span>{item.text}</span>
+                <span className="fw-bold">{item.amount} €</span>
+                <DeleteButton onDelete={() => {
+                  const updatedItems = lossItems.filter((_, i) => i !== index);
                   setLossItems(updatedItems);
-                }}
-              />
+                }} />
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* Fake Items / Expense List */}

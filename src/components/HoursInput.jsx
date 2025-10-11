@@ -1,25 +1,31 @@
-    import { useState } from "react";
 
-    const HoursInput = ({hoursInput, setHoursInput, totalHours, setTotalHours}) => {
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 
-        const handleClick= (e) => {
-            e.preventDefault();
-            if(!hoursInput) {
-                alert('Please enter the number of hours you worked today before continuing.');
-                return;
-            };
+const HoursInput = () => {
+    const { 
+        hoursInput, setHoursInput, 
+        totalHours, setTotalHours
+    } = useContext(AppContext);
 
-            parseFloat(hoursInput);
-
-            if (isNaN(hoursInput) || hoursInput<= 0) {
-                alert("Please provide a valid positive number for your worked hours.");
-                return;
-            };
-
-            alert("Your worked hours have been successfully recorded.");
-            setTotalHours(totalHours + parseFloat(hoursInput));
-            setHoursInput('');
+    const handleClick= (e) => {
+        e.preventDefault();
+        if(!hoursInput) {
+            alert('Please enter the number of hours you worked today before continuing.');
+            return;
         };
+
+        parseFloat(hoursInput);
+
+        if (isNaN(hoursInput) || hoursInput<= 0) {
+            alert("Please provide a valid positive number for your worked hours.");
+            return;
+        };
+
+        alert("Your worked hours have been successfully recorded.");
+        setTotalHours(totalHours + parseFloat(hoursInput));
+        setHoursInput('');
+    };
     return (
         <div className="col-md-6">
             <div className="card shadow-sm border-0 rounded-3 p-4 text-center">
@@ -51,7 +57,7 @@
                 </div>
             </div>
         </div>
-    )
-    }
+    );
+};
 
-    export default HoursInput
+export default HoursInput;

@@ -1,8 +1,11 @@
 
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 import { useState } from "react"; 
 import DeleteButton from "../buttons/DeleteButton";
 
-const AddMoneyProfit = ({incomeItems, setIncomeItems, filterProfit }) => {
+const AddMoneyProfit = () => {
+  const {incomeItems, setIncomeItems, filterProfit } = useContext(AppContext);
   const [incomeText, setIncomeText] = useState ('');
   const [incomeAmount, setIncomeAmount] = useState('');
 
@@ -78,19 +81,22 @@ const AddMoneyProfit = ({incomeItems, setIncomeItems, filterProfit }) => {
       
       {/* Dynamic Expense List */}
       <div className="mt-3">
-        {filteredItems.map((item, index) => (
-          <div className="card my-2" key={index}>
-            <div className="card-body d-flex justify-content-between align-items-center">
-              <span>{item.text}</span>
-              <span className="fw-bold">{item.amount} €</span>
-              <DeleteButton onDelete={()=> {
-                  const updatedItems=incomeItems.filter((_, i) => i!==index);
+        {filterProfit && filteredItems.length === 0 ? (
+          <p className="text-center text-muted fst-italic">❌ No matching income found.</p>
+        ) : (
+          filteredItems.map((item, index) => (
+            <div className="card my-2" key={index}>
+              <div className="card-body d-flex justify-content-between align-items-center">
+                <span>{item.text}</span>
+                <span className="fw-bold">{item.amount} €</span>
+                <DeleteButton onDelete={() => {
+                  const updatedItems = incomeItems.filter((_, i) => i !== index);
                   setIncomeItems(updatedItems);
-                }}
-              />
+                }} />
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* Fake Items / Income List */}

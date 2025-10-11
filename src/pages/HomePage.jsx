@@ -1,64 +1,52 @@
 
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AppContext } from "../context/AppContext";
 import Header from "../components/Header";
 import Stats from "../components/Stats";
 import Filter from "../components/Filter";
 import Items from "../components/Items";
 import AddMoneyLoss from "../components/AddMoneyLoss";
 import AddMoneyProfit from "../components/AddMoneyProfit";
+import loaderGif from '../assets/spinner.gif'
 
 const HomePage = () => {
-  const [incomeItems, setIncomeItems] = useState([]);
-  const [lossItems, setLossItems] = useState([]);
-  const [payment, setPayment] = useState(0);
-  const [filterLoss, setFilterLoss] = useState("");
-  const [filterProfit, setFilterProfit] = useState("");
-  const [balance, setBalance] = useState(0);
-  const [totalIncome, setTotalIncome] = useState(0);
-  const [totalLoss, setTotalLoss] = useState(0);
+  const {
+    incomeItems, setIncomeItems,
+    lossItems, setLossItems,
+    payment, setPayment,
+    filterLoss, setFilterLoss,
+    filterProfit, setFilterProfit,
+    balance, setBalance,
+    totalIncome, setTotalIncome,
+    totalLoss, setTotalLoss
+  } = useContext(AppContext);
+ 
+  const [loading, setLoading] = useState(false);
+  
 
   return (
     <>
-      <Header
-        payment={payment}
-        setPayment={setPayment}
-        setBalance={setBalance}
-        setTotalIncome={setTotalIncome}
-        setTotalLoss={setTotalLoss}
-        setLossItems={setLossItems}
-        setIncomeItems={setIncomeItems}
-      />
+      {loading ? (
+        <div className="text-center my-5">
+          <img src={loaderGif} alt="Loading..." style={{ width: '100px', height: '100px' }} />
+        </div>
+      ) : (
+        <>
+          <Header/>
 
-      <Stats
-        incomeItems={incomeItems}
-        lossItems={lossItems}
-        payment={payment}
-      />
+          <Stats/>
 
-      <Filter
-        filterLoss={filterLoss}
-        setFilterLoss={setFilterLoss}
-        filterProfit={filterProfit}
-        setFilterProfit={setFilterProfit}
-      />
+          <Filter/>
 
-      <Items
-        incomeItems={incomeItems}
-        setIncomeItems={setIncomeItems}
-        lossItems={lossItems}
-        setLossItems={setLossItems}
-        filterLoss={filterLoss}
-        filterProfit={filterProfit}
-      >
-        <AddMoneyLoss
-          lossItems={lossItems}
-          setLossItems={setLossItems}
-        />
-        <AddMoneyProfit
-          incomeItems={incomeItems}
-          setIncomeItems={setIncomeItems}
-        />
-      </Items>
+          <Items>
+
+            <AddMoneyLoss/>
+
+            <AddMoneyProfit/>
+
+          </Items>
+        </>
+      )}
     </>
   );
 };

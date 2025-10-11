@@ -1,5 +1,5 @@
 
-const LimitModal = ({ id, title, placeholder, onSubmit }) => {
+const UserSettingModal = () => {
   return (
     <div className="modal fade" id={id} tabIndex="-1" aria-labelledby={`${id}Label`} aria-hidden="true">
       <div className="modal-dialog">
@@ -23,4 +23,4 @@ const LimitModal = ({ id, title, placeholder, onSubmit }) => {
   );
 };
 
-export default LimitModal;
+export default UserSettingModal;

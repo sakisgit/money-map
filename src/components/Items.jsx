@@ -1,8 +1,16 @@
 
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 import AddMoneyLoss from "./AddMoneyLoss";
 import AddMoneyProfit from "./AddMoneyProfit";
 
-const Items = ({incomeItems, setIncomeItems, lossItems, setLossItems, filterLoss, filterProfit}) => {
+const Items = () => {
+  const {
+    incomeItems, setIncomeItems, 
+    lossItems, setLossItems, 
+    filterLoss, filterProfit
+  } = useContext(AppContext);
+
   return (
     <section className="items mx-5">
       <div className="row g-4">
@@ -21,11 +29,7 @@ const Items = ({incomeItems, setIncomeItems, lossItems, setLossItems, filterLoss
             </button>
           </div>
 
-          <AddMoneyLoss 
-            lossItems={lossItems}
-            setLossItems={setLossItems}
-            filterLoss={filterLoss}
-          />
+          <AddMoneyLoss/>
         </div>
 
         {/* Profit / Income */}
@@ -43,11 +47,8 @@ const Items = ({incomeItems, setIncomeItems, lossItems, setLossItems, filterLoss
             </button>
           </div>
 
-          <AddMoneyProfit 
-            incomeItems={incomeItems}
-            setIncomeItems={setIncomeItems}
-            filterProfit={filterProfit}
-          />
+          <AddMoneyProfit/>
+          
         </div>
       </div>
     </section>

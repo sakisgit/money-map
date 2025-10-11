@@ -1,15 +1,14 @@
 
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 
-
-const ResetButton = ({ 
-        setLossItems, 
-        setIncomeItems, 
-        setPayment, 
-        setBalance, 
-        setTotalIncome, 
-        setTotalLoss 
-    }) => {
-        
+const ResetButton = () => {
+    const {
+      setLossItems, setIncomeItems, 
+      setPayment, setBalance, 
+      setTotalIncome, setTotalLoss 
+    } = useContext(AppContext);
+    
     const handleReset= () =>{
         if(window.confirm('Do you really want to reset the stats??')){
             setLossItems([]);

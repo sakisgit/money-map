@@ -1,6 +1,12 @@
 
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 
-const Filter = ({ filterLoss, setFilterLoss, filterProfit, setFilterProfit }) => {
+const Filter = () => {
+  const { 
+    filterLoss, setFilterLoss, 
+    filterProfit, setFilterProfit 
+  } = useContext(AppContext);
   return (
     <section className="filter my-5 px-5">
       <div className="row g-3">
