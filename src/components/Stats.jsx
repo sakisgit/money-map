@@ -82,19 +82,24 @@ import { AppContext } from "../context/AppContext";
         </section>
 
         {/* Progress Bar */}
-        <section className="px-5">
-          <div className="progress">
-            <div
-              id="money-progress"
-              className={`progress-bar ${totalLoss > 0 ? 'bg-danger' : 'bg-light'}`}
-              role="progressbar"
-              style={{width: `${progressBar.toFixed(1)}%`}}
-              aria-placeholder="bar of expneses monaey"
-            >
-              {progressBar.toFixed(1)}%
-            </div>
-          </div>
-        </section>
+        {totalLoss>0 &&(
+            <section className="px-5">
+              <div className="progress">
+                <div
+                  id="money-progress"
+                  className={`progress-bar ${totalLoss > 0 ? 'bg-danger' : 'bg-light'}`}
+                  role="progressbar"
+                  style={{width: `${progressBar.toFixed(1)}%`}}
+                  title={`This bar represents ${formatMoney(totalLoss)} spent out of ${formatMoney(payment)} available`}
+                  >
+                  {progressBar.toFixed(1)}%
+                </div>
+              </div>
+               <small className="text-muted center">
+                The progress bar shows the proportion of your monthly budget that has been spent so far.
+              </small>
+            </section>
+        )}
       </>
     );
   };
