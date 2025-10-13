@@ -3,16 +3,12 @@ import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 
   const Stats = () => {
-    const {incomeItems,lossItems,payment} = useContext(AppContext);
+    const {incomeItems,lossItems,payment,formatMoney} = useContext(AppContext);
     const totalIncome=incomeItems.reduce((acc,item) => acc + item.amount, 0);
     const totalLoss= lossItems.reduce((acc,item) => acc + item.amount, 0);
     const moneyRemaining = (payment + totalIncome) - totalLoss; 
 
     const progressBar =  payment > 0 ? Math.min((totalLoss / payment) * 100, 100) : 0;
-
-    const formatMoney = (num) => 
-      num.toLocaleString("el-GR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
 
     return (
       <>

@@ -5,7 +5,7 @@ import DeleteButton from "../buttons/DeleteButton";
 import { useGiphyGif } from "../hooks/useGiphyGif";
 
 const AddMoneyProfit = () => {
-  const { incomeItems, setIncomeItems, filterProfit } = useContext(AppContext);
+  const { incomeItems, setIncomeItems, filterProfit,formatMoney } = useContext(AppContext);
   const [incomeText, setIncomeText] = useState('');
   const [incomeAmount, setIncomeAmount] = useState('');
 
@@ -92,7 +92,7 @@ const AddMoneyProfit = () => {
                   </span>
 
                   <span className="fw-bold" style={{ whiteSpace: 'nowrap' }}>
-                    {item.amount} €
+                    {formatMoney(item.amount)} €
                   </span>
 
                   {gifUrl && index === incomeItems.length - 1 && (

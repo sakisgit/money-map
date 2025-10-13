@@ -5,7 +5,7 @@ import DeleteButton from "../buttons/DeleteButton";
 import { useGiphyGif } from "../hooks/useGiphyGif";
 
 const AddMoneyLoss = () => {
-  const { lossItems, setLossItems, filterLoss, payment, moneyRemaining } = useContext(AppContext);
+  const { lossItems, setLossItems, filterLoss, payment, moneyRemaining,formatMoney } = useContext(AppContext);
   const [lossText, setLossText] = useState('');
   const [lossAmount, setLossAmount] = useState('');
 
@@ -99,7 +99,7 @@ const AddMoneyLoss = () => {
                   </span>
 
                   <span className="fw-bold" style={{ whiteSpace: 'nowrap' }}>
-                    {item.amount} €
+                    {formatMoney (item.amount)} €
                   </span>
 
                   {gifUrl && index === lossItems.length - 1 && (

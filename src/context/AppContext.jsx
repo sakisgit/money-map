@@ -20,6 +20,12 @@ export const AppProvider = ({ children }) => {
     const [hoursInput, setHoursInput] = useState('');
     const [totalHours, setTotalHours] = useState(0);
 
+     const formatMoney = (num) =>
+        num.toLocaleString("el-GR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+    });
+
     const contextValue = {
 
         // HomePage to share
@@ -35,8 +41,9 @@ export const AppProvider = ({ children }) => {
         // WorkHoursPage to share 
         rateInput, setRateInput,
         hoursInput, setHoursInput,
-        totalHours, setTotalHours
+        totalHours, setTotalHours,
 
+        formatMoney,
 
     };
 
