@@ -5,7 +5,7 @@ import DeleteButton from "../buttons/DeleteButton";
 import { useGiphyGif } from "../hooks/useGiphyGif";
 
 const AddMoneyLoss = () => {
-  const { lossItems, setLossItems, filterLoss, payment, moneyRemaining,formatMoney } = useContext(AppContext);
+  const { lossItems, setLossItems, filterLoss, payment, moneyRemaining, formatMoney } = useContext(AppContext);
   const [lossText, setLossText] = useState('');
   const [lossAmount, setLossAmount] = useState('');
 
@@ -22,17 +22,24 @@ const AddMoneyLoss = () => {
     if (!lossText || !lossAmount) {
       alert('Please complete all fields before adding an expense.');
       return;
-    } else if (lossAmount <= 0) {
+    }
+
+    const amountValue = parseFloat(lossAmount);
+    if (isNaN(amountValue) || amountValue <= 0) {
       alert('The expense amount must be greater than zero.');
       return;
-    } else if (/\d/.test(lossText)) { 
+    }
+
+    if (/\d/.test(lossText)) {
       alert('The text must not contain numbers.');
       return;
     }
 
     const newItem = { 
+      id: Date.now(),
+      date: new Date().toLocaleDateString(),
       text: lossText, 
-      amount: parseFloat(lossAmount) 
+      amount: amountValue
     };
 
     setLossItems([...lossItems, newItem]);
@@ -59,7 +66,7 @@ const AddMoneyLoss = () => {
                 className="form-control"
                 id="loss-name"
                 placeholder="Enter Expense Item"
-                onChange={(e) => setLossText(e.target.value.replace(/\d/g, ''))} // αφαιρεί αριθμούς
+                onChange={(e) => setLossText(e.target.value.replace(/\d/g, ''))} 
               />
             </div>
             <div className="mb-3">
@@ -83,26 +90,43 @@ const AddMoneyLoss = () => {
         {filterLoss && filteredItems.length === 0 ? (
           <p className="text-center text-muted fst-italic">❌ No matching expenses found.</p>
         ) : (
-          filteredItems.map((item, index) => (
-            <div className="card my-2" key={index}>
+          filteredItems.map((item) => (
+            <div className="card my-2 shadow-sm" key={item.id}>
               <div className="card-body d-flex align-items-center justify-content-between">
                 
-                {/* Container για text + amount + GIF */}
+                {/* Container για text + amount + date + GIF */}
                 <div className="d-flex align-items-center gap-3" style={{ flex: 1, minWidth: 0 }}>
+                  
+                  {/* Expense text */}
                   <span style={{
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
-                    flex: 1
+                    flex: 1,
+                    fontWeight: 500
                   }}>
                     {item.text}
                   </span>
 
-                  <span className="fw-bold" style={{ whiteSpace: 'nowrap' }}>
-                    {formatMoney (item.amount)} €
+                  {/* Date badge */}
+                  <span style={{
+                    backgroundColor: '#e0e7ff',
+                    color: '#1e40af',
+                    padding: '2px 6px',
+                    borderRadius: '6px',
+                    fontSize: '0.8rem',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {item.date}
                   </span>
 
-                  {gifUrl && index === lossItems.length - 1 && (
+                  {/* Amount */}
+                  <span className="fw-bold" style={{ whiteSpace: 'nowrap' }}>
+                    {formatMoney(item.amount)} €
+                  </span>
+
+                  {/* GIF */}
+                  {gifUrl && item.id === lossItems[lossItems.length - 1]?.id && (
                     <img
                       src={gifUrl}
                       alt="expense gif"
@@ -118,9 +142,9 @@ const AddMoneyLoss = () => {
                   )}
                 </div>
 
-                {/* Delete button ξεχωριστά */}
+                {/* Delete button */}
                 <DeleteButton
-                  onDelete={() => setLossItems(lossItems.filter((_, i) => i !== index))}
+                  onDelete={() => setLossItems(lossItems.filter(li => li.id !== item.id))}
                 />
               </div>
             </div>

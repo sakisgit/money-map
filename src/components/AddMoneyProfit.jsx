@@ -5,7 +5,7 @@ import DeleteButton from "../buttons/DeleteButton";
 import { useGiphyGif } from "../hooks/useGiphyGif";
 
 const AddMoneyProfit = () => {
-  const { incomeItems, setIncomeItems, filterProfit,formatMoney } = useContext(AppContext);
+  const { incomeItems, setIncomeItems, filterProfit, formatMoney } = useContext(AppContext);
   const [incomeText, setIncomeText] = useState('');
   const [incomeAmount, setIncomeAmount] = useState('');
 
@@ -17,17 +17,27 @@ const AddMoneyProfit = () => {
     if (!incomeText || !incomeAmount) {
       alert('Please complete all fields before adding an income.');
       return; 
-    } else if (incomeAmount <= 0) {
+    }
+
+    const amountValue = parseFloat(incomeAmount);
+    if (isNaN(amountValue) || amountValue <= 0) {
       alert('The income amount must be greater than zero.');
       return;
-    }  else if (/\d/.test(incomeText)) { 
+    }
+
+    if (/\d/.test(incomeText)) { 
       alert('The text must not contain numbers.');
       return;
     }
 
-    const newItem = { text: incomeText, amount: parseFloat(incomeAmount) };
-    setIncomeItems([...incomeItems, newItem]);
+    const newItem = { 
+      id: Date.now(),
+      date: new Date().toLocaleDateString(),
+      text: incomeText, 
+      amount: amountValue
+    };
 
+    setIncomeItems([...incomeItems, newItem]);
     showGif(incomeText || "profit", "profit");
 
     setIncomeText('');
@@ -52,7 +62,7 @@ const AddMoneyProfit = () => {
                 className="form-control"
                 id="profit-name"
                 placeholder="Enter Income Source"
-                onChange={(e) => setIncomeText(e.target.value.replace(/\d/g, ''))} // αφαιρεί αριθμούς
+                onChange={(e) => setIncomeText(e.target.value.replace(/\d/g, ''))} 
               />
             </div>
             <div className="mb-3">
@@ -77,25 +87,42 @@ const AddMoneyProfit = () => {
           <p className="text-center text-muted fst-italic">❌ No matching income found.</p>
         ) : (
           filteredItems.map((item, index) => (
-            <div className="card my-2" key={index}>
+            <div className="card my-2 shadow-sm" key={item.id}>
               <div className="card-body d-flex align-items-center justify-content-between">
 
-                {/* Container για text + amount + GIF */}
+                {/* Container για text + amount + date + GIF */}
                 <div className="d-flex align-items-center gap-3" style={{ flex: 1, minWidth: 0 }}>
+                  
+                  {/* Income text */}
                   <span style={{
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
-                    flex: 1
+                    flex: 1,
+                    fontWeight: 500
                   }}>
                     {item.text}
                   </span>
 
+                  {/* Date badge */}
+                  <span style={{
+                    backgroundColor: '#e0e7ff',
+                    color: '#1e40af',
+                    padding: '2px 6px',
+                    borderRadius: '6px',
+                    fontSize: '0.8rem',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {item.date}
+                  </span>
+
+                  {/* Amount */}
                   <span className="fw-bold" style={{ whiteSpace: 'nowrap' }}>
                     {formatMoney(item.amount)} €
                   </span>
 
-                  {gifUrl && index === incomeItems.length - 1 && (
+                  {/* GIF */}
+                  {gifUrl && item.id === incomeItems[incomeItems.length - 1]?.id && (
                     <img
                       src={gifUrl}
                       alt="income gif"
@@ -111,9 +138,9 @@ const AddMoneyProfit = () => {
                   )}
                 </div>
 
-                {/* Delete button ξεχωριστά */}
+                {/* Delete button */}
                 <DeleteButton
-                  onDelete={() => setIncomeItems(incomeItems.filter((_, i) => i !== index))}
+                  onDelete={() => setIncomeItems(incomeItems.filter(li => li.id !== item.id))}
                 />
               </div>
             </div>

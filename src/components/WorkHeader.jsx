@@ -1,10 +1,7 @@
 
-  import { useContext } from "react";
-  import { AppContext } from "../context/AppContext";
   import TotalEarnings from "./TotalEarnings";
 
   const WorkHeader = () => {
-    const { rateInput, totalHours } = useContext(AppContext);
     const date = new Date();
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const day = days[date.getDay()];
