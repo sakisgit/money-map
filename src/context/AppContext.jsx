@@ -19,6 +19,7 @@ export const AppProvider = ({ children }) => {
     const [rateInput, setRateInput]=useState('');
     const [hoursInput, setHoursInput] = useState('');
     const [totalHours, setTotalHours] = useState(0);
+    const [hoursList, setHoursList] = useState([]);
 
      const formatMoney = (num) =>
         num.toLocaleString("el-GR", {
@@ -42,6 +43,7 @@ export const AppProvider = ({ children }) => {
         rateInput, setRateInput,
         hoursInput, setHoursInput,
         totalHours, setTotalHours,
+        hoursList, setHoursList,
 
         formatMoney,
 

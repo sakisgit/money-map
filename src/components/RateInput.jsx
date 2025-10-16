@@ -1,7 +1,6 @@
 
-import { useContext } from "react";
+import { useContext,useState } from "react";
 import { AppContext } from "../context/AppContext";
-import { useState } from "react"
 
 const RateInput = () => {
     const {rateInput, setRateInput} = useContext(AppContext);

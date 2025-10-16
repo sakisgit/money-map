@@ -5,7 +5,8 @@ import { AppContext } from "../context/AppContext";
 const HoursInput = () => {
     const { 
         hoursInput, setHoursInput, 
-        totalHours, setTotalHours
+        totalHours, setTotalHours,
+        hoursList, setHoursList,
     } = useContext(AppContext);
 
     const handleClick= (e) => {
@@ -24,6 +25,14 @@ const HoursInput = () => {
 
         alert("Your worked hours have been successfully recorded.");
         setTotalHours(totalHours + parseFloat(hoursInput));
+
+        const newEntry= {
+            id:Date.now(),
+            hours: parseFloat(hoursInput),
+            date:new Date().toLocaleDateString(),
+        };
+
+        setHoursList([...hoursList,newEntry]);
         setHoursInput('');
     };
     return (
