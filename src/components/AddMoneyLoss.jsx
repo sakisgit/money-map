@@ -3,9 +3,15 @@ import { useContext, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import DeleteButton from "../buttons/DeleteButton";
 import { useGiphyGif } from "../hooks/useGiphyGif";
+import { useFullDate } from "../hooks/useFullDate";
 
 const AddMoneyLoss = () => {
-  const { lossItems, setLossItems, filterLoss, payment, moneyRemaining, formatMoney } = useContext(AppContext);
+  const { 
+    lossItems, setLossItems, 
+    filterLoss, payment, 
+    moneyRemaining, formatMoney 
+  } = useContext(AppContext);
+  const fullDate=useFullDate();
   const [lossText, setLossText] = useState('');
   const [lossAmount, setLossAmount] = useState('');
 
@@ -37,7 +43,7 @@ const AddMoneyLoss = () => {
 
     const newItem = { 
       id: Date.now(),
-      date: new Date().toLocaleDateString(),
+      fullDate:fullDate,
       text: lossText, 
       amount: amountValue
     };
@@ -117,7 +123,7 @@ const AddMoneyLoss = () => {
                     fontSize: '0.8rem',
                     whiteSpace: 'nowrap'
                   }}>
-                    {item.date}
+                    {item.fullDate}
                   </span>
 
                   {/* Amount */}

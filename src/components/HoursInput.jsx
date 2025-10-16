@@ -1,13 +1,17 @@
 
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
+import { useFullDate } from "../hooks/useFullDate";
 
 const HoursInput = () => {
     const { 
         hoursInput, setHoursInput, 
         totalHours, setTotalHours,
         hoursList, setHoursList,
+        rateInput
     } = useContext(AppContext);
+
+    const fullDate= useFullDate();
 
     const handleClick= (e) => {
         e.preventDefault();
@@ -18,7 +22,7 @@ const HoursInput = () => {
 
         parseFloat(hoursInput);
 
-        if (isNaN(hoursInput) || hoursInput<= 0) {
+        if (isNaN(hoursInput) || hoursInput<= 0 || isNaN(rateInput)) {
             alert("Please provide a valid positive number for your worked hours.");
             return;
         };
@@ -28,8 +32,8 @@ const HoursInput = () => {
 
         const newEntry= {
             id:Date.now(),
+            fullDate:fullDate,
             hours: parseFloat(hoursInput),
-            date:new Date().toLocaleDateString(),
         };
 
         setHoursList([...hoursList,newEntry]);

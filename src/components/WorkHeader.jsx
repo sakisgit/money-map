@@ -1,11 +1,10 @@
 
   import TotalEarnings from "./TotalEarnings";
+  import { useFullDate } from "../hooks/useFullDate";
+ import { useDateOnly } from "../hooks/useDateOnly";
 
   const WorkHeader = () => {
-    const date = new Date();
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const day = days[date.getDay()];
-    const fullDate = `${day}, ${date.toLocaleDateString()}`;
+    const dateOnly = useDateOnly();
 
 
     return (
@@ -25,7 +24,7 @@
             </div>
 
             <span className="fs-6 fw-semibold text-light opacity-75">
-              {fullDate}
+              {dateOnly}
             </span>
           </div>
         </header>

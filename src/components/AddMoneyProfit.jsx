@@ -3,13 +3,18 @@ import { useContext, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import DeleteButton from "../buttons/DeleteButton";
 import { useGiphyGif } from "../hooks/useGiphyGif";
+import { useFullDate } from "../hooks/useFullDate";
 
 const AddMoneyProfit = () => {
-  const { incomeItems, setIncomeItems, filterProfit, formatMoney } = useContext(AppContext);
+  const { 
+    incomeItems, setIncomeItems, 
+    filterProfit, formatMoney 
+  } = useContext(AppContext);
   const [incomeText, setIncomeText] = useState('');
   const [incomeAmount, setIncomeAmount] = useState('');
 
   const { gifUrl, showGif } = useGiphyGif();
+  const fullDate  = useFullDate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -32,7 +37,7 @@ const AddMoneyProfit = () => {
 
     const newItem = { 
       id: Date.now(),
-      date: new Date().toLocaleDateString(),
+      fullDate: fullDate,
       text: incomeText, 
       amount: amountValue
     };
@@ -113,7 +118,7 @@ const AddMoneyProfit = () => {
                     fontSize: '0.8rem',
                     whiteSpace: 'nowrap'
                   }}>
-                    {item.date}
+                    {item.fullDate}
                   </span>
 
                   {/* Amount */}
