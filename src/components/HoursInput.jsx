@@ -36,9 +36,10 @@ const HoursInput = () => {
             hours: parseFloat(hoursInput),
         };
 
-        setHoursList([...hoursList,newEntry]);
+        setHoursList([newEntry,...hoursList]);
         setHoursInput('');
     };
+
     return (
         <div className="col-md-6">
             <div className="card shadow-sm border-0 rounded-3 p-4 text-center">

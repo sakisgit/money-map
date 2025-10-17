@@ -7,7 +7,9 @@ const Filter = () => {
     filterLoss, setFilterLoss, 
     filterProfit, setFilterProfit 
   } = useContext(AppContext);
+
   return (
+    
     <section className="filter my-5 px-5">
       <div className="row g-3">
         <div className="col-md-6">

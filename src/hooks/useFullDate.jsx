@@ -18,7 +18,7 @@ export const useFullDate = () => {
     };
 
     updateDate(); // αρχική τιμή
-    const interval = setInterval(updateDate, 60000); // ανανέωση κάθε λεπτό
+    const interval = setInterval(updateDate, 1000); // ανανέωση κάθε λεπτό
 
     return () => clearInterval(interval);
   }, []);

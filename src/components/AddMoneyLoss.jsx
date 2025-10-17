@@ -48,7 +48,7 @@ const AddMoneyLoss = () => {
       amount: amountValue
     };
 
-    setLossItems([...lossItems, newItem]);
+    setLossItems([newItem,...lossItems]);
     showGif(lossText || "loss", "loss");
     setLossText('');
     setLossAmount('');
@@ -132,7 +132,7 @@ const AddMoneyLoss = () => {
                   </span>
 
                   {/* GIF */}
-                  {gifUrl && item.id === lossItems[lossItems.length - 1]?.id && (
+                  {gifUrl && item.id === lossItems[0]?.id && (
                     <img
                       src={gifUrl}
                       alt="expense gif"

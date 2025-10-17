@@ -1,13 +1,11 @@
 
-  import TotalEarnings from "./TotalEarnings";
-  import { useFullDate } from "../hooks/useFullDate";
- import { useDateOnly } from "../hooks/useDateOnly";
+import TotalEarnings from "./TotalEarnings";
+import { useDateOnly } from "../hooks/useDateOnly";
 
-  const WorkHeader = () => {
-    const dateOnly = useDateOnly();
+const WorkHeader = () => {
+  const dateOnly = useDateOnly();
 
-
-    return (
+  return (
         <header className="d-flex justify-content-between align-items-center bg-primary text-white py-3 px-4 mb-4 rounded-4 shadow-lg">
           
           <h1 className="fs-3 fw-bold d-flex align-items-center m-0">
@@ -28,7 +26,7 @@
             </span>
           </div>
         </header>
-    );
-  };
+  );
+};
 
     export default WorkHeader;
