@@ -22,8 +22,11 @@ const HoursInput = () => {
 
         parseFloat(hoursInput);
 
-        if (isNaN(hoursInput) || hoursInput<= 0 || isNaN(rateInput)) {
+        if (isNaN(hoursInput) || hoursInput<= 0) {
             alert("Please provide a valid positive number for your worked hours.");
+            return;
+        } else if (isNaN(rateInput) || rateInput<=0) {
+            alert("Oops! It looks like your hourly rate hasn't been set yet.");
             return;
         };
 
@@ -34,6 +37,7 @@ const HoursInput = () => {
             id:Date.now(),
             fullDate:fullDate,
             hours: parseFloat(hoursInput),
+            rate: rateInput,
         };
 
         setHoursList([newEntry,...hoursList]);

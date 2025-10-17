@@ -4,7 +4,10 @@ import { AppContext } from "../context/AppContext";
 import DeleteButton from "../buttons/DeleteButton";
 
 const HoursList = () => {
-  const { hoursList, setHoursList,setTotalHours } = useContext(AppContext);
+  const { 
+    hoursList, setHoursList,
+    setTotalHours,totalHours
+  } = useContext(AppContext);
 
   const handleClear = () => {
     if (window.confirm("Are you sure you want to clear all worked hours?")) {
@@ -43,9 +46,9 @@ const HoursList = () => {
               }}>
                 {hoursItem.fullDate}
               </span>
-
+              
               <span className="fw-semibold">
-                {hoursItem.hours} h
+                You worked for {hoursItem.hours} hours and earned {(hoursItem.rate * hoursItem.hours).toFixed(2)}€ at an hourly rate of {hoursItem.rate}€.
               </span>
 
               {/* Delete button */}

@@ -1,8 +1,11 @@
 
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 import TotalEarnings from "./TotalEarnings";
 import { useDateOnly } from "../hooks/useDateOnly";
 
 const WorkHeader = () => {
+  const {totalHours}= useContext(AppContext);
   const dateOnly = useDateOnly();
 
   return (
@@ -19,6 +22,15 @@ const WorkHeader = () => {
             <div className="bg-light text-dark px-4 py-2 rounded-4 shadow-sm text-center">
 
               <TotalEarnings/>
+            </div>
+
+            {/* Hours Box */}
+            <div className="bg-light text-dark px-4 py-2 rounded-4 shadow-sm text-center">
+              <span className="fs-6 fw-semibold d-block text-secondary mb-1">Total Hours:</span>
+              <span className="fs-5 fw-bold">
+                <i className="fa-solid fa-clock me-1"></i>
+                {totalHours.toFixed(2)} 
+              </span>
             </div>
 
             <span className="fs-6 fw-semibold text-light opacity-75">
