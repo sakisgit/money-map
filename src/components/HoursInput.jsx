@@ -1,5 +1,5 @@
 
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AppContext } from "../context/AppContext";
 import { useFullDate } from "../hooks/useFullDate";
 import Swal from "sweetalert2";
@@ -13,6 +13,15 @@ const HoursInput = () => {
     } = useContext(AppContext);
 
     const fullDate= useFullDate();
+
+    // Φορτώνουμε από localStorage όταν ανοίγει η σελίδα
+    useEffect(() => {
+        const savedHoursList = localStorage.getItem('hoursList');
+        const savedTotalHours = localStorage.getItem('totalHours');
+
+        if (savedHoursList) setHoursList(JSON.parse(savedHoursList));
+        if (savedTotalHours) setTotalHours(parseFloat(savedTotalHours));
+    }, []);
 
     const handleClick= (e) => {
         e.preventDefault();
@@ -56,7 +65,8 @@ const HoursInput = () => {
             text: `You have successfully recorded ${hoursValue} hours.`,
             confirmButtonText: 'OK'
         }).then(() => {
-            setTotalHours(totalHours + hoursValue);
+            const newTotalHours = totalHours + hoursValue;
+            setTotalHours(newTotalHours);
 
             const newEntry = {
                 id: Date.now(),
@@ -65,39 +75,44 @@ const HoursInput = () => {
                 rate: rateInput,
             };
 
-            setHoursList([newEntry, ...hoursList]);
+            const newHoursList = [newEntry, ...hoursList];
+            setHoursList(newHoursList);
             setHoursInput('');
+
+            // Αποθηκεύουμε στο localStorage
+            localStorage.setItem('hoursList', JSON.stringify(newHoursList));
+            localStorage.setItem('totalHours', newTotalHours);
         });
-};
+    };
 
     return (
         <div className="col-md-6">
             <div className="card shadow-sm border-0 rounded-3 p-4 text-center">
                 <h6 className="mb-3 text-muted fw-bold">Worked Hours</h6>
                 <div className="d-flex justify-content-center gap-2">
-                <input 
-                    type="number" 
-                    className="form-control text-center"
-                    placeholder="Hours"
-                    value={hoursInput}
-                    onChange={(e)=> {
-                        let val = e.target.value;
-                        if (val.includes('.')) {
-                            const [intPart, decPart] = val.split('.');
-                            val = intPart + '.' + decPart.slice(0,2); // κρατάει μόνο 2 δεκαδικά
-                        }
-                        setHoursInput(val);
-                    }}
-                    style={{ width: '120px', height: '38px' }}
-                />
-                <button
-                    type="submit"
-                    onClick={handleClick}
-                    className="btn btn-success fw-bold px-3 py-1"
-                >
-                    <i className="fa-solid fa-plus"></i> 
-                    Add
-                </button>
+                    <input 
+                        type="number" 
+                        className="form-control text-center"
+                        placeholder="Hours"
+                        value={hoursInput}
+                        onChange={(e)=> {
+                            let val = e.target.value;
+                            if (val.includes('.')) {
+                                const [intPart, decPart] = val.split('.');
+                                val = intPart + '.' + decPart.slice(0,2); // κρατάει μόνο 2 δεκαδικά
+                            }
+                            setHoursInput(val);
+                        }}
+                        style={{ width: '120px', height: '38px' }}
+                    />
+                    <button
+                        type="submit"
+                        onClick={handleClick}
+                        className="btn btn-success fw-bold px-3 py-1"
+                    >
+                        <i className="fa-solid fa-plus"></i> 
+                        Add
+                    </button>
                 </div>
             </div>
         </div>

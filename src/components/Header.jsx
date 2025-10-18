@@ -1,18 +1,11 @@
 
 import { useContext } from 'react';
-import { AppContext } from '../context/AppContext';
 import { ThemeContext } from '../context/ThemeContext';
 import { Link } from 'react-router-dom';
 import PaymentDropdown from "../buttons/PaymentDropdown";
 import ResetButton from "../buttons/ResetButton";
 
 const Header = () => {
-  const {
-    payment, setPayment,
-    setLossItems, setIncomeItems,
-    setBalance, setTotalIncome, 
-    setTotalLoss
-  } = useContext(AppContext);
 
   const { theme, toggleTheme } = useContext(ThemeContext);
 

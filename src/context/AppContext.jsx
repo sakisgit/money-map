@@ -1,5 +1,5 @@
 
-import { useState, createContext } from "react";
+import { useState, useEffect, createContext } from "react";
 
 export const AppContext = createContext();
 
@@ -21,15 +21,64 @@ export const AppProvider = ({ children }) => {
     const [totalHours, setTotalHours] = useState(0);
     const [hoursList, setHoursList] = useState([]);
 
-     const formatMoney = (num) =>
+    const formatMoney = (num) =>
         num.toLocaleString("el-GR", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
-    });
+        });
+
+    // --- Load initial state from localStorage ---
+    useEffect(() => {
+        const savedPayment = localStorage.getItem("payment");
+        if (savedPayment) setPayment(Number(savedPayment));
+
+        const savedIncome = localStorage.getItem("incomeItems");
+        if (savedIncome) setIncomeItems(JSON.parse(savedIncome));
+
+        const savedLoss = localStorage.getItem("lossItems");
+        if (savedLoss) setLossItems(JSON.parse(savedLoss));
+
+        const savedRate = localStorage.getItem("rateInput");
+        if (savedRate) setRateInput(savedRate);
+
+        const savedHours = localStorage.getItem("hoursList");
+        if (savedHours) {
+            const list = JSON.parse(savedHours);
+            setHoursList(list);
+            const total = list.reduce((sum, item) => sum + item.hours, 0);
+            setTotalHours(total);
+        }
+    }, []);
+
+    // --- Save to localStorage on changes ---
+    useEffect(() => {
+        localStorage.setItem("payment", payment);
+    }, [payment]);
+
+    useEffect(() => {
+        localStorage.setItem("incomeItems", JSON.stringify(incomeItems));
+        const total = incomeItems.reduce((sum, item) => sum + item.amount, 0);
+        setTotalIncome(total);
+    }, [incomeItems]);
+
+    useEffect(() => {
+        localStorage.setItem("lossItems", JSON.stringify(lossItems));
+        const total = lossItems.reduce((sum, item) => sum + item.amount, 0);
+        setTotalLoss(total);
+    }, [lossItems]);
+
+    useEffect(() => {
+        localStorage.setItem("rateInput", rateInput);
+    }, [rateInput]);
+
+    useEffect(() => {
+        localStorage.setItem("hoursList", JSON.stringify(hoursList));
+        const total = hoursList.reduce((sum, item) => sum + item.hours, 0);
+        setTotalHours(total);
+    }, [hoursList]);
 
     const contextValue = {
-
-        // HomePage to share
+        // HomePage
         incomeItems, setIncomeItems,
         lossItems, setLossItems,
         payment, setPayment,
@@ -38,21 +87,16 @@ export const AppProvider = ({ children }) => {
         balance, setBalance,
         totalIncome, setTotalIncome,
         totalLoss, setTotalLoss,
-
-        // WorkHoursPage to share 
+        // WorkHoursPage
         rateInput, setRateInput,
         hoursInput, setHoursInput,
         totalHours, setTotalHours,
         hoursList, setHoursList,
-
         formatMoney,
-
     };
 
     return (
-        <AppContext.Provider 
-            value={contextValue}
-        >
+        <AppContext.Provider value={contextValue}>
             {children}
         </AppContext.Provider>
     );

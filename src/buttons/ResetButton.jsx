@@ -22,12 +22,20 @@ const ResetButton = () => {
         cancelButtonText: 'Cancel'
       }).then((result) => {
         if (result.isConfirmed) {
+
+          // Καθαρίζουμε το context
           setLossItems([]);
           setIncomeItems([]);
           setPayment(0);
           setBalance(0);
           setTotalIncome(0);
           setTotalLoss(0);
+
+          // Καθαρίζουμε και το localStorage
+          localStorage.removeItem('payment');
+          localStorage.removeItem('incomeItems');
+          localStorage.removeItem('lossItems');
+          localStorage.removeItem('hoursList');
 
           Swal.fire({
             title: 'Reset!',

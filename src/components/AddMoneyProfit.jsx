@@ -1,5 +1,5 @@
 
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AppContext } from "../context/AppContext";
 import DeleteButton from "../buttons/DeleteButton";
 import { useGiphyGif } from "../hooks/useGiphyGif";
@@ -17,61 +17,69 @@ const AddMoneyProfit = () => {
   const { gifUrl, showGif } = useGiphyGif();
   const fullDate  = useFullDate();
 
+  // Φόρτωση από localStorage
+  useEffect(() => {
+    const savedIncome = localStorage.getItem('incomeItems');
+    if (savedIncome) setIncomeItems(JSON.parse(savedIncome));
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!incomeText || !incomeAmount) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Missing Fields',
-      text: 'Please complete all fields before adding an income.',
-      confirmButtonText: 'OK'
-    });
-    return;
-  }
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Fields',
+        text: 'Please complete all fields before adding an income.',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
 
-  const amountValue = parseFloat(incomeAmount);
-  if (isNaN(amountValue) || amountValue <= 0) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Invalid Amount',
-      text: 'The income amount must be greater than zero.',
-      confirmButtonText: 'OK'
-    });
-    return;
-  }
+    const amountValue = parseFloat(incomeAmount);
+    if (isNaN(amountValue) || amountValue <= 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Amount',
+        text: 'The income amount must be greater than zero.',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
 
-  if (/\d/.test(incomeText)) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Invalid Text',
-      text: 'The text must not contain numbers.',
-      confirmButtonText: 'OK'
-    });
-    return;
-  }
+    if (/\d/.test(incomeText)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Text',
+        text: 'The text must not contain numbers.',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
 
-  const newItem = { 
-    id: Date.now(),
-    fullDate: fullDate,
-    text: incomeText, 
-    amount: amountValue
+    const newItem = { 
+      id: Date.now(),
+      fullDate: fullDate,
+      text: incomeText, 
+      amount: amountValue
+    };
+
+    const updatedIncomeItems = [...incomeItems, newItem];
+    setIncomeItems(updatedIncomeItems);
+    localStorage.setItem('incomeItems', JSON.stringify(updatedIncomeItems));
+
+    showGif(incomeText || "profit", "profit");
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Income Added!',
+      text: `"${incomeText}" has been added successfully.`,
+      confirmButtonText: 'OK'
+    }).then(() => {
+      setIncomeText('');
+      setIncomeAmount('');
+    });
   };
-
-  setIncomeItems([...incomeItems, newItem]);
-  showGif(incomeText || "profit", "profit");
-
-  
-  Swal.fire({
-    icon: 'success',
-    title: 'Income Added!',
-    text: `"${incomeText}" has been added successfully.`,
-    confirmButtonText: 'OK'
-  }).then(() => {
-    setIncomeText('');
-    setIncomeAmount('');
-  });
-};
 
   const filteredItems = incomeItems.filter(item =>
     item.text.toLowerCase().includes(filterProfit.toLowerCase())
@@ -95,9 +103,7 @@ const AddMoneyProfit = () => {
                   let value = e.target.value;
                   value = value.replace(/\d/g, ''); // αφαιρεί αριθμούς
                   const maxLength = 15; 
-                  if (value.length > maxLength) {
-                      value = value.slice(0, maxLength); // περιορίζει το μήκος
-                  }
+                  if (value.length > maxLength) value = value.slice(0, maxLength);
                   setIncomeText(value);
                 }} 
               />
@@ -123,14 +129,11 @@ const AddMoneyProfit = () => {
         {filterProfit && filteredItems.length === 0 ? (
           <p className="text-center text-muted fst-italic">❌ No matching income found.</p>
         ) : (
-          filteredItems.map((item, index) => (
+          filteredItems.map((item) => (
             <div className="card my-2 shadow-sm" key={item.id}>
               <div className="card-body d-flex align-items-center justify-content-between">
 
-                {/* Container για text + amount + date + GIF */}
                 <div className="d-flex align-items-center gap-3" style={{ flex: 1, minWidth: 0 }}>
-                  
-                  {/* Income text */}
                   <span style={{
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -141,7 +144,6 @@ const AddMoneyProfit = () => {
                     {item.text}
                   </span>
 
-                  {/* Date badge */}
                   <span style={{
                     backgroundColor: '#e0e7ff',
                     color: '#1e40af',
@@ -153,12 +155,10 @@ const AddMoneyProfit = () => {
                     {item.fullDate}
                   </span>
 
-                  {/* Amount */}
                   <span className="fw-bold" style={{ whiteSpace: 'nowrap' }}>
                     {formatMoney(item.amount)} €
                   </span>
 
-                  {/* GIF */}
                   {gifUrl && item.id === incomeItems[incomeItems.length - 1]?.id && (
                     <img
                       src={gifUrl}
@@ -175,9 +175,12 @@ const AddMoneyProfit = () => {
                   )}
                 </div>
 
-                {/* Delete button */}
                 <DeleteButton
-                  onDelete={() => setIncomeItems(incomeItems.filter(li => li.id !== item.id))}
+                  onDelete={() => {
+                    const updated = incomeItems.filter(li => li.id !== item.id);
+                    setIncomeItems(updated);
+                    localStorage.setItem('incomeItems', JSON.stringify(updated));
+                  }}
                 />
               </div>
             </div>

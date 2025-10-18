@@ -1,3 +1,4 @@
+
 # Logs
 logs
 *.log
@@ -7,18 +8,31 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependency directories
+node_modules/
+
+# Build outputs
+dist/
+dist-ssr/
 *.local
+
+# Environment files
+.env
+.env.*    # αν έχεις διαφορετικά περιβάλλοντα π.χ. .env.production, .env.development
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# macOS
+.DS_Store
+
+# Optional: OS generated files
+Thumbs.db
+ehthumbs.db

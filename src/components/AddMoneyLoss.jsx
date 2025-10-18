@@ -1,5 +1,5 @@
 
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AppContext } from "../context/AppContext";
 import DeleteButton from "../buttons/DeleteButton";
 import { useGiphyGif } from "../hooks/useGiphyGif";
@@ -13,76 +13,85 @@ const AddMoneyLoss = () => {
     moneyRemaining, formatMoney 
   } = useContext(AppContext);
   
-  const fullDate=useFullDate();
+  const fullDate = useFullDate();
   const [lossText, setLossText] = useState('');
   const [lossAmount, setLossAmount] = useState('');
 
   const { gifUrl, showGif } = useGiphyGif();
 
+  // Φόρτωση από localStorage όταν ανοίγει το component
+  useEffect(() => {
+    const savedLoss = localStorage.getItem('lossItems');
+    if (savedLoss) setLossItems(JSON.parse(savedLoss));
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (payment === 0 || moneyRemaining === 0) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Set Income First',
-      text: 'Please set your monthly income before adding any expenses.',
-      confirmButtonText: 'OK'
-    });
-    return;
-  }
+      Swal.fire({
+        icon: 'warning',
+        title: 'Set Income First',
+        text: 'Please set your monthly income before adding any expenses.',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
 
-  if (!lossText || !lossAmount) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Incomplete Fields',
-      text: 'Please complete all fields before adding an expense.',
-      confirmButtonText: 'OK'
-    });
-    return;
-  }
+    if (!lossText || !lossAmount) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Incomplete Fields',
+        text: 'Please complete all fields before adding an expense.',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
 
-  const amountValue = parseFloat(lossAmount);
-  if (isNaN(amountValue) || amountValue <= 0) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Invalid Amount',
-      text: 'The expense amount must be greater than zero.',
-      confirmButtonText: 'OK'
-    });
-    return;
-  }
+    const amountValue = parseFloat(lossAmount);
+    if (isNaN(amountValue) || amountValue <= 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Amount',
+        text: 'The expense amount must be greater than zero.',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
 
-  if (/\d/.test(lossText)) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Invalid Text',
-      text: 'The text must not contain numbers.',
-      confirmButtonText: 'OK'
-    });
-    return;
-  }
+    if (/\d/.test(lossText)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Text',
+        text: 'The text must not contain numbers.',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
 
-  const newItem = { 
-    id: Date.now(),
-    fullDate: fullDate,
-    text: lossText, 
-    amount: amountValue
+    const newItem = { 
+      id: Date.now(),
+      fullDate: fullDate,
+      text: lossText, 
+      amount: amountValue
+    };
+
+    const updatedLossItems = [newItem, ...lossItems];
+    setLossItems(updatedLossItems);
+    localStorage.setItem('lossItems', JSON.stringify(updatedLossItems));
+
+    showGif(lossText || "loss", "loss");
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Expense Added!',
+      text: `"${lossText}" has been added successfully.`,
+      confirmButtonText: 'OK'
+    }).then(() => {
+      setLossText('');
+      setLossAmount('');
+    });
   };
-
-  setLossItems([newItem, ...lossItems]);
-  showGif(lossText || "loss", "loss");
-
-  Swal.fire({
-    icon: 'success',
-    title: 'Expense Added!',
-    text: `"${lossText}" has been added successfully.`,
-    confirmButtonText: 'OK'
-  }).then(() => {
-    setLossText('');
-    setLossAmount('');
-  });
-};
 
   const filteredItems = lossItems.filter(item =>
     item.text.toLowerCase().includes(filterLoss.toLowerCase())
@@ -102,15 +111,11 @@ const AddMoneyLoss = () => {
                 className="form-control"
                 id="loss-name"
                 placeholder="Enter Expense Item"
-                // onChange={(e) => setLossText(e.target.value.replace(/\d/g, ''))} 
                 onChange={(e) => {
-                    let value = e.target.value;
-                    value = value.replace(/\d/g, ''); // αφαιρεί αριθμούς
-                    const maxLength = 15; 
-                    if (value.length > maxLength) {
-                        value = value.slice(0, maxLength); // περιορίζει το μήκος
-                    }
-                    setLossText(value);
+                  let value = e.target.value.replace(/\d/g, ''); // αφαιρεί αριθμούς
+                  const maxLength = 15; 
+                  if (value.length > maxLength) value = value.slice(0, maxLength);
+                  setLossText(value);
                 }}
               />
             </div>
@@ -189,7 +194,11 @@ const AddMoneyLoss = () => {
 
                 {/* Delete button */}
                 <DeleteButton
-                  onDelete={() => setLossItems(lossItems.filter(li => li.id !== item.id))}
+                  onDelete={() => {
+                    const updated = lossItems.filter(li => li.id !== item.id);
+                    setLossItems(updated);
+                    localStorage.setItem('lossItems', JSON.stringify(updated));
+                  }}
                 />
               </div>
             </div>

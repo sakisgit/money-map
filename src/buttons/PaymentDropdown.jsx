@@ -4,7 +4,7 @@ import { AppContext } from "../context/AppContext";
 import Swal from "sweetalert2";
 
 const PaymentDropdown = () => {
-  const { setPayment} = useContext(AppContext);
+  const { payment, setPayment } = useContext(AppContext);
   const [inputValue, setInputValue] = useState('');
   const [show, setShow] = useState(false);
   const ref = useRef(null);
@@ -22,11 +22,12 @@ const PaymentDropdown = () => {
         setInputValue('');
         setShow(true); 
       });
-
       return;
     }
 
-    setPayment(inputValue);
+    // Αποθήκευση στο context και localStorage
+    setPayment(Number(inputValue));
+    localStorage.setItem('payment', inputValue);
 
     Swal.fire({
       icon: 'success',
@@ -36,9 +37,18 @@ const PaymentDropdown = () => {
       showConfirmButton: false
     });
 
-    setInputValue('');
+    setInputValue(''); // καθαρίζει το input
     setShow(false);
   };
+
+  // Όταν φορτώνει το component, παίρνουμε την τιμή από localStorage
+  useEffect(() => {
+    const savedPayment = localStorage.getItem('payment');
+    if (savedPayment) {
+      setPayment(Number(savedPayment)); // context κρατάει την τιμή
+    }
+    setInputValue(''); // input αρχικά κενό
+  }, []);
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
