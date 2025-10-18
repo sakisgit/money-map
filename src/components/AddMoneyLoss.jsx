@@ -4,6 +4,7 @@ import { AppContext } from "../context/AppContext";
 import DeleteButton from "../buttons/DeleteButton";
 import { useGiphyGif } from "../hooks/useGiphyGif";
 import { useFullDate } from "../hooks/useFullDate";
+import Swal from "sweetalert2";
 
 const AddMoneyLoss = () => {
   const { 
@@ -11,6 +12,7 @@ const AddMoneyLoss = () => {
     filterLoss, payment, 
     moneyRemaining, formatMoney 
   } = useContext(AppContext);
+  
   const fullDate=useFullDate();
   const [lossText, setLossText] = useState('');
   const [lossAmount, setLossAmount] = useState('');
@@ -21,38 +23,66 @@ const AddMoneyLoss = () => {
     e.preventDefault();
 
     if (payment === 0 || moneyRemaining === 0) {
-      alert("Please set your monthly income before adding any expenses.");
-      return;
-    }
+    Swal.fire({
+      icon: 'warning',
+      title: 'Set Income First',
+      text: 'Please set your monthly income before adding any expenses.',
+      confirmButtonText: 'OK'
+    });
+    return;
+  }
 
-    if (!lossText || !lossAmount) {
-      alert('Please complete all fields before adding an expense.');
-      return;
-    }
+  if (!lossText || !lossAmount) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Incomplete Fields',
+      text: 'Please complete all fields before adding an expense.',
+      confirmButtonText: 'OK'
+    });
+    return;
+  }
 
-    const amountValue = parseFloat(lossAmount);
-    if (isNaN(amountValue) || amountValue <= 0) {
-      alert('The expense amount must be greater than zero.');
-      return;
-    }
+  const amountValue = parseFloat(lossAmount);
+  if (isNaN(amountValue) || amountValue <= 0) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Invalid Amount',
+      text: 'The expense amount must be greater than zero.',
+      confirmButtonText: 'OK'
+    });
+    return;
+  }
 
-    if (/\d/.test(lossText)) {
-      alert('The text must not contain numbers.');
-      return;
-    }
+  if (/\d/.test(lossText)) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Invalid Text',
+      text: 'The text must not contain numbers.',
+      confirmButtonText: 'OK'
+    });
+    return;
+  }
 
-    const newItem = { 
-      id: Date.now(),
-      fullDate:fullDate,
-      text: lossText, 
-      amount: amountValue
-    };
+  const newItem = { 
+    id: Date.now(),
+    fullDate: fullDate,
+    text: lossText, 
+    amount: amountValue
+  };
 
-    setLossItems([newItem,...lossItems]);
-    showGif(lossText || "loss", "loss");
+  setLossItems([newItem, ...lossItems]);
+  showGif(lossText || "loss", "loss");
+
+  Swal.fire({
+    icon: 'success',
+    title: 'Expense Added!',
+    text: `"${lossText}" has been added successfully.`,
+    confirmButtonText: 'OK'
+  }).then(() => {
     setLossText('');
     setLossAmount('');
-  };
+  });
+};
 
   const filteredItems = lossItems.filter(item =>
     item.text.toLowerCase().includes(filterLoss.toLowerCase())
@@ -72,7 +102,16 @@ const AddMoneyLoss = () => {
                 className="form-control"
                 id="loss-name"
                 placeholder="Enter Expense Item"
-                onChange={(e) => setLossText(e.target.value.replace(/\d/g, ''))} 
+                // onChange={(e) => setLossText(e.target.value.replace(/\d/g, ''))} 
+                onChange={(e) => {
+                    let value = e.target.value;
+                    value = value.replace(/\d/g, ''); // αφαιρεί αριθμούς
+                    const maxLength = 15; 
+                    if (value.length > maxLength) {
+                        value = value.slice(0, maxLength); // περιορίζει το μήκος
+                    }
+                    setLossText(value);
+                }}
               />
             </div>
             <div className="mb-3">

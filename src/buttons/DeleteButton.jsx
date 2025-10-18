@@ -1,11 +1,29 @@
 
+import Swal from "sweetalert2";
 
 const DeleteButton = ({onDelete}) => {
   const handleClick= () =>{
-    const confirmDelete = window.confirm('Are you sure you want to delete this item?');
-    if(confirmDelete) {
-      onDelete();
-    };
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        onDelete();
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Your item has been deleted.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        });
+      };
+    });
   };
   return (
     <button

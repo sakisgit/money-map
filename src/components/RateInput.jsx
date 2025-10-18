@@ -1,36 +1,56 @@
 
 import { useContext,useState } from "react";
 import { AppContext } from "../context/AppContext";
+import Swal from "sweetalert2";
 
 const RateInput = () => {
     const {rateInput, setRateInput} = useContext(AppContext);
     const [isConfirmed, setIsConfirmed] = useState(false);
 
-    const handleClick= (e) => {
+    const handleClick= async (e) => {
         e.preventDefault()
 
         if (!rateInput) {
-            alert('Please enter your hourly rate before proceeding.');
+            Swal.fire({
+            icon: 'warning',
+            title: 'Missing Rate',
+            text: 'Please enter your hourly rate before proceeding.',
+            confirmButtonText: 'OK'
+            });
             return;
-        };
+        }
 
-        parseFloat(rateInput).toFixed(2);
-
-        if (isNaN(rateInput) || rateInput<= 0) {
-            alert("Your hourly rate must be a valid positive number.");
+        const rateValue = parseFloat(rateInput).toFixed(2);
+        if (isNaN(rateValue) || rateValue <= 0) {
+            Swal.fire({
+            icon: 'error',
+            title: 'Invalid Rate',
+            text: 'Your hourly rate must be a valid positive number.',
+            confirmButtonText: 'OK'
+            });
             return;
-        };
+        }
 
-        const confirmed = window.confirm
-            (`You have set your hourly rate to €${rateInput}.\nDo you want to confirm this amount?`
-        );
+        const { isConfirmed } = await Swal.fire({
+            title: `Confirm Hourly Rate`,
+            text: `You have set your hourly rate to €${rateValue}. Do you want to confirm?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, confirm',
+            cancelButtonText: 'Cancel'
+        });
 
-        if (confirmed) {
-            alert("✅ Your hourly rate has been successfully saved!");
+        if (isConfirmed) {
             setIsConfirmed(true);
-        };
-
-    };
+            Swal.fire({
+            icon: 'success',
+            title: 'Saved!',
+            text: `Your hourly rate has been successfully saved!`,
+            timer: 1500,
+            showConfirmButton: false
+            });
+        }
+};
             
   return (
     <div className="col-md-6">
@@ -44,14 +64,22 @@ const RateInput = () => {
                         Your wage is €{Number(rateInput).toFixed(2)}
                     </p>
                     <button
-                        onClick={() => {
-                            const confirmChange = window.confirm('Are you sure you want to change your hourly rate?');
-                            if (confirmChange) {
+                        onClick={async () => {
+                            const { isConfirmed } = await Swal.fire({
+                            title: 'Change Hourly Rate?',
+                            text: 'Are you sure you want to change your hourly rate?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes, change',
+                            cancelButtonText: 'Cancel'
+                            });
+
+                            if (isConfirmed) {
                             setIsConfirmed(false);
                             }
                         }}
                         className="btn btn-warning fw-bold px-3 py-1"
-                    >
+                        >
                         Change
                     </button>
                     </>

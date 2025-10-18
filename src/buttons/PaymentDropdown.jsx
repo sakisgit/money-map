@@ -1,9 +1,10 @@
 
 import { useState, useEffect, useRef, useContext } from "react";
 import { AppContext } from "../context/AppContext";
+import Swal from "sweetalert2";
 
 const PaymentDropdown = () => {
-  const {payment, setPayment} = useContext(AppContext);
+  const { setPayment} = useContext(AppContext);
   const [inputValue, setInputValue] = useState('');
   const [show, setShow] = useState(false);
   const ref = useRef(null);
@@ -12,10 +13,29 @@ const PaymentDropdown = () => {
 
   const handleSave = () => {
     if (inputValue <= 0) {
-      alert("Enter a valid payment amount!");
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Amount',
+        text: 'Enter a valid payment amount!',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        setInputValue('');
+        setShow(true); 
+      });
+
       return;
     }
+
     setPayment(inputValue);
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Payment Set!',
+      text: `Your payment has been set to €${inputValue}.`,
+      timer: 1500,
+      showConfirmButton: false
+    });
+
     setInputValue('');
     setShow(false);
   };

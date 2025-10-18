@@ -4,6 +4,7 @@ import { AppContext } from "../context/AppContext";
 import DeleteButton from "../buttons/DeleteButton";
 import { useGiphyGif } from "../hooks/useGiphyGif";
 import { useFullDate } from "../hooks/useFullDate";
+import Swal from "sweetalert2";
 
 const AddMoneyProfit = () => {
   const { 
@@ -20,34 +21,57 @@ const AddMoneyProfit = () => {
     e.preventDefault();
 
     if (!incomeText || !incomeAmount) {
-      alert('Please complete all fields before adding an income.');
-      return; 
-    }
+    Swal.fire({
+      icon: 'warning',
+      title: 'Missing Fields',
+      text: 'Please complete all fields before adding an income.',
+      confirmButtonText: 'OK'
+    });
+    return;
+  }
 
-    const amountValue = parseFloat(incomeAmount);
-    if (isNaN(amountValue) || amountValue <= 0) {
-      alert('The income amount must be greater than zero.');
-      return;
-    }
+  const amountValue = parseFloat(incomeAmount);
+  if (isNaN(amountValue) || amountValue <= 0) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Invalid Amount',
+      text: 'The income amount must be greater than zero.',
+      confirmButtonText: 'OK'
+    });
+    return;
+  }
 
-    if (/\d/.test(incomeText)) { 
-      alert('The text must not contain numbers.');
-      return;
-    }
+  if (/\d/.test(incomeText)) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Invalid Text',
+      text: 'The text must not contain numbers.',
+      confirmButtonText: 'OK'
+    });
+    return;
+  }
 
-    const newItem = { 
-      id: Date.now(),
-      fullDate: fullDate,
-      text: incomeText, 
-      amount: amountValue
-    };
+  const newItem = { 
+    id: Date.now(),
+    fullDate: fullDate,
+    text: incomeText, 
+    amount: amountValue
+  };
 
-    setIncomeItems([...incomeItems, newItem]);
-    showGif(incomeText || "profit", "profit");
+  setIncomeItems([...incomeItems, newItem]);
+  showGif(incomeText || "profit", "profit");
 
+  
+  Swal.fire({
+    icon: 'success',
+    title: 'Income Added!',
+    text: `"${incomeText}" has been added successfully.`,
+    confirmButtonText: 'OK'
+  }).then(() => {
     setIncomeText('');
     setIncomeAmount('');
-  };
+  });
+};
 
   const filteredItems = incomeItems.filter(item =>
     item.text.toLowerCase().includes(filterProfit.toLowerCase())
@@ -67,7 +91,15 @@ const AddMoneyProfit = () => {
                 className="form-control"
                 id="profit-name"
                 placeholder="Enter Income Source"
-                onChange={(e) => setIncomeText(e.target.value.replace(/\d/g, ''))} 
+                onChange={(e) => {
+                  let value = e.target.value;
+                  value = value.replace(/\d/g, ''); // αφαιρεί αριθμούς
+                  const maxLength = 15; 
+                  if (value.length > maxLength) {
+                      value = value.slice(0, maxLength); // περιορίζει το μήκος
+                  }
+                  setIncomeText(value);
+                }} 
               />
             </div>
             <div className="mb-3">

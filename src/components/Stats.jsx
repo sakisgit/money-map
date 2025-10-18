@@ -19,7 +19,7 @@ import { AppContext } from "../context/AppContext";
               <div className="card text-center bg-primary text-white">
                 <div className="card-body">
                   <div id="money-limit" className="fs-1 fw-bold">{formatMoney(payment)} €</div>
-                  <p className="fs-4">Monthly Money Income</p>
+                  <p className="fs-4">Monthly Income</p>
                 </div>
               </div>
             </div>
@@ -34,7 +34,7 @@ import { AppContext } from "../context/AppContext";
               >
                 <div className="card-body">
                   <div id="profit-loss" className="fs-1 fw-bold">{formatMoney(moneyRemaining)} €</div>
-                  <p className="fs-4">Profit / Loss</p>
+                  <p className="fs-4">Net Balance</p>
                 </div>
               </div>
             </div>
@@ -46,7 +46,7 @@ import { AppContext } from "../context/AppContext";
               <div className={`card text-center ${totalIncome > 0 ? 'bg-success text-white' : 'bg-light'}`}>
                 <div className="card-body">
                   <div id="income" className="fs-1 fw-bold">{formatMoney(totalIncome)} €</div>
-                  <p className="fs-4">Income</p>
+                  <p className="fs-4">Total Income</p>
                 </div>
               </div>
             </div>
@@ -56,7 +56,7 @@ import { AppContext } from "../context/AppContext";
               <div className={`card ${totalLoss > 0 ? 'bg-danger' : 'bg-light'}`}>
                 <div className='card-body'>
                   <div id="expenses" className="fs-1 fw-bold">{formatMoney(totalLoss)} €</div>
-                  <p className="fs-4">Expenses</p>
+                  <p className="fs-4">Total Expenses</p>
                 </div>
               </div>
             </div>
@@ -70,7 +70,7 @@ import { AppContext } from "../context/AppContext";
               }`}>
                 <div className="card-body">
                   <div id="money-remaining" className="fs-1 fw-bold">{formatMoney(moneyRemaining)} €</div>
-                  <p className="fs-4">Money Remaining</p>
+                  <p className="fs-4">Remaining Budget</p>
                 </div>
               </div>
             </div>

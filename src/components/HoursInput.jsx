@@ -2,6 +2,7 @@
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 import { useFullDate } from "../hooks/useFullDate";
+import Swal from "sweetalert2";
 
 const HoursInput = () => {
     const { 
@@ -15,34 +16,59 @@ const HoursInput = () => {
 
     const handleClick= (e) => {
         e.preventDefault();
-        if(!hoursInput) {
-            alert('Please enter the number of hours you worked today before continuing.');
+
+        if (!hoursInput) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Input',
+                text: 'Please enter the number of hours you worked today before continuing.',
+                confirmButtonText: 'OK'
+            });
             return;
         };
 
-        parseFloat(hoursInput);
+        const hoursValue = parseFloat(hoursInput);
 
-        if (isNaN(hoursInput) || hoursInput<= 0) {
-            alert("Please provide a valid positive number for your worked hours.");
+        if (isNaN(hoursValue) || hoursValue <= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Number',
+                text: 'Please provide a valid positive number for your worked hours.',
+                confirmButtonText: 'OK'
+            });
             return;
-        } else if (isNaN(rateInput) || rateInput<=0) {
-            alert("Oops! It looks like your hourly rate hasn't been set yet.");
+        }
+
+        if (isNaN(rateInput) || rateInput <= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Hourly Rate Missing',
+                text: "Oops! It looks like your hourly rate hasn't been set yet.",
+                confirmButtonText: 'OK'
+            });
             return;
-        };
+        }
 
-        alert("Your worked hours have been successfully recorded.");
-        setTotalHours(totalHours + parseFloat(hoursInput));
+        // Επιτυχής προσθήκη
+        Swal.fire({
+            icon: 'success',
+            title: 'Hours Recorded!',
+            text: `You have successfully recorded ${hoursValue} hours.`,
+            confirmButtonText: 'OK'
+        }).then(() => {
+            setTotalHours(totalHours + hoursValue);
 
-        const newEntry= {
-            id:Date.now(),
-            fullDate:fullDate,
-            hours: parseFloat(hoursInput),
-            rate: rateInput,
-        };
+            const newEntry = {
+                id: Date.now(),
+                fullDate: fullDate,
+                hours: hoursValue,
+                rate: rateInput,
+            };
 
-        setHoursList([newEntry,...hoursList]);
-        setHoursInput('');
-    };
+            setHoursList([newEntry, ...hoursList]);
+            setHoursInput('');
+        });
+};
 
     return (
         <div className="col-md-6">

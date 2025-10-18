@@ -2,6 +2,7 @@
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 import DeleteButton from "../buttons/DeleteButton";
+import Swal from "sweetalert2";
 
 const HoursList = () => {
   const { 
@@ -10,11 +11,29 @@ const HoursList = () => {
   } = useContext(AppContext);
 
   const handleClear = () => {
-    if (window.confirm("Are you sure you want to clear all worked hours?")) {
-      setHoursList([]);
-      setTotalHours(0);
-    }
-  };
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you really want to clear all worked hours?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, clear all!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setHoursList([]);
+        setTotalHours(0);
+        Swal.fire({
+          icon: 'success',
+          title: 'Cleared!',
+          text: 'All worked hours have been removed.',
+          timer: 1500,
+          showConfirmButton: false
+        });
+      }
+    });
+};
 
   return (
     hoursList.length>0 && (

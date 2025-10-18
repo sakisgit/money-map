@@ -4,6 +4,7 @@ import { AppContext } from "../context/AppContext";
 import TotalEarnings from "./TotalEarnings";
 import { useDateOnly } from "../hooks/useDateOnly";
 
+
 const WorkHeader = () => {
   const {totalHours}= useContext(AppContext);
   const dateOnly = useDateOnly();
