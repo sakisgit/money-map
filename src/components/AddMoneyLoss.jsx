@@ -19,7 +19,6 @@ const AddMoneyLoss = () => {
 
   const { gifUrl, showGif } = useGiphyGif();
 
-  // Φόρτωση από localStorage όταν ανοίγει το component
   useEffect(() => {
     const savedLoss = localStorage.getItem('lossItems');
     if (savedLoss) setLossItems(JSON.parse(savedLoss));
@@ -112,7 +111,7 @@ const AddMoneyLoss = () => {
                 id="loss-name"
                 placeholder="Enter Expense Item"
                 onChange={(e) => {
-                  let value = e.target.value.replace(/\d/g, ''); // αφαιρεί αριθμούς
+                  let value = e.target.value.replace(/\d/g, ''); 
                   const maxLength = 15; 
                   if (value.length > maxLength) value = value.slice(0, maxLength);
                   setLossText(value);
@@ -130,7 +129,7 @@ const AddMoneyLoss = () => {
                 onChange={(e) => setLossAmount(e.target.value)}
               />
             </div>
-            <button type="submit" className="btn btn-primary text-white">Add Expense</button>
+            <button type="submit" className="btn btn-primary text-white w-100 w-sm-auto mb-2">Add Expense</button>
           </form>
         </div>
       </div>
@@ -142,10 +141,10 @@ const AddMoneyLoss = () => {
         ) : (
           filteredItems.map((item) => (
             <div className="card my-2 shadow-sm" key={item.id}>
-              <div className="card-body d-flex align-items-center justify-content-between">
+              <div className="card-body d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2 gap-sm-3">
                 
                 {/* Container για text + amount + date + GIF */}
-                <div className="d-flex align-items-center gap-3" style={{ flex: 1, minWidth: 0 }}>
+                <div className="d-flex align-items-center gap-2 gap-sm-3 flex-wrap flex-sm-nowrap" style={{ flex: 1, minWidth: 0 }}>
                   
                   {/* Expense text */}
                   <span style={{

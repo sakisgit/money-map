@@ -12,7 +12,7 @@ const PaymentDropdown = () => {
   const toggleShow = () => setShow(!show);
 
   const handleSave = () => {
-    if (inputValue <= 0) {
+    if (inputValue <= 0 || isNaN(inputValue)) {
       Swal.fire({
         icon: 'warning',
         title: 'Invalid Amount',
@@ -62,7 +62,7 @@ const PaymentDropdown = () => {
 
   return (
     <div className="me-2 position-relative" ref={ref}>
-      <button className="btn btn-outline-light" onClick={toggleShow}>
+      <button className="btn btn-outline-light w-100 w-sm-auto" onClick={toggleShow}>
         Payment Day
       </button>
       {show && (
@@ -77,7 +77,8 @@ const PaymentDropdown = () => {
             borderRadius: '8px',
             boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
             zIndex: 1000,
-            width: '220px'
+            width: '220px',
+            maxWidth: '90vw', // responsive για μικρές οθόνες
           }}
         >
           <h6 className="mb-2">Set Your Payment</h6>
@@ -92,6 +93,7 @@ const PaymentDropdown = () => {
               placeholder="Enter Amount (€)"
               value={inputValue}
               onChange={(e) => setInputValue(Number(e.target.value))}
+              style={{ fontSize: '0.9rem', padding: '6px' }} // responsive input
             />
           </div>
           <button className="btn btn-primary w-100" onClick={handleSave}>

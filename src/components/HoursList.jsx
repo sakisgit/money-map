@@ -24,11 +24,8 @@ const HoursList = () => {
       if (result.isConfirmed) {
         setHoursList([]);
         setTotalHours(0);
-
-        // Καθαρίζουμε και το localStorage
         localStorage.removeItem('hoursList');
         localStorage.removeItem('totalHours');
-
         Swal.fire({
           icon: 'success',
           title: 'Cleared!',
@@ -45,19 +42,18 @@ const HoursList = () => {
     setHoursList(newHoursList);
     setTotalHours(prev => prev - hoursItem.hours);
 
-    // Ενημέρωση localStorage
     localStorage.setItem('hoursList', JSON.stringify(newHoursList));
     localStorage.setItem('totalHours', totalHours - hoursItem.hours);
   };
 
   return (
-    hoursList.length>0 && (
+    hoursList.length > 0 && (
       <div className="card shadow-sm border-0 rounded-3 p-3 mt-4 text-center">
-        <div className="d-flex align-items-center mb-3">
+        <div className="d-flex flex-wrap align-items-center mb-3">
           <h6 className="text-muted fw-bold m-0">Worked Hours List</h6>
           <button
             onClick={handleClear}
-            className="btn btn-primary btn-sm ms-auto text-white fw-bold py-1 px-2"
+            className="btn btn-primary btn-sm ms-auto mt-2 mt-sm-0 text-white fw-bold py-1 px-2"
           >
             Clear All List
           </button>
@@ -68,7 +64,7 @@ const HoursList = () => {
             {hoursList.map((hoursItem) => (
               <li
                 key={hoursItem.id}
-                className="list-group-item d-flex justify-content-between align-items-center p-2 border rounded-2 mb-1"
+                className="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center p-2 border rounded-2 mb-1"
               >
                 <span style={{
                   backgroundColor: '#e0e7ff',
@@ -76,16 +72,16 @@ const HoursList = () => {
                   padding: '2px 6px',
                   borderRadius: '6px',
                   fontSize: '0.8rem',
-                  whiteSpace: 'nowrap'
+                  whiteSpace: 'nowrap',
+                  marginBottom: '4px'
                 }}>
                   {hoursItem.fullDate}
                 </span>
                 
-                <span className="fw-semibold">
+                <span className="fw-semibold text-truncate" style={{ maxWidth: '60%' }}>
                   You worked for {hoursItem.hours} hours and earned {(hoursItem.rate * hoursItem.hours).toFixed(2)}€ at an hourly rate of {hoursItem.rate}€.
                 </span>
 
-                {/* Delete button */}
                 <DeleteButton onDelete={() => handleDelete(hoursItem)} />
               </li>
             ))}

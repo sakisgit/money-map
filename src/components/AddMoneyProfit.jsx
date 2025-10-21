@@ -11,13 +11,13 @@ const AddMoneyProfit = () => {
     incomeItems, setIncomeItems, 
     filterProfit, formatMoney 
   } = useContext(AppContext);
+
   const [incomeText, setIncomeText] = useState('');
   const [incomeAmount, setIncomeAmount] = useState('');
 
   const { gifUrl, showGif } = useGiphyGif();
-  const fullDate  = useFullDate();
+  const fullDate = useFullDate();
 
-  // Φόρτωση από localStorage
   useEffect(() => {
     const savedIncome = localStorage.getItem('incomeItems');
     if (savedIncome) setIncomeItems(JSON.parse(savedIncome));
@@ -100,12 +100,11 @@ const AddMoneyProfit = () => {
                 id="profit-name"
                 placeholder="Enter Income Source"
                 onChange={(e) => {
-                  let value = e.target.value;
-                  value = value.replace(/\d/g, ''); // αφαιρεί αριθμούς
-                  const maxLength = 15; 
+                  let value = e.target.value.replace(/\d/g, '');
+                  const maxLength = 15;
                   if (value.length > maxLength) value = value.slice(0, maxLength);
                   setIncomeText(value);
-                }} 
+                }}
               />
             </div>
             <div className="mb-3">
@@ -119,7 +118,7 @@ const AddMoneyProfit = () => {
                 onChange={(e) => setIncomeAmount(e.target.value)}
               />
             </div>
-            <button type="submit" className="btn btn-primary text-white">Add Income</button>
+            <button type="submit" className="btn btn-primary text-white w-100 w-sm-auto mb-2">Add Income</button>
           </form>
         </div>
       </div>
@@ -131,9 +130,12 @@ const AddMoneyProfit = () => {
         ) : (
           filteredItems.map((item) => (
             <div className="card my-2 shadow-sm" key={item.id}>
-              <div className="card-body d-flex align-items-center justify-content-between">
-
-                <div className="d-flex align-items-center gap-3" style={{ flex: 1, minWidth: 0 }}>
+              <div className="card-body d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2 gap-sm-3">
+                
+                {/* Container για text + amount + date + GIF */}
+                <div className="d-flex align-items-center gap-2 gap-sm-3 flex-wrap flex-sm-nowrap" style={{ flex: 1, minWidth: 0 }}>
+                  
+                  {/* Income text */}
                   <span style={{
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -144,6 +146,7 @@ const AddMoneyProfit = () => {
                     {item.text}
                   </span>
 
+                  {/* Date badge */}
                   <span style={{
                     backgroundColor: '#e0e7ff',
                     color: '#1e40af',
@@ -155,10 +158,12 @@ const AddMoneyProfit = () => {
                     {item.fullDate}
                   </span>
 
+                  {/* Amount */}
                   <span className="fw-bold" style={{ whiteSpace: 'nowrap' }}>
                     {formatMoney(item.amount)} €
                   </span>
 
+                  {/* GIF */}
                   {gifUrl && item.id === incomeItems[incomeItems.length - 1]?.id && (
                     <img
                       src={gifUrl}
@@ -175,6 +180,7 @@ const AddMoneyProfit = () => {
                   )}
                 </div>
 
+                {/* Delete button */}
                 <DeleteButton
                   onDelete={() => {
                     const updated = incomeItems.filter(li => li.id !== item.id);
