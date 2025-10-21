@@ -79,7 +79,7 @@ const HoursList = () => {
                 </span>
                 
                 <span className="fw-semibold text-truncate" style={{ maxWidth: '60%' }}>
-                  You worked for {hoursItem.hours} hours and earned {(hoursItem.rate * hoursItem.hours).toFixed(2)}€ at an hourly rate of {hoursItem.rate}€.
+                  Worked {hoursItem.hours}h → {(hoursItem.rate * hoursItem.hours).toFixed(2)}€
                 </span>
 
                 <DeleteButton onDelete={() => handleDelete(hoursItem)} />
