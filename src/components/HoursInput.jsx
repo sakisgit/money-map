@@ -83,10 +83,10 @@ const HoursInput = () => {
   };
 
   return (
-    <div className="col-12 col-md-6 mb-3">
-      <div className="card shadow-sm border-0 rounded-3 p-4 text-center">
+    <div className="col-12 col-md-6">
+      <div className="card shadow-sm border-0 rounded-3 p-3 p-md-4 text-center h-100">
         <h6 className="mb-3 text-muted fw-bold">Worked Hours</h6>
-        <div className="d-flex flex-wrap justify-content-center gap-2">
+        <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
           <input 
             type="number" 
             className="form-control text-center"
@@ -100,14 +100,20 @@ const HoursInput = () => {
               }
               setHoursInput(val);
             }}
-            style={{ width: '120px', height: '38px' }}
+            style={{ 
+              width: '100%', 
+              maxWidth: '200px',
+              height: '42px',
+              margin: '0 auto'
+            }}
           />
           <button
             type="submit"
             onClick={handleClick}
-            className="btn btn-success fw-bold px-3 py-1"
+            className="btn btn-success fw-bold px-4 py-2"
+            style={{ minWidth: '100px' }}
           >
-            <i className="fa-solid fa-plus"></i> Add
+            <i className="fa-solid fa-plus me-1"></i> Add
           </button>
         </div>
       </div>

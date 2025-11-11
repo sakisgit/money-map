@@ -48,14 +48,15 @@ const HoursList = () => {
 
   return (
     hoursList.length > 0 && (
-      <div className="card shadow-sm border-0 rounded-3 p-3 mt-4 text-center">
-        <div className="d-flex flex-wrap align-items-center mb-3">
+      <div className="card shadow-sm border-0 rounded-3 p-3 mt-4">
+        <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2 mb-3">
           <h6 className="text-muted fw-bold m-0">Worked Hours List</h6>
           <button
             onClick={handleClear}
-            className="btn btn-primary btn-sm ms-auto mt-2 mt-sm-0 text-white fw-bold py-1 px-2"
+            className="btn btn-primary btn-sm text-white fw-bold py-2 px-3"
           >
-            Clear All List
+            <i className="fa-solid fa-trash me-1"></i>
+            Clear All
           </button>
         </div>
 
@@ -64,25 +65,23 @@ const HoursList = () => {
             {hoursList.map((hoursItem) => (
               <li
                 key={hoursItem.id}
-                className="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center p-2 border rounded-2 mb-1"
+                className="list-group-item p-3 border rounded-2 mb-2"
               >
-                <span style={{
-                  backgroundColor: '#e0e7ff',
-                  color: '#1e40af',
-                  padding: '2px 6px',
-                  borderRadius: '6px',
-                  fontSize: '0.8rem',
-                  whiteSpace: 'nowrap',
-                  marginBottom: '4px'
-                }}>
-                  {hoursItem.fullDate}
-                </span>
-                
-                <span className="fw-semibold text-truncate" style={{ maxWidth: '60%' }}>
-                  Worked {hoursItem.hours}h → {(hoursItem.rate * hoursItem.hours).toFixed(2)}€
-                </span>
+                <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
+                  {/* Left: Date + Info */}
+                  <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2 flex-grow-1" style={{ minWidth: 0 }}>
+                    <span className="badge date-badge">
+                      {hoursItem.fullDate}
+                    </span>
+                    
+                    <span className="fw-semibold" style={{ fontSize: '0.95rem' }}>
+                      Worked {hoursItem.hours}h → <span className="text-success fw-bold">{(hoursItem.rate * hoursItem.hours).toFixed(2)}€</span>
+                    </span>
+                  </div>
 
-                <DeleteButton onDelete={() => handleDelete(hoursItem)} />
+                  {/* Right: Delete button */}
+                  <DeleteButton onDelete={() => handleDelete(hoursItem)} />
+                </div>
               </li>
             ))}
           </ul>

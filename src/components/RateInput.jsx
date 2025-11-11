@@ -78,13 +78,12 @@ const RateInput = () => {
   };
 
   return (
-    <div className="col-md-6">
-      <div className="card shadow-sm border-0 rounded-3 p-4 text-center">
+    <div className="col-12 col-md-6">
+      <div className="card shadow-sm border-0 rounded-3 p-3 p-md-4 text-center h-100">
         <h6 className="mb-3 text-muted fw-bold">Hourly Rate (€)</h6>
 
         <div
-          className="d-flex flex-wrap justify-content-center align-items-center gap-2"
-          style={{ rowGap: "10px" }}
+          className="d-flex flex-column flex-sm-row flex-wrap justify-content-center align-items-center gap-2"
         >
           {isConfirmed ? (
             <>
@@ -96,7 +95,7 @@ const RateInput = () => {
               </p>
               <button
                 onClick={handleChangeRate}
-                className="btn btn-warning fw-bold px-3 py-1"
+                className="btn btn-warning fw-bold px-3 py-2"
                 style={{ minWidth: "100px" }}
               >
                 Change
@@ -118,14 +117,15 @@ const RateInput = () => {
                   setRateInput(val);
                 }}
                 style={{
-                  width: "130px",
-                  height: "40px",
+                  width: "100%",
+                  maxWidth: "200px",
+                  height: "42px",
                   fontSize: "0.95rem",
                 }}
               />
               <button
                 onClick={handleClick}
-                className="btn btn-success fw-bold px-3 py-1"
+                className="btn btn-success fw-bold px-4 py-2"
                 style={{ minWidth: "100px" }}
               >
                 <i className="fa-solid fa-plus me-1"></i>Add

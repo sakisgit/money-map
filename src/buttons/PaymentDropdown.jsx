@@ -60,45 +60,78 @@ const PaymentDropdown = () => {
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [show]);
 
+  // Calculate position for dropdown
+  const getDropdownStyle = () => {
+    if (ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      const isMobile = window.innerWidth < 576;
+      
+      if (isMobile) {
+        return {
+          position: 'fixed',
+          top: `${rect.bottom + 8}px`,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 'calc(100vw - 2rem)',
+          maxWidth: '320px',
+          zIndex: 9999,
+        };
+      } else {
+        return {
+          position: 'absolute',
+          top: 'calc(100% + 8px)',
+          right: '0',
+          left: 'auto',
+          width: '280px',
+          zIndex: 9999,
+        };
+      }
+    }
+    return {};
+  };
+
   return (
-    <div className="me-2 position-relative" ref={ref}>
-      <button className="btn btn-outline-light w-100 w-sm-auto" onClick={toggleShow}>
-        Payment Day
+    <div className="position-relative" ref={ref} style={{ minWidth: 'fit-content', zIndex: 1000 }}>
+      <button 
+        className="btn btn-outline-light btn-sm" 
+        onClick={toggleShow}
+        style={{ whiteSpace: 'nowrap' }}
+      >
+        <i className="fa-solid fa-calendar-days d-sm-none me-1"></i>
+        <span className="d-none d-sm-inline">Payment Day</span>
+        <span className="d-sm-none">Payment</span>
       </button>
       {show && (
         <div
-          style={{
-            position: 'absolute',
-            top: '110%',
-            left: '0',
-            backgroundColor: 'white',
-            color: 'black',
-            padding: '15px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            zIndex: 1000,
-            width: '220px',
-            maxWidth: '90vw', // responsive για μικρές οθόνες
-          }}
+          className="payment-dropdown"
+          style={getDropdownStyle()}
         >
-          <h6 className="mb-2">Set Your Payment</h6>
-          <div className="mb-3">
-            <label htmlFor="payment-input" className="form-label">
-              Payment (€)
-            </label>
-            <input
-              type="number"
-              className="form-control"
-              id="payment-input"
-              placeholder="Enter Amount (€)"
-              value={inputValue}
-              onChange={(e) => setInputValue(Number(e.target.value))}
-              style={{ fontSize: '0.9rem', padding: '6px' }} // responsive input
-            />
+          <div className="payment-dropdown-content">
+            <h6 className="mb-3 fw-bold">Set Your Payment</h6>
+            <div className="mb-3">
+              <label htmlFor="payment-input" className="form-label mb-2">
+                Payment (€)
+              </label>
+              <input
+                type="number"
+                className="form-control"
+                id="payment-input"
+                placeholder="Enter Amount (€)"
+                value={inputValue || ''}
+                onChange={(e) => setInputValue(e.target.value ? Number(e.target.value) : '')}
+                autoFocus
+                style={{ 
+                  width: '100%',
+                  display: 'block',
+                  visibility: 'visible',
+                  opacity: 1
+                }}
+              />
+            </div>
+            <button className="btn btn-primary w-100 fw-bold" onClick={handleSave}>
+              <i className="fa-solid fa-check me-1"></i> Save
+            </button>
           </div>
-          <button className="btn btn-primary w-100" onClick={handleSave}>
-            Save
-          </button>
         </div>
       )}
     </div>

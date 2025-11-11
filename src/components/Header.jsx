@@ -10,39 +10,45 @@ const Header = () => {
   const { theme, toggleTheme } = useContext(ThemeContext);
 
   return (
-      <header className="d-sm-flex justify-content-between align-items-center bg-primary text-white text-center py-2 px-5 position-relative">
-        <h1>
-          <i className="fa-solid fa-coins"></i> Money Map
-        </h1>
+      <header className={`${theme === "light" ? "header-light" : "header-dark"} py-3 px-3 px-md-5`}>
+        <div className="container-fluid">
+          <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3">
+            {/* Title */}
+            <h1 className="mb-0 text-center text-sm-start">
+              <i className="fa-solid fa-coins"></i> Money Map
+            </h1>
 
-        <div className="d-flex align-items-center">
+            {/* Actions */}
+            <div className="d-flex flex-wrap align-items-center justify-content-center gap-2 gap-sm-3">
+              <PaymentDropdown/>
 
-          <PaymentDropdown/>
+              <ResetButton/>
 
-          <ResetButton/>
+              <Link 
+                to="/work-hours" 
+                className="btn btn-outline-light rounded-work-hours btn-sm"
+              >
+                <i className="fa-solid fa-clock d-sm-none"></i>
+                <span className="d-none d-sm-inline">Work Hours</span>
+                <span className="d-sm-none ms-1">Hours</span>
+              </Link> 
 
-          <Link 
-            to="/work-hours" 
-            className="btn btn-outline-light rounded-work-hours"
-          >
-            Work Hours
-          </Link> 
-
-          <button 
-            className="btn btn-light ms-3 d-flex align-items-center justify-content-center"
-            onClick={toggleTheme}
-            style={{ width: "40px", height: "40px", borderRadius: "50%" }}
-            title="Toggle Light/Dark Mode"
-          >
-            <i 
-              className={`fa-solid ${theme === "light" ? "fa-sun" : "fa-moon"}`} 
-              style={{ color: theme === "light" ? "orange" : "#706f6cff" }}
-            >
-            </i>
-        </button>
-
+              <button 
+                className="btn btn-light d-flex align-items-center justify-content-center"
+                onClick={toggleTheme}
+                style={{ width: "40px", height: "40px", borderRadius: "50%", minWidth: "40px" }}
+                title="Toggle Light/Dark Mode"
+                aria-label="Toggle theme"
+              >
+                <i 
+                  className={`fa-solid ${theme === "light" ? "fa-sun" : "fa-moon"}`} 
+                  style={{ color: theme === "light" ? "orange" : "#706f6cff" }}
+                >
+                </i>
+              </button>
+            </div>
+          </div>
         </div>
-        
       </header>
   );
 };

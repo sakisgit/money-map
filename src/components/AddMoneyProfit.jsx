@@ -126,68 +126,67 @@ const AddMoneyProfit = () => {
       {/* Dynamic Income List */}
       <div className="mt-3">
         {filterProfit && filteredItems.length === 0 ? (
-          <p className="text-center text-muted fst-italic">❌ No matching income found.</p>
+          <p className="text-center text-muted fst-italic py-3">❌ No matching income found.</p>
         ) : (
           filteredItems.map((item) => (
             <div className="card my-2 shadow-sm" key={item.id}>
-              <div className="card-body d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2 gap-sm-3">
-                
-                {/* Container για text + amount + date + GIF */}
-                <div className="d-flex align-items-center gap-2 gap-sm-3 flex-wrap flex-sm-nowrap" style={{ flex: 1, minWidth: 0 }}>
+              <div className="card-body p-3">
+                <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2">
                   
-                  {/* Income text */}
-                  <span style={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    flex: 1,
-                    fontWeight: 500
-                  }}>
-                    {item.text}
-                  </span>
+                  {/* Left section: text + date */}
+                  <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2 flex-grow-1" style={{ minWidth: 0 }}>
+                    {/* Income text */}
+                    <span className="fw-semibold" style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      flex: '1 1 auto',
+                      fontSize: '0.95rem'
+                    }}>
+                      {item.text}
+                    </span>
 
-                  {/* Date badge */}
-                  <span style={{
-                    backgroundColor: '#e0e7ff',
-                    color: '#1e40af',
-                    padding: '2px 6px',
-                    borderRadius: '6px',
-                    fontSize: '0.8rem',
-                    whiteSpace: 'nowrap'
-                  }}>
-                    {item.fullDate}
-                  </span>
+                    {/* Date badge */}
+                    <span className="badge date-badge">
+                      {item.fullDate}
+                    </span>
+                  </div>
 
-                  {/* Amount */}
-                  <span className="fw-bold" style={{ whiteSpace: 'nowrap' }}>
-                    {formatMoney(item.amount)} €
-                  </span>
+                  {/* Right section: amount + GIF + delete */}
+                  <div className="d-flex align-items-center gap-2">
+                    {/* Amount */}
+                    <span className="fw-bold text-success" style={{ 
+                      whiteSpace: 'nowrap',
+                      fontSize: '1rem'
+                    }}>
+                      {formatMoney(item.amount)} €
+                    </span>
 
-                  {/* GIF */}
-                  {gifUrl && item.id === incomeItems[incomeItems.length - 1]?.id && (
-                    <img
-                      src={gifUrl}
-                      alt="income gif"
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        objectFit: "cover",
-                        borderRadius: "8px",
-                        padding: "5px",
-                        backgroundColor: "#f0f0f0"
+                    {/* GIF */}
+                    {gifUrl && item.id === incomeItems[incomeItems.length - 1]?.id && (
+                      <img
+                        src={gifUrl}
+                        alt="income gif"
+                        className="d-none d-sm-block"
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          objectFit: "cover",
+                          borderRadius: "8px"
+                        }}
+                      />
+                    )}
+
+                    {/* Delete button */}
+                    <DeleteButton
+                      onDelete={() => {
+                        const updated = incomeItems.filter(li => li.id !== item.id);
+                        setIncomeItems(updated);
+                        localStorage.setItem('incomeItems', JSON.stringify(updated));
                       }}
                     />
-                  )}
+                  </div>
                 </div>
-
-                {/* Delete button */}
-                <DeleteButton
-                  onDelete={() => {
-                    const updated = incomeItems.filter(li => li.id !== item.id);
-                    setIncomeItems(updated);
-                    localStorage.setItem('incomeItems', JSON.stringify(updated));
-                  }}
-                />
               </div>
             </div>
           ))
