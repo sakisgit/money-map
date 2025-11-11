@@ -1,5 +1,5 @@
 
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { AppContext } from "../context/AppContext";
 import DeleteButton from "../buttons/DeleteButton";
 import { useGiphyGif } from "../hooks/useGiphyGif";
@@ -14,14 +14,52 @@ const AddMoneyProfit = () => {
 
   const [incomeText, setIncomeText] = useState('');
   const [incomeAmount, setIncomeAmount] = useState('');
+  const [showTopFade, setShowTopFade] = useState(false);
+  const [showBottomFade, setShowBottomFade] = useState(false);
+  const listContainerRef = useRef(null);
 
   const { gifUrl, showGif } = useGiphyGif();
   const fullDate = useFullDate();
+
+  // Calculate filtered items first
+  const filteredItems = incomeItems.filter(item =>
+    item.text.toLowerCase().includes(filterProfit.toLowerCase())
+  );
 
   useEffect(() => {
     const savedIncome = localStorage.getItem('incomeItems');
     if (savedIncome) setIncomeItems(JSON.parse(savedIncome));
   }, []);
+
+  // Check scroll position for fade indicators
+  useEffect(() => {
+    const container = listContainerRef.current;
+    if (!container || filteredItems.length <= 4) {
+      setShowTopFade(false);
+      setShowBottomFade(false);
+      return;
+    }
+
+    const checkScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const canScrollDown = scrollTop < scrollHeight - clientHeight - 10;
+      const canScrollUp = scrollTop > 10;
+      
+      setShowTopFade(canScrollUp);
+      setShowBottomFade(canScrollDown);
+    };
+
+    // Initial check
+    setTimeout(checkScroll, 100);
+
+    container.addEventListener('scroll', checkScroll);
+    window.addEventListener('resize', checkScroll);
+
+    return () => {
+      container.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [filteredItems]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -81,10 +119,6 @@ const AddMoneyProfit = () => {
     });
   };
 
-  const filteredItems = incomeItems.filter(item =>
-    item.text.toLowerCase().includes(filterProfit.toLowerCase())
-  );
-
   return (
     <div className="mb-5">
       {/* Add Income Form */}
@@ -124,72 +158,102 @@ const AddMoneyProfit = () => {
       </div>
 
       {/* Dynamic Income List */}
-      <div className="mt-3">
+      <div className="mt-3 position-relative">
         {filterProfit && filteredItems.length === 0 ? (
           <p className="text-center text-muted fst-italic py-3">❌ No matching income found.</p>
         ) : (
-          filteredItems.map((item) => (
-            <div className="card my-2 shadow-sm" key={item.id}>
-              <div className="card-body p-3">
-                <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2">
-                  
-                  {/* Left section: text + date */}
-                  <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2 flex-grow-1" style={{ minWidth: 0 }}>
-                    {/* Income text */}
-                    <span className="fw-semibold" style={{
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      flex: '1 1 auto',
-                      fontSize: '0.95rem'
-                    }}>
-                      {item.text}
-                    </span>
+          <>
+            {/* Top Fade Indicator */}
+            {showTopFade && filteredItems.length > 4 && (
+              <div className="scroll-fade-top">
+                <i className="fa-solid fa-chevron-up"></i>
+                <span>Scroll up</span>
+              </div>
+            )}
+            
+            {/* Bottom Fade Indicator */}
+            {showBottomFade && filteredItems.length > 4 && (
+              <div className="scroll-fade-bottom">
+                <i className="fa-solid fa-chevron-down"></i>
+                <span>Scroll down</span>
+              </div>
+            )}
 
-                    {/* Date badge */}
-                    <span className="badge date-badge">
-                      {item.fullDate}
-                    </span>
-                  </div>
+            <div 
+              ref={listContainerRef}
+              className="income-list-container"
+              style={{
+                maxHeight: 'calc(4 * (80px + 0.5rem))',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                paddingRight: '4px',
+                position: 'relative'
+              }}
+            >
+            {filteredItems.map((item) => (
+              <div className="card my-2 shadow-sm" key={item.id}>
+                <div className="card-body p-3">
+                  <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2">
+                    
+                    {/* Left section: text + date */}
+                    <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2 flex-grow-1" style={{ minWidth: 0 }}>
+                      {/* Income text */}
+                      <span className="fw-semibold" style={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        flex: '1 1 auto',
+                        fontSize: '0.95rem'
+                      }}>
+                        {item.text}
+                      </span>
 
-                  {/* Right section: amount + GIF + delete */}
-                  <div className="d-flex align-items-center gap-2">
-                    {/* Amount */}
-                    <span className="fw-bold text-success" style={{ 
-                      whiteSpace: 'nowrap',
-                      fontSize: '1rem'
-                    }}>
-                      {formatMoney(item.amount)} €
-                    </span>
+                      {/* Date badge */}
+                      <span className="badge date-badge">
+                        {item.fullDate}
+                      </span>
+                    </div>
 
-                    {/* GIF */}
-                    {gifUrl && item.id === incomeItems[incomeItems.length - 1]?.id && (
-                      <img
-                        src={gifUrl}
-                        alt="income gif"
-                        className="d-none d-sm-block"
-                        style={{
-                          width: "40px",
-                          height: "40px",
-                          objectFit: "cover",
-                          borderRadius: "8px"
+                    {/* Right section: amount + GIF + delete */}
+                    <div className="d-flex align-items-center gap-2">
+                      {/* Amount */}
+                      <span className="fw-bold text-success" style={{ 
+                        whiteSpace: 'nowrap',
+                        fontSize: '1rem'
+                      }}>
+                        {formatMoney(item.amount)} €
+                      </span>
+
+                      {/* GIF */}
+                      {gifUrl && item.id === incomeItems[incomeItems.length - 1]?.id && (
+                        <img
+                          src={gifUrl}
+                          alt="income gif"
+                          className="d-none d-sm-block"
+                          style={{
+                            width: "40px",
+                            height: "40px",
+                            objectFit: "cover",
+                            borderRadius: "8px"
+                          }}
+                        />
+                      )}
+
+                      {/* Delete button */}
+                      <DeleteButton
+                        onDelete={() => {
+                          const updated = incomeItems.filter(li => li.id !== item.id);
+                          setIncomeItems(updated);
+                          localStorage.setItem('incomeItems', JSON.stringify(updated));
                         }}
                       />
-                    )}
-
-                    {/* Delete button */}
-                    <DeleteButton
-                      onDelete={() => {
-                        const updated = incomeItems.filter(li => li.id !== item.id);
-                        setIncomeItems(updated);
-                        localStorage.setItem('incomeItems', JSON.stringify(updated));
-                      }}
-                    />
+                    </div>
                   </div>
                 </div>
               </div>
+            ))}
             </div>
-          ))
+          </>
         )}
       </div>
     </div>

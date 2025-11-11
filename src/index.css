@@ -61,13 +61,15 @@ header h1 {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   overflow: hidden;
-  background: #ffffff;
+  background: #ffffff !important;
+  color: #1a1a1a;
 }
 
 body.dark .card {
-  background: #1e293b;
+  background: #1e293b !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #f1f5f9 !important;
 }
 
 @media (min-width: 768px) {
@@ -98,6 +100,10 @@ body.dark .card-body p {
 }
 
 /* ---------- Expense and Income Lists Text Colors for Dark Mode ---------- */
+body.dark .card-body {
+  color: #f1f5f9 !important;
+}
+
 body.dark .card-body .fw-semibold {
   color: #f1f5f9 !important;
 }
@@ -111,6 +117,15 @@ body.dark .card-body .text-success {
 }
 
 body.dark .card-body span:not(.badge):not(.text-danger):not(.text-success) {
+  color: #f1f5f9 !important;
+}
+
+body.dark .card-body * {
+  color: inherit;
+}
+
+body.dark .card-body .fw-semibold,
+body.dark .card-body span.fw-semibold {
   color: #f1f5f9 !important;
 }
 
@@ -901,4 +916,139 @@ body.dark .swal2-progress-bar {
 
 body.dark .swal2-timer-progress-bar {
   background-color: #2563eb !important;
+}
+
+/* ---------- Scrollable Lists ---------- */
+.expense-list-container,
+.income-list-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  /* Max height for 4 items: each item ~80px + margin */
+  max-height: calc(4 * (80px + 0.5rem));
+}
+
+.expense-list-container::-webkit-scrollbar,
+.income-list-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.expense-list-container::-webkit-scrollbar-track,
+.income-list-container::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.expense-list-container::-webkit-scrollbar-thumb,
+.income-list-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.expense-list-container::-webkit-scrollbar-thumb:hover,
+.income-list-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+body.dark .expense-list-container::-webkit-scrollbar-thumb,
+body.dark .income-list-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+body.dark .expense-list-container::-webkit-scrollbar-thumb:hover,
+body.dark .income-list-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ---------- Scroll Fade Indicators ---------- */
+.scroll-fade-top,
+.scroll-fade-bottom {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  pointer-events: none;
+  animation: fadeInOut 2s ease-in-out infinite;
+  backdrop-filter: blur(8px);
+}
+
+body.dark .scroll-fade-top,
+body.dark .scroll-fade-bottom {
+  background: rgba(30, 41, 59, 0.95);
+  color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.scroll-fade-top {
+  top: 8px;
+}
+
+.scroll-fade-bottom {
+  bottom: 8px;
+}
+
+.scroll-fade-top i,
+.scroll-fade-bottom i {
+  font-size: 0.875rem;
+  animation: bounce 1.5s ease-in-out infinite;
+}
+
+.scroll-fade-top span,
+.scroll-fade-bottom span {
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+.scroll-fade-top i {
+  animation: bounceUp 1.5s ease-in-out infinite;
+}
+
+.scroll-fade-bottom i {
+  animation: bounceDown 1.5s ease-in-out infinite;
+}
+
+@keyframes bounceUp {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes bounceDown {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
 }
