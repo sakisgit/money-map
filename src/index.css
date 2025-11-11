@@ -97,6 +97,23 @@ body.dark .card-body p {
   color: #cbd5e1;
 }
 
+/* ---------- Expense and Income Lists Text Colors for Dark Mode ---------- */
+body.dark .card-body .fw-semibold {
+  color: #f1f5f9 !important;
+}
+
+body.dark .card-body .text-danger {
+  color: #f87171 !important;
+}
+
+body.dark .card-body .text-success {
+  color: #34d399 !important;
+}
+
+body.dark .card-body span:not(.badge):not(.text-danger):not(.text-success) {
+  color: #f1f5f9 !important;
+}
+
 /* ---------- Stat Numbers ---------- */
 .fs-1 {
   font-size: 1.8rem !important;
