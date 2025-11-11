@@ -156,9 +156,14 @@ body.dark .progress {
   box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
-body.dark .progress .progress-bar.bg-danger {
+body.light .progress .progress-bar.bg-danger {
   background: linear-gradient(90deg, #f87171, #ef4444);
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
+  box-shadow: 0 2px 8px rgba(248, 113, 113, 0.35);
+}
+
+body.dark .progress .progress-bar.bg-danger {
+  background: linear-gradient(90deg, #b91c1c, #991b1b);
+  box-shadow: 0 2px 8px rgba(185, 28, 28, 0.5);
 }
 
 .progress .progress-bar.bg-light {
@@ -574,21 +579,50 @@ body.dark .shadow-lg {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -2px rgba(0, 0, 0, 0.5) !important;
 }
 
+/* ---------- Bootstrap Color Overrides for Light Mode ---------- */
+body.light .bg-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+  background-color: #3b82f6 !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+body.light .bg-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  background-color: #10b981 !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+body.light .bg-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  background-color: #ef4444 !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+body.light .bg-secondary {
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
+  background-color: #64748b !important;
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.2);
+}
+
 /* ---------- Bootstrap Color Overrides for Dark Mode ---------- */
 body.dark .bg-primary {
-  background-color: #2563eb !important;
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 100%) !important;
+  background-color: #1e3a8a !important;
 }
 
 body.dark .bg-success {
-  background-color: #10b981 !important;
+  background: linear-gradient(135deg, #047857 0%, #065f46 100%) !important;
+  background-color: #047857 !important;
 }
 
 body.dark .bg-danger {
-  background-color: #ef4444 !important;
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%) !important;
+  background-color: #b91c1c !important;
 }
 
 body.dark .bg-secondary {
-  background-color: #64748b !important;
+  background: linear-gradient(135deg, #475569 0%, #334155 100%) !important;
+  background-color: #475569 !important;
 }
 
 body.dark .text-success {

@@ -14,14 +14,6 @@ const HoursInput = () => {
 
   const fullDate = useFullDate();
 
-  useEffect(() => {
-    const savedHoursList = localStorage.getItem('hoursList');
-    const savedTotalHours = localStorage.getItem('totalHours');
-
-    if (savedHoursList) setHoursList(JSON.parse(savedHoursList));
-    if (savedTotalHours) setTotalHours(parseFloat(savedTotalHours));
-  }, []);
-
   const handleClick = (e) => {
     e.preventDefault();
 
@@ -75,10 +67,13 @@ const HoursInput = () => {
 
       const newHoursList = [newEntry, ...hoursList];
       setHoursList(newHoursList);
+      setTotalHours(newTotalHours);
       setHoursInput('');
 
+      // Η αποθήκευση γίνεται αυτόματα από το AppContext useEffect
+      // Αλλά το κάνουμε και εδώ για να είμαστε σίγουροι
       localStorage.setItem('hoursList', JSON.stringify(newHoursList));
-      localStorage.setItem('totalHours', newTotalHours);
+      localStorage.setItem('totalHours', newTotalHours.toString());
     });
   };
 

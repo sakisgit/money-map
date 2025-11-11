@@ -26,7 +26,8 @@ const PaymentDropdown = () => {
     }
 
     // Αποθήκευση στο context και localStorage
-    setPayment(Number(inputValue));
+    const paymentValue = Number(inputValue);
+    setPayment(paymentValue);
     localStorage.setItem('payment', inputValue);
 
     Swal.fire({
@@ -93,9 +94,9 @@ const PaymentDropdown = () => {
   return (
     <div className="position-relative" ref={ref} style={{ minWidth: 'fit-content', zIndex: 1000 }}>
       <button 
-        className="btn btn-outline-light btn-sm" 
+        className="btn btn-outline-light btn-sm d-flex align-items-center justify-content-center" 
         onClick={toggleShow}
-        style={{ whiteSpace: 'nowrap' }}
+        style={{ whiteSpace: 'nowrap', minHeight: '38px', height: '38px', minWidth: 'fit-content', padding: '0.375rem 0.75rem' }}
       >
         <i className="fa-solid fa-calendar-days d-sm-none me-1"></i>
         <span className="d-none d-sm-inline">Payment Day</span>

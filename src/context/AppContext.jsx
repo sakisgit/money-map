@@ -38,14 +38,14 @@ export const AppProvider = ({ children }) => {
     const savedLoss = localStorage.getItem("lossItems");
     if (savedLoss) setLossItems(JSON.parse(savedLoss));
 
-    const savedRate = localStorage.getItem("hourlyRate"); // εναρμονισμένο με RateInput
+    const savedRate = localStorage.getItem("hourlyRate");
     if (savedRate) setRateInput(savedRate);
 
     const savedHours = localStorage.getItem("hoursList");
     if (savedHours) {
       const list = JSON.parse(savedHours);
       setHoursList(list);
-      const total = list.reduce((sum, item) => sum + item.hours, 0);
+      const total = list.reduce((sum, item) => sum + (item.hours || 0), 0);
       setTotalHours(total);
     }
   }, []);
@@ -72,9 +72,12 @@ export const AppProvider = ({ children }) => {
   }, [rateInput]);
 
   useEffect(() => {
-    localStorage.setItem("hoursList", JSON.stringify(hoursList));
-    const total = hoursList.reduce((sum, item) => sum + item.hours, 0);
-    setTotalHours(total);
+    if (hoursList.length > 0 || localStorage.getItem("hoursList")) {
+      localStorage.setItem("hoursList", JSON.stringify(hoursList));
+      const total = hoursList.reduce((sum, item) => sum + (item.hours || 0), 0);
+      setTotalHours(total);
+      localStorage.setItem("totalHours", total.toString());
+    }
   }, [hoursList]);
 
   // --- Derived State ---

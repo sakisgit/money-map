@@ -51,10 +51,13 @@ const ResetButton = () => {
     
     <button 
         id="reset" 
-        className="btn btn-outline-light me-2"
+        className="btn btn-outline-light btn-sm d-flex align-items-center justify-content-center"
         onClick={handleReset}
+        style={{ whiteSpace: 'nowrap', minHeight: '38px', height: '38px', minWidth: 'fit-content', padding: '0.375rem 0.75rem' }}
     >
-          Reset Stats
+          <i className="fa-solid fa-rotate d-sm-none me-1"></i>
+          <span className="d-none d-sm-inline">Reset Stats</span>
+          <span className="d-sm-none">Reset</span>
     </button>
   )
 };

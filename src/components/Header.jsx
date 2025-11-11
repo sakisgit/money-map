@@ -26,7 +26,8 @@ const Header = () => {
 
               <Link 
                 to="/work-hours" 
-                className="btn btn-outline-light rounded-work-hours btn-sm"
+                className="btn btn-outline-light rounded-work-hours btn-sm d-flex align-items-center justify-content-center"
+                style={{ whiteSpace: 'nowrap', minHeight: '38px', height: '38px', minWidth: 'fit-content', padding: '0.375rem 0.75rem' }}
               >
                 <i className="fa-solid fa-clock d-sm-none"></i>
                 <span className="d-none d-sm-inline">Work Hours</span>
@@ -34,9 +35,9 @@ const Header = () => {
               </Link> 
 
               <button 
-                className="btn btn-light d-flex align-items-center justify-content-center"
+                className="btn btn-light btn-sm d-flex align-items-center justify-content-center"
                 onClick={toggleTheme}
-                style={{ width: "40px", height: "40px", borderRadius: "50%", minWidth: "40px" }}
+                style={{ width: "38px", height: "38px", borderRadius: "50%", minWidth: "38px", minHeight: "38px" }}
                 title="Toggle Light/Dark Mode"
                 aria-label="Toggle theme"
               >
