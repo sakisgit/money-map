@@ -86,6 +86,9 @@ export const AppProvider = ({ children }) => {
     setBalance(newBalance);
   }, [payment, totalIncome, totalLoss]);
 
+  // Calculate moneyRemaining (same as balance)
+  const moneyRemaining = payment + totalIncome - totalLoss;
+
   // --- Context Value ---
   const contextValue = {
     // HomePage
@@ -97,6 +100,7 @@ export const AppProvider = ({ children }) => {
     balance, setBalance,
     totalIncome, setTotalIncome,
     totalLoss, setTotalLoss,
+    moneyRemaining, // Remaining budget: payment + totalIncome - totalLoss
 
     // WorkHoursPage
     rateInput, setRateInput,
