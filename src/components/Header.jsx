@@ -42,8 +42,8 @@ const Header = () => {
                 aria-label="Toggle theme"
               >
                 <i 
-                  className={`fa-solid ${theme === "light" ? "fa-sun" : "fa-moon"}`} 
-                  style={{ color: theme === "light" ? "orange" : "#706f6cff" }}
+                  className={`fa-solid ${theme === "light" ? "fa-moon" : "fa-sun"}`} 
+                  style={{ color: theme === "light" ? "#1e293b" : "orange" }}
                 >
                 </i>
               </button>
