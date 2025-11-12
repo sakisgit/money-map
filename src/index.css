@@ -1012,6 +1012,110 @@ body.dark .income-summary-item {
   color: #f1f5f9 !important;
 }
 
+/* ---------- Progress Bar Alert Messages ---------- */
+.alert {
+  border-radius: 0.75rem;
+  border: none;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.alert-danger {
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+  border-left: 4px solid #dc2626 !important;
+}
+
+body.dark .alert-danger {
+  background-color: rgba(220, 38, 38, 0.2) !important;
+  color: #fca5a5 !important;
+  border-left-color: #dc2626 !important;
+}
+
+.alert-warning {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+  border-left: 4px solid #f59e0b !important;
+}
+
+body.dark .alert-warning {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  color: #fcd34d !important;
+  border-left-color: #f59e0b !important;
+}
+
+.alert-info {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+  border-left: 4px solid #3b82f6 !important;
+}
+
+body.dark .alert-info {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+  color: #93c5fd !important;
+  border-left-color: #3b82f6 !important;
+}
+
+/* ---------- Progress Bar Info Text ---------- */
+.progress-info {
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+body.dark .progress-info {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.progress-info-icon {
+  color: #3b82f6;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+body.dark .progress-info-icon {
+  color: #60a5fa;
+}
+
+.progress-info-text {
+  font-size: 0.875rem;
+  color: #475569;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+body.dark .progress-info-text {
+  color: #cbd5e1;
+}
+
+@media (min-width: 768px) {
+  .progress-info {
+    padding: 1rem 1.25rem;
+  }
+  
+  .progress-info-text {
+    font-size: 0.9rem;
+  }
+  
+  .progress-info-icon {
+    font-size: 1.1rem;
+  }
+}
+
 /* ---------- Scroll Fade Indicators ---------- */
 .scroll-fade-top,
 .scroll-fade-bottom {

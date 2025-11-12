@@ -10,7 +10,7 @@ const AddMoneyLoss = () => {
   const { 
     lossItems, setLossItems, 
     filterLoss, payment, 
-    moneyRemaining, formatMoney 
+    moneyRemaining, formatMoney
   } = useContext(AppContext);
   
   const fullDate = useFullDate();
@@ -85,7 +85,7 @@ const AddMoneyLoss = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (payment === 0 || moneyRemaining === 0) {
+    if (payment === 0) {
       Swal.fire({
         icon: 'warning',
         title: 'Set Income First',
