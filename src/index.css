@@ -959,6 +959,59 @@ body.dark .income-list-container::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
 
+/* ---------- Search Summary Cards ---------- */
+.expense-summary-card {
+  border: 2px solid #ef4444 !important;
+}
+
+body.dark .expense-summary-card {
+  border-color: #dc2626 !important;
+  background: #1e293b !important;
+}
+
+.expense-summary-title {
+  color: #ef4444 !important;
+}
+
+body.dark .expense-summary-title {
+  color: #f87171 !important;
+}
+
+.expense-summary-item {
+  background-color: #f8f9fa !important;
+}
+
+body.dark .expense-summary-item {
+  background-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+.income-summary-card {
+  border: 2px solid #10b981 !important;
+}
+
+body.dark .income-summary-card {
+  border-color: #22c55e !important;
+  background: #1e293b !important;
+}
+
+.income-summary-title {
+  color: #10b981 !important;
+}
+
+body.dark .income-summary-title {
+  color: #34d399 !important;
+}
+
+.income-summary-item {
+  background-color: #f8f9fa !important;
+}
+
+body.dark .income-summary-item {
+  background-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
 /* ---------- Scroll Fade Indicators ---------- */
 .scroll-fade-top,
 .scroll-fade-bottom {

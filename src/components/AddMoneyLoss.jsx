@@ -22,10 +22,30 @@ const AddMoneyLoss = () => {
 
   const { gifUrl, showGif } = useGiphyGif();
 
-  // Calculate filtered items first
+  // Calculate filtered items first (case-insensitive)
   const filteredItems = lossItems.filter(item =>
     item.text.toLowerCase().includes(filterLoss.toLowerCase())
   );
+
+  // Group items by normalized name (case-insensitive) and calculate totals
+  const groupedTotals = filteredItems.reduce((acc, item) => {
+    const normalizedName = item.text.toLowerCase().trim();
+    if (!acc[normalizedName]) {
+      acc[normalizedName] = {
+        displayName: item.text, // Keep original case of first occurrence
+        total: 0,
+        count: 0
+      };
+    }
+    acc[normalizedName].total += item.amount;
+    acc[normalizedName].count += 1;
+    return acc;
+  }, {});
+
+  // Convert to array - show all groups that have matches
+  const summaryGroups = Object.entries(groupedTotals)
+    .map(([_, data]) => data)
+    .sort((a, b) => b.total - a.total); // Sort by total descending
 
   useEffect(() => {
     const savedLoss = localStorage.getItem('lossItems');
@@ -174,6 +194,31 @@ const AddMoneyLoss = () => {
           <p className="text-center text-muted fst-italic py-3">❌ No matching expenses found.</p>
         ) : (
           <>
+            {/* Summary Section - Show totals for grouped items */}
+            {filterLoss && summaryGroups.length > 0 && (
+              <div className="card mb-3 shadow-sm expense-summary-card">
+                <div className="card-body p-3">
+                  <h6 className="fw-bold mb-3 expense-summary-title">
+                    <i className="fa-solid fa-calculator me-2"></i>
+                    Search Summary
+                  </h6>
+                  <div className="d-flex flex-column gap-2">
+                    {summaryGroups.map((group, idx) => (
+                      <div key={idx} className="d-flex justify-content-between align-items-center p-2 expense-summary-item rounded">
+                        <span className="fw-semibold">{group.displayName}:</span>
+                        <span className="fw-bold text-danger fs-5">
+                          {formatMoney(group.total)} €
+                          {group.count > 1 && (
+                            <small className="text-muted ms-2">({group.count} items)</small>
+                          )}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Top Fade Indicator */}
             {showTopFade && filteredItems.length > 4 && (
               <div className="scroll-fade-top">
