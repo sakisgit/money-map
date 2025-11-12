@@ -442,20 +442,82 @@ body.dark .input-group-text {
 
 /* Date badge styling */
 .date-badge {
-  background-color: #e0e7ff !important;
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%) !important;
   color: #1e40af !important;
   font-size: 0.75rem;
   white-space: nowrap;
+  font-weight: 600;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(30, 64, 175, 0.2);
+  border: 1px solid rgba(30, 64, 175, 0.2);
 }
 
 body.dark .date-badge {
-  background-color: #1e3a8a !important;
-  color: #93c5fd !important;
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%) !important;
+  color: #e0e7ff !important;
+  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.4);
+  border-color: rgba(147, 197, 253, 0.3);
 }
 
 body.dark .badge {
   background-color: #334155 !important;
   color: #cbd5e1 !important;
+}
+
+/* ---------- List Group Items for Dark Mode ---------- */
+body.dark .list-group-item {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+}
+
+body.dark .list-group-item .fw-semibold {
+  color: #f1f5f9 !important;
+}
+
+body.dark .list-group-item .text-success {
+  color: #34d399 !important;
+}
+
+/* ---------- Work Header Date Styling ---------- */
+.work-header-date {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 0.75rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.work-header-date:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.work-header-date i {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+}
+
+body.dark .work-header-date {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f1f5f9;
+}
+
+body.dark .work-header-date:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+body.dark .work-header-date i {
+  color: #cbd5e1;
 }
 
 /* ---------- Container Improvements ---------- */

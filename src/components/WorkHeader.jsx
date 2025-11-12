@@ -35,7 +35,8 @@ const WorkHeader = () => {
           </div>
 
           {/* Date */}
-          <div className="text-light opacity-75 text-center d-none d-md-block">
+          <div className="work-header-date text-center d-none d-md-block">
+            <i className="fa-solid fa-calendar-days me-2"></i>
             <span className="fs-6 fw-semibold">{dateOnly}</span>
           </div>
         </div>
