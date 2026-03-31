@@ -4,6 +4,14 @@ import { useState, useEffect, createContext } from "react";
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
+  const safeParse = (value, fallback) => {
+    try {
+      return value ? JSON.parse(value) : fallback;
+    } catch {
+      return fallback;
+    }
+  };
+
   // --- HomePage States ---
   const [incomeItems, setIncomeItems] = useState([]);
   const [lossItems, setLossItems] = useState([]);
@@ -33,19 +41,21 @@ export const AppProvider = ({ children }) => {
     if (savedPayment) setPayment(Number(savedPayment));
 
     const savedIncome = localStorage.getItem("incomeItems");
-    if (savedIncome) setIncomeItems(JSON.parse(savedIncome));
+    const parsedIncome = safeParse(savedIncome, []);
+    if (Array.isArray(parsedIncome)) setIncomeItems(parsedIncome);
 
     const savedLoss = localStorage.getItem("lossItems");
-    if (savedLoss) setLossItems(JSON.parse(savedLoss));
+    const parsedLoss = safeParse(savedLoss, []);
+    if (Array.isArray(parsedLoss)) setLossItems(parsedLoss);
 
     const savedRate = localStorage.getItem("hourlyRate");
     if (savedRate) setRateInput(savedRate);
 
     const savedHours = localStorage.getItem("hoursList");
-    if (savedHours) {
-      const list = JSON.parse(savedHours);
-      setHoursList(list);
-      const total = list.reduce((sum, item) => sum + (item.hours || 0), 0);
+    const parsedHours = safeParse(savedHours, []);
+    if (Array.isArray(parsedHours)) {
+      setHoursList(parsedHours);
+      const total = parsedHours.reduce((sum, item) => sum + (Number(item?.hours) || 0), 0);
       setTotalHours(total);
     }
   }, []);
@@ -74,7 +84,7 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     if (hoursList.length > 0 || localStorage.getItem("hoursList")) {
       localStorage.setItem("hoursList", JSON.stringify(hoursList));
-      const total = hoursList.reduce((sum, item) => sum + (item.hours || 0), 0);
+      const total = hoursList.reduce((sum, item) => sum + (Number(item?.hours) || 0), 0);
       setTotalHours(total);
       localStorage.setItem("totalHours", total.toString());
     }
