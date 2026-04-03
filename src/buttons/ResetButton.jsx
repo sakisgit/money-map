@@ -23,7 +23,7 @@ const ResetButton = () => {
       }).then((result) => {
         if (result.isConfirmed) {
 
-          // Καθαρίζουμε το context
+          // Clear context state
           setLossItems([]);
           setIncomeItems([]);
           setPayment(0);
@@ -31,7 +31,7 @@ const ResetButton = () => {
           setTotalIncome(0);
           setTotalLoss(0);
 
-          // Καθαρίζουμε και το localStorage
+          // Clear localStorage
           localStorage.removeItem('payment');
           localStorage.removeItem('incomeItems');
           localStorage.removeItem('lossItems');

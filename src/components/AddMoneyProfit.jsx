@@ -5,6 +5,7 @@ import DeleteButton from "../buttons/DeleteButton";
 import { useGiphyGif } from "../hooks/useGiphyGif";
 import { useFullDate } from "../hooks/useFullDate";
 import Swal from "sweetalert2";
+import { toLocalDateKey } from "../utils/dateKey";
 
 const AddMoneyProfit = () => {
   const { 
@@ -45,11 +46,6 @@ const AddMoneyProfit = () => {
   const summaryGroups = Object.entries(groupedTotals)
     .filter(([_, data]) => data.count > 1)
     .map(([_, data]) => data);
-
-  useEffect(() => {
-    const savedIncome = localStorage.getItem('incomeItems');
-    if (savedIncome) setIncomeItems(JSON.parse(savedIncome));
-  }, []);
 
   // Check scroll position for fade indicators
   useEffect(() => {
@@ -115,11 +111,12 @@ const AddMoneyProfit = () => {
       return;
     }
 
-    const newItem = { 
+    const newItem = {
       id: Date.now(),
       fullDate: fullDate,
-      text: incomeText, 
-      amount: amountValue
+      dateKey: toLocalDateKey(),
+      text: incomeText,
+      amount: amountValue,
     };
 
     const updatedIncomeItems = [...incomeItems, newItem];

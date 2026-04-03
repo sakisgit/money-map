@@ -5,6 +5,7 @@ import DeleteButton from "../buttons/DeleteButton";
 import { useGiphyGif } from "../hooks/useGiphyGif";
 import { useFullDate } from "../hooks/useFullDate";
 import Swal from "sweetalert2";
+import { toLocalDateKey } from "../utils/dateKey";
 
 const AddMoneyLoss = () => {
   const { 
@@ -46,11 +47,6 @@ const AddMoneyLoss = () => {
   const summaryGroups = Object.entries(groupedTotals)
     .map(([_, data]) => data)
     .sort((a, b) => b.total - a.total); // Sort by total descending
-
-  useEffect(() => {
-    const savedLoss = localStorage.getItem('lossItems');
-    if (savedLoss) setLossItems(JSON.parse(savedLoss));
-  }, []);
 
   // Check scroll position for fade indicators
   useEffect(() => {
@@ -126,11 +122,12 @@ const AddMoneyLoss = () => {
       return;
     }
 
-    const newItem = { 
+    const newItem = {
       id: Date.now(),
       fullDate: fullDate,
-      text: lossText, 
-      amount: amountValue
+      dateKey: toLocalDateKey(),
+      text: lossText,
+      amount: amountValue,
     };
 
     const updatedLossItems = [newItem, ...lossItems];

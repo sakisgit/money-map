@@ -3,13 +3,7 @@ import { useContext, useEffect } from "react";
 import { AppContext } from "../context/AppContext";
 import { useFullDate } from "../hooks/useFullDate";
 import Swal from "sweetalert2";
-
-const toLocalDateKey = (date = new Date()) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
+import { toLocalDateKey } from "../utils/dateKey";
 
 const HoursInput = () => {
   const { 
@@ -78,8 +72,7 @@ const HoursInput = () => {
       setTotalHours(newTotalHours);
       setHoursInput('');
 
-      // Η αποθήκευση γίνεται αυτόματα από το AppContext useEffect
-      // Αλλά το κάνουμε και εδώ για να είμαστε σίγουροι
+      // AppContext also persists; this keeps storage in sync after add
       localStorage.setItem('hoursList', JSON.stringify(newHoursList));
       localStorage.setItem('totalHours', newTotalHours.toString());
     });

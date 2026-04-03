@@ -25,7 +25,7 @@ const PaymentDropdown = () => {
       return;
     }
 
-    // Αποθήκευση στο context και localStorage
+    // Save to context and localStorage
     const paymentValue = Number(inputValue);
     setPayment(paymentValue);
     localStorage.setItem('payment', inputValue);
@@ -38,17 +38,16 @@ const PaymentDropdown = () => {
       showConfirmButton: false
     });
 
-    setInputValue(''); // καθαρίζει το input
+    setInputValue("");
     setShow(false);
   };
 
-  // Όταν φορτώνει το component, παίρνουμε την τιμή από localStorage
   useEffect(() => {
-    const savedPayment = localStorage.getItem('payment');
+    const savedPayment = localStorage.getItem("payment");
     if (savedPayment) {
-      setPayment(Number(savedPayment)); // context κρατάει την τιμή
+      setPayment(Number(savedPayment));
     }
-    setInputValue(''); // input αρχικά κενό
+    setInputValue("");
   }, []);
 
   useEffect(() => {

@@ -7,8 +7,10 @@ const Stats = () => {
   const [progressMessage, setProgressMessage] = useState(null);
   const [lastProgressLevel, setLastProgressLevel] = useState(0);
 
-  const totalIncome = incomeItems.reduce((acc, item) => acc + item.amount, 0);
-  const totalLoss = lossItems.reduce((acc, item) => acc + item.amount, 0);
+  const safeIncome = Array.isArray(incomeItems) ? incomeItems : [];
+  const safeLoss = Array.isArray(lossItems) ? lossItems : [];
+  const totalIncome = safeIncome.reduce((acc, item) => acc + (Number(item?.amount) || 0), 0);
+  const totalLoss = safeLoss.reduce((acc, item) => acc + (Number(item?.amount) || 0), 0);
   const moneyRemaining = (payment + totalIncome) - totalLoss;
   const progressBar = payment > 0 ? Math.min((totalLoss / payment) * 100, 100) : 0;
 

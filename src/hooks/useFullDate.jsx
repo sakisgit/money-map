@@ -14,11 +14,16 @@ export const useFullDate = () => {
       const minutes = date.getMinutes().toString().padStart(2, '0');
       const seconds = date.getSeconds().toString().padStart(2, '0');
 
-      setFullDate(`${day}, ${date.toLocaleDateString()} ${hours}:${minutes}:${seconds}`);
+      const datePart = date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+      });
+      setFullDate(`${day}, ${datePart} ${hours}:${minutes}:${seconds}`);
     };
 
-    updateDate(); // αρχική τιμή
-    const interval = setInterval(updateDate, 1000); // ανανέωση κάθε λεπτό
+    updateDate();
+    const interval = setInterval(updateDate, 1000);
 
     return () => clearInterval(interval);
   }, []);

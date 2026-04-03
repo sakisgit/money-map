@@ -16,30 +16,52 @@ export const AppProvider = ({ children }) => {
     if (!fullDate || typeof fullDate !== "string") return null;
 
     const parsed = new Date(fullDate);
-    const parsedKey = toLocalDateKey(parsed);
-    if (parsedKey) return parsedKey;
+    if (!Number.isNaN(parsed.getTime())) {
+      const parsedKey = toLocalDateKey(parsed);
+      if (parsedKey) return parsedKey;
+    }
 
-    const dateToken = fullDate.split(", ")[1]?.split(" ")[0];
+    const afterComma = fullDate.includes(", ")
+      ? fullDate.split(", ").slice(1).join(", ")
+      : fullDate;
+    const dateToken = afterComma.trim().split(/\s+/)[0];
     if (!dateToken) return null;
 
-    const parts = dateToken.split("/");
+    const parts = dateToken.split(/[/.\-]/).filter(Boolean);
     if (parts.length !== 3) return null;
 
-    const [a, b, y] = parts.map(Number);
-    if (![a, b, y].every(Number.isFinite)) return null;
+    const nums = parts.map((p) => Number(p));
+    if (!nums.every(Number.isFinite)) return null;
+    let [a, b, y] = nums;
+    if (y < 100) y += 2000;
 
-    const month = a >= 1 && a <= 12 ? a : b;
-    const day = a >= 1 && a <= 12 ? b : a;
+    let month;
+    let day;
+    if (a > 12) {
+      day = a;
+      month = b;
+    } else if (b > 12) {
+      day = a;
+      month = b;
+    } else {
+      day = a;
+      month = b;
+    }
+
     const manual = new Date(y, month - 1, day);
     return toLocalDateKey(manual);
   };
 
   const ensureDateKey = (entry) => {
     if (entry?.dateKey) return entry;
-    return {
-      ...entry,
-      dateKey: parseDateKeyFromFullDate(entry?.fullDate),
-    };
+    const dk = parseDateKeyFromFullDate(entry?.fullDate);
+    return dk ? { ...entry, dateKey: dk } : entry;
+  };
+
+  const ensureIncomeLossDateKey = (entry) => {
+    if (entry?.dateKey) return entry;
+    const dk = parseDateKeyFromFullDate(entry?.fullDate);
+    return dk ? { ...entry, dateKey: dk } : entry;
   };
 
   const safeParse = (value, fallback) => {
@@ -68,11 +90,14 @@ export const AppProvider = ({ children }) => {
   const [workDayStatus, setWorkDayStatus] = useState({});
 
   // --- Format Helper ---
-  const formatMoney = (num) =>
-    num.toLocaleString("el-GR", {
+  const formatMoney = (num) => {
+    const n = Number(num);
+    const safe = Number.isFinite(n) ? n : 0;
+    return safe.toLocaleString("en-US", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
+  };
 
   // --- Load initial state from localStorage ---
   useEffect(() => {
@@ -81,11 +106,15 @@ export const AppProvider = ({ children }) => {
 
     const savedIncome = localStorage.getItem("incomeItems");
     const parsedIncome = safeParse(savedIncome, []);
-    if (Array.isArray(parsedIncome)) setIncomeItems(parsedIncome);
+    if (Array.isArray(parsedIncome)) {
+      setIncomeItems(parsedIncome.map(ensureIncomeLossDateKey));
+    }
 
     const savedLoss = localStorage.getItem("lossItems");
     const parsedLoss = safeParse(savedLoss, []);
-    if (Array.isArray(parsedLoss)) setLossItems(parsedLoss);
+    if (Array.isArray(parsedLoss)) {
+      setLossItems(parsedLoss.map(ensureIncomeLossDateKey));
+    }
 
     const savedRate = localStorage.getItem("hourlyRate");
     if (savedRate) setRateInput(savedRate);
@@ -113,13 +142,19 @@ export const AppProvider = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem("incomeItems", JSON.stringify(incomeItems));
-    const total = incomeItems.reduce((sum, item) => sum + item.amount, 0);
+    const total = incomeItems.reduce(
+      (sum, item) => sum + (Number(item?.amount) || 0),
+      0
+    );
     setTotalIncome(total);
   }, [incomeItems]);
 
   useEffect(() => {
     localStorage.setItem("lossItems", JSON.stringify(lossItems));
-    const total = lossItems.reduce((sum, item) => sum + item.amount, 0);
+    const total = lossItems.reduce(
+      (sum, item) => sum + (Number(item?.amount) || 0),
+      0
+    );
     setTotalLoss(total);
   }, [lossItems]);
 
