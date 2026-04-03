@@ -7,6 +7,7 @@ import Filter from "../components/Filter";
 import Items from "../components/Items";
 import AddMoneyLoss from "../components/AddMoneyLoss";
 import AddMoneyProfit from "../components/AddMoneyProfit";
+import WorkCalendar from "../components/WorkCalendar";
 import loaderGif from '../assets/spinner.gif'
 
 const HomePage = () => {
@@ -33,6 +34,10 @@ const HomePage = () => {
       ) : (
         <>
           <Header/>
+
+          <div className="container my-4">
+            <WorkCalendar />
+          </div>
 
           <Stats/>
 
