@@ -19,15 +19,14 @@ const Header = () => {
             </h1>
 
             {/* Actions */}
-            <div className="d-flex flex-wrap align-items-center justify-content-center gap-2 gap-sm-3">
+            <div className="d-flex flex-wrap align-items-center justify-content-center gap-2 gap-sm-3 header-actions">
               <PaymentDropdown/>
 
               <ResetButton/>
 
               <Link 
                 to="/work-hours" 
-                className="btn btn-outline-light rounded-work-hours btn-sm d-flex align-items-center justify-content-center"
-                style={{ whiteSpace: 'nowrap', minHeight: '38px', height: '38px', minWidth: 'fit-content', padding: '0.375rem 0.75rem' }}
+                className="btn btn-outline-light btn-sm header-action-btn rounded-work-hours d-flex align-items-center justify-content-center"
               >
                 <i className="fa-solid fa-clock d-sm-none"></i>
                 <span className="d-none d-sm-inline">Work Hours</span>
@@ -35,9 +34,9 @@ const Header = () => {
               </Link> 
 
               <button 
-                className="btn btn-light btn-sm d-flex align-items-center justify-content-center"
+                type="button"
+                className="btn btn-light btn-sm header-theme-btn d-flex align-items-center justify-content-center"
                 onClick={toggleTheme}
-                style={{ width: "38px", height: "38px", borderRadius: "50%", minWidth: "38px", minHeight: "38px" }}
                 title="Toggle Light/Dark Mode"
                 aria-label="Toggle theme"
               >

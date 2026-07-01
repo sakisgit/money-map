@@ -153,11 +153,39 @@ const WorkCalendar = () => {
       .filter(inSelectedMonth)
       .reduce((sum, item) => sum + (Number(item?.amount) || 0), 0);
 
+    const monthTotalIn = totalMonthEarnings + totalMonthListIncome;
+    const monthBalance = monthTotalIn - totalMonthListExpenses;
+    const overSalary = Math.max(0, totalMonthListExpenses - totalMonthEarnings);
+
+    let balanceStatus = "zero";
+    let balanceLabel = "Left over";
+    let balanceAmount = 0;
+
+    if (monthBalance > 0) {
+      balanceStatus = "surplus";
+      balanceAmount = monthBalance;
+    } else if (monthBalance === 0) {
+      balanceStatus = "zero";
+      balanceAmount = 0;
+    } else if (overSalary > 0) {
+      balanceStatus = "over-salary";
+      balanceLabel = "Over salary";
+      balanceAmount = overSalary;
+    } else {
+      balanceStatus = "deficit";
+      balanceLabel = "Over spent";
+      balanceAmount = Math.abs(monthBalance);
+    }
+
     return {
       totalMonthHours,
       totalMonthEarnings,
       totalMonthListIncome,
       totalMonthListExpenses,
+      monthBalance,
+      balanceStatus,
+      balanceLabel,
+      balanceAmount,
       isViewingCurrentMonth,
     };
   }, [hoursList, incomeItems, lossItems, monthCursor]);
@@ -222,7 +250,8 @@ const WorkCalendar = () => {
       <div className="calendar-topbar d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-3">
         <div>
           <h6 className="m-0 fw-bold">Work Calendar</h6>
-          <small className="text-muted">Click a day to cycle: none - off - vacation</small>
+          <small className="text-muted d-none d-sm-inline">Click a day to cycle: none - off - vacation</small>
+          <small className="text-muted d-sm-none">Tap day: off / vacation</small>
         </div>
         <div className="calendar-month-controls d-flex align-items-center gap-2">
           <button type="button" className="btn btn-outline-secondary btn-sm calendar-nav-btn" onClick={goPrevMonth}>
@@ -261,19 +290,6 @@ const WorkCalendar = () => {
             </div>
           </article>
 
-          <article className="calendar-stat-tile calendar-stat-tile--expense" role="listitem">
-            <div className="calendar-stat-tile__icon-wrap" aria-hidden>
-              <i className="fa-solid fa-arrow-trend-down"></i>
-            </div>
-            <div className="calendar-stat-tile__content">
-              <span className="calendar-stat-tile__label">Total expenses</span>
-              <span className="calendar-stat-tile__value">
-                {formatMoney(monthlyStats.totalMonthListExpenses)}
-                <span className="calendar-stat-tile__currency">€</span>
-              </span>
-            </div>
-          </article>
-
           <article className="calendar-stat-tile calendar-stat-tile--pay" role="listitem">
             <div className="calendar-stat-tile__icon-wrap" aria-hidden>
               <i className="fa-solid fa-briefcase"></i>
@@ -287,14 +303,53 @@ const WorkCalendar = () => {
             </div>
           </article>
 
+          <article className="calendar-stat-tile calendar-stat-tile--expense" role="listitem">
+            <div className="calendar-stat-tile__icon-wrap" aria-hidden>
+              <i className="fa-solid fa-arrow-trend-down"></i>
+            </div>
+            <div className="calendar-stat-tile__content">
+              <span className="calendar-stat-tile__label">Total expenses</span>
+              <span className="calendar-stat-tile__value">
+                {formatMoney(monthlyStats.totalMonthListExpenses)}
+                <span className="calendar-stat-tile__currency">€</span>
+              </span>
+            </div>
+          </article>
+
           <article className="calendar-stat-tile calendar-stat-tile--income" role="listitem">
             <div className="calendar-stat-tile__icon-wrap" aria-hidden>
               <i className="fa-solid fa-arrow-trend-up"></i>
             </div>
             <div className="calendar-stat-tile__content">
-              <span className="calendar-stat-tile__label">Month income</span>
+              <span className="calendar-stat-tile__label">Total income</span>
               <span className="calendar-stat-tile__value">
                 {formatMoney(monthlyStats.totalMonthListIncome)}
+                <span className="calendar-stat-tile__currency">€</span>
+              </span>
+            </div>
+          </article>
+
+          <article
+            className={`calendar-stat-tile calendar-stat-tile--balance calendar-stat-tile--balance-${monthlyStats.balanceStatus}`}
+            role="listitem"
+          >
+            <div className="calendar-stat-tile__icon-wrap" aria-hidden>
+              <i
+                className={
+                  monthlyStats.balanceStatus === "surplus"
+                    ? "fa-solid fa-piggy-bank"
+                    : "fa-solid fa-triangle-exclamation"
+                }
+              ></i>
+            </div>
+            <div className="calendar-stat-tile__content">
+              <span className="calendar-stat-tile__label">{monthlyStats.balanceLabel}</span>
+              <span
+                className={`calendar-stat-tile__value calendar-stat-tile__value--${
+                  monthlyStats.balanceStatus === "surplus" ? "positive" : "negative"
+                }`}
+              >
+                {formatMoney(monthlyStats.balanceAmount)}
                 <span className="calendar-stat-tile__currency">€</span>
               </span>
             </div>

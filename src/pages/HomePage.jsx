@@ -29,27 +29,21 @@ const HomePage = () => {
     <>
       {loading ? (
         <div className="text-center my-5">
-          <img src={loaderGif} alt="Loading..." style={{ width: '100px', height: '100px' }} />
+          <img src={loaderGif} alt="Loading..." className="page-loader" />
         </div>
       ) : (
         <>
           <Header/>
 
-          <div className="container my-4">
+          <div className="container page-content my-4">
             <WorkCalendar />
+            <Stats/>
+            <Filter/>
+            <Items>
+              <AddMoneyLoss/>
+              <AddMoneyProfit/>
+            </Items>
           </div>
-
-          <Stats/>
-
-          <Filter/>
-
-          <Items>
-
-            <AddMoneyLoss/>
-
-            <AddMoneyProfit/>
-
-          </Items>
         </>
       )}
     </>

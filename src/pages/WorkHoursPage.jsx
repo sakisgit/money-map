@@ -1,27 +1,19 @@
 
 import { Link } from 'react-router-dom'
-import { useContext, useState } from 'react';
-import { AppContext } from '../context/AppContext';
+import { useState } from 'react';
 import loaderGif from '../assets/spinner.gif'
 import WorkHeader from '../components/WorkHeader';
-import RateInput from '../components/RateInput';
-import HoursInput from '../components/HoursInput';
+import WorkShiftPanel from '../components/WorkShiftPanel';
 import HoursList from '../components/HoursList';
 
 const WorkHoursPage = () => {
-  const {
-    rateInput, setRateInput,
-    hoursInput, setHoursInput,
-    totalHours, setTotalHours
-  } = useContext(AppContext);
-
   const [loading, setLoading] = useState(false);
 
   return (
     <>
     {loading ? (
       <div className="text-center my-5">
-        <img src={loaderGif} alt="Loading..." style={{ width: '100px', height: '100px' }} />
+        <img src={loaderGif} alt="Loading..." className="page-loader" />
       </div>
     ) : (
       <div className="container my-4 my-md-5">
@@ -29,19 +21,9 @@ const WorkHoursPage = () => {
         {/* Header */}
         <WorkHeader/>
 
-        {/* Input Section */}
-        <div className="row g-3 g-md-4 mb-4">
-          
-          {/* Rate Input */}
-          <RateInput/>
+        <WorkShiftPanel />
 
-          {/* Hours Input */}
-          <HoursInput/>
-
-        </div>
-
-        {/* Display Hours List */}
-        <HoursList/>
+        <HoursList />
 
         {/* Back Button */}
         <div className="text-center mt-4 mb-3">

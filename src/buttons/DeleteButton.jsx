@@ -28,7 +28,7 @@ const DeleteButton = ({onDelete}) => {
   return (
     <button
       type="button"  
-      className="btn btn-danger btn-sm mx-2"
+      className="btn btn-danger btn-sm touch-icon-btn"
       onClick={handleClick}
     >
       <i className="fa-solid fa-xmark"></i>

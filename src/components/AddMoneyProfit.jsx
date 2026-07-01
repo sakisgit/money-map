@@ -5,7 +5,7 @@ import DeleteButton from "../buttons/DeleteButton";
 import { useGiphyGif } from "../hooks/useGiphyGif";
 import { useFullDate } from "../hooks/useFullDate";
 import Swal from "sweetalert2";
-import { toLocalDateKey } from "../utils/dateKey";
+import { toLocalDateKey, formatEntryDisplayDate } from "../utils/dateKey";
 
 const AddMoneyProfit = () => {
   const { 
@@ -224,13 +224,6 @@ const AddMoneyProfit = () => {
             <div 
               ref={listContainerRef}
               className="income-list-container"
-              style={{
-                maxHeight: 'calc(4 * (80px + 0.5rem))',
-                overflowY: 'auto',
-                overflowX: 'hidden',
-                paddingRight: '4px',
-                position: 'relative'
-              }}
             >
             {filteredItems.map((item) => (
               <div className="card my-2 shadow-sm" key={item.id}>
@@ -238,31 +231,22 @@ const AddMoneyProfit = () => {
                   <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2">
                     
                     {/* Left section: text + date */}
-                    <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2 flex-grow-1" style={{ minWidth: 0 }}>
+                    <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2 flex-grow-1 money-item-row">
                       {/* Income text */}
-                      <span className="fw-semibold" style={{
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        flex: '1 1 auto',
-                        fontSize: '0.95rem'
-                      }}>
+                      <span className="fw-semibold money-item-text">
                         {item.text}
                       </span>
 
                       {/* Date badge */}
                       <span className="badge date-badge">
-                        {item.fullDate}
+                        {formatEntryDisplayDate(item)}
                       </span>
                     </div>
 
                     {/* Right section: amount + GIF + delete */}
                     <div className="d-flex align-items-center gap-2">
                       {/* Amount */}
-                      <span className="fw-bold text-success" style={{ 
-                        whiteSpace: 'nowrap',
-                        fontSize: '1rem'
-                      }}>
+                      <span className="fw-bold text-success money-item-amount">
                         {formatMoney(item.amount)} €
                       </span>
 

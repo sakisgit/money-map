@@ -57,10 +57,10 @@ const Stats = () => {
           <div className="col-12 col-md-6">
             <div className="card text-center bg-primary text-white shadow-sm h-100">
               <div className="card-body py-3 py-md-4">
-                <div id="money-limit" className="fs-1 fw-bold">
+                <div id="money-limit" className="fs-1 fw-bold stat-amount">
                   {formatMoney(payment)} €
                 </div>
-                <p className="fs-5 fs-md-6 mb-0 mt-2">Monthly Income</p>
+                <p className="fs-6 mb-0 mt-2">Monthly Income</p>
               </div>
             </div>
           </div>
@@ -77,10 +77,10 @@ const Stats = () => {
               }`}
             >
               <div className="card-body py-3 py-md-4">
-                <div id="profit-loss" className="fs-1 fw-bold">
+                <div id="profit-loss" className="fs-1 fw-bold stat-amount">
                   {formatMoney(moneyRemaining)} €
                 </div>
-                <p className="fs-5 fs-md-6 mb-0 mt-2">Net Balance</p>
+                <p className="fs-6 mb-0 mt-2">Net Balance</p>
               </div>
             </div>
           </div>
@@ -89,14 +89,14 @@ const Stats = () => {
         {/* Income / Expenses / Remaining */}
         <div className="row g-3 g-md-4 text-center">
           {/* Total Income */}
-          <div className="col-12 col-sm-6 col-md-4">
+          <div className="col-12 col-md-4">
             <div
               className={`card text-center shadow-sm h-100 ${
                 totalIncome > 0 ? "bg-success text-white" : "bg-light"
               }`}
             >
               <div className="card-body py-3 py-md-4">
-                <div id="income" className="fs-2 fw-bold">
+                <div id="income" className="fs-2 fw-bold stat-amount">
                   {formatMoney(totalIncome)} €
                 </div>
                 <p className="fs-6 mb-0 mt-2">Total Income</p>
@@ -105,14 +105,14 @@ const Stats = () => {
           </div>
 
           {/* Total Expenses */}
-          <div className="col-12 col-sm-6 col-md-4">
+          <div className="col-12 col-md-4">
             <div
               className={`card text-center shadow-sm h-100 ${
                 totalLoss > 0 ? "bg-danger text-white" : "bg-light"
               }`}
             >
               <div className="card-body py-3 py-md-4">
-                <div id="expenses" className="fs-2 fw-bold">
+                <div id="expenses" className="fs-2 fw-bold stat-amount">
                   {formatMoney(totalLoss)} €
                 </div>
                 <p className="fs-6 mb-0 mt-2">Total Expenses</p>
@@ -121,7 +121,7 @@ const Stats = () => {
           </div>
 
           {/* Remaining Budget */}
-          <div className="col-12 col-sm-12 col-md-4">
+          <div className="col-12 col-md-4">
             <div
               className={`card text-center shadow-sm h-100 ${
                 moneyRemaining < 0
@@ -132,7 +132,7 @@ const Stats = () => {
               }`}
             >
               <div className="card-body py-3 py-md-4">
-                <div id="money-remaining" className="fs-2 fw-bold">
+                <div id="money-remaining" className="fs-2 fw-bold stat-amount">
                   {formatMoney(moneyRemaining)} €
                 </div>
                 <p className="fs-6 mb-0 mt-2">Remaining Budget</p>
@@ -145,16 +145,20 @@ const Stats = () => {
       {/* Progress Bar */}
       {totalLoss > 0 && (
         <section className="stats mt-3 mt-md-4 text-center">
+          <p className="progress-percent-label mb-2 fw-semibold">
+            {progressBar.toFixed(1)}% of monthly budget spent
+          </p>
           <div className="progress">
             <div
               id="money-progress"
               className={`progress-bar ${totalLoss > 0 ? "bg-danger" : "bg-light"}`}
               role="progressbar"
               style={{ width: `${progressBar.toFixed(1)}%`, transition: "width 0.6s ease" }}
+              aria-valuenow={progressBar}
+              aria-valuemin={0}
+              aria-valuemax={100}
               title={`You spent ${formatMoney(totalLoss)} out of ${formatMoney(payment)}`}
-            >
-              {progressBar.toFixed(1)}%
-            </div>
+            />
           </div>
           
           {/* Progress Messages */}

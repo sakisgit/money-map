@@ -1,5 +1,5 @@
-
-import { useState, useEffect, createContext } from "react";
+import { useState, useEffect, createContext, useCallback, useMemo } from "react";
+import { getPreviousMonthKey } from "../utils/dateKey";
 
 export const AppContext = createContext();
 
@@ -58,6 +58,23 @@ export const AppProvider = ({ children }) => {
     return dk ? { ...entry, dateKey: dk } : entry;
   };
 
+  const normalizeHoursList = (list) => {
+    if (!Array.isArray(list)) return [];
+    const seenIds = new Set();
+
+    return list.map((entry, index) => {
+      const withDate = ensureDateKey(entry);
+      let id = withDate?.id;
+
+      if (id == null || id === "" || seenIds.has(String(id))) {
+        id = `hours-${withDate?.dateKey ?? "nd"}-${withDate?.startTime ?? "t"}-${withDate?.endTime ?? "t"}-${index}`;
+      }
+
+      seenIds.add(String(id));
+      return { ...withDate, id };
+    });
+  };
+
   const ensureIncomeLossDateKey = (entry) => {
     if (entry?.dateKey) return entry;
     const dk = parseDateKeyFromFullDate(entry?.fullDate);
@@ -88,6 +105,7 @@ export const AppProvider = ({ children }) => {
   const [totalHours, setTotalHours] = useState(0);
   const [hoursList, setHoursList] = useState([]);
   const [workDayStatus, setWorkDayStatus] = useState({});
+  const [isHydrated, setIsHydrated] = useState(false);
 
   // --- Format Helper ---
   const formatMoney = (num) => {
@@ -122,7 +140,7 @@ export const AppProvider = ({ children }) => {
     const savedHours = localStorage.getItem("hoursList");
     const parsedHours = safeParse(savedHours, []);
     if (Array.isArray(parsedHours)) {
-      const normalizedHours = parsedHours.map(ensureDateKey);
+      const normalizedHours = normalizeHoursList(parsedHours);
       setHoursList(normalizedHours);
       const total = normalizedHours.reduce((sum, item) => sum + (Number(item?.hours) || 0), 0);
       setTotalHours(total);
@@ -133,47 +151,53 @@ export const AppProvider = ({ children }) => {
     if (parsedWorkDayStatus && typeof parsedWorkDayStatus === "object") {
       setWorkDayStatus(parsedWorkDayStatus);
     }
+
+    setIsHydrated(true);
   }, []);
 
-  // --- Save to localStorage on changes ---
+  // --- Save to localStorage on changes (after initial load) ---
   useEffect(() => {
+    if (!isHydrated) return;
     localStorage.setItem("payment", payment);
-  }, [payment]);
+  }, [payment, isHydrated]);
 
   useEffect(() => {
+    if (!isHydrated) return;
     localStorage.setItem("incomeItems", JSON.stringify(incomeItems));
     const total = incomeItems.reduce(
       (sum, item) => sum + (Number(item?.amount) || 0),
       0
     );
     setTotalIncome(total);
-  }, [incomeItems]);
+  }, [incomeItems, isHydrated]);
 
   useEffect(() => {
+    if (!isHydrated) return;
     localStorage.setItem("lossItems", JSON.stringify(lossItems));
     const total = lossItems.reduce(
       (sum, item) => sum + (Number(item?.amount) || 0),
       0
     );
     setTotalLoss(total);
-  }, [lossItems]);
+  }, [lossItems, isHydrated]);
 
   useEffect(() => {
+    if (!isHydrated) return;
     localStorage.setItem("hourlyRate", rateInput);
-  }, [rateInput]);
+  }, [rateInput, isHydrated]);
 
   useEffect(() => {
-    if (hoursList.length > 0 || localStorage.getItem("hoursList")) {
-      localStorage.setItem("hoursList", JSON.stringify(hoursList));
-      const total = hoursList.reduce((sum, item) => sum + (Number(item?.hours) || 0), 0);
-      setTotalHours(total);
-      localStorage.setItem("totalHours", total.toString());
-    }
-  }, [hoursList]);
+    if (!isHydrated) return;
+    localStorage.setItem("hoursList", JSON.stringify(hoursList));
+    const total = hoursList.reduce((sum, item) => sum + (Number(item?.hours) || 0), 0);
+    setTotalHours(total);
+    localStorage.setItem("totalHours", total.toString());
+  }, [hoursList, isHydrated]);
 
   useEffect(() => {
+    if (!isHydrated) return;
     localStorage.setItem("workDayStatus", JSON.stringify(workDayStatus));
-  }, [workDayStatus]);
+  }, [workDayStatus, isHydrated]);
 
   // --- Derived State ---
   useEffect(() => {
@@ -183,6 +207,61 @@ export const AppProvider = ({ children }) => {
 
   // Calculate moneyRemaining (same as balance)
   const moneyRemaining = payment + totalIncome - totalLoss;
+
+  const getEntryMonthKey = useCallback((entry) => {
+    const dk = entry?.dateKey || parseDateKeyFromFullDate(entry?.fullDate);
+    return dk ? dk.slice(0, 7) : null;
+  }, []);
+
+  const getWorkHoursEarningsForMonth = useCallback(
+    (monthKey) =>
+      (hoursList || []).reduce((sum, item) => {
+        if (getEntryMonthKey(item) !== monthKey) return sum;
+        return (
+          sum + (Number(item?.hours) || 0) * (Number(item?.rate) || 0)
+        );
+      }, 0),
+    [hoursList, getEntryMonthKey]
+  );
+
+  const workHoursTotalEarnings = (hoursList || []).reduce(
+    (sum, item) =>
+      sum + (Number(item?.hours) || 0) * (Number(item?.rate) || 0),
+    0
+  );
+
+  const previousMonthWorkHoursEarnings = useMemo(
+    () => getWorkHoursEarningsForMonth(getPreviousMonthKey()),
+    [getWorkHoursEarningsForMonth]
+  );
+
+  const applyPreviousMonthWorkHoursToPayment = useCallback(() => {
+    const monthKey = getPreviousMonthKey();
+    const total = getWorkHoursEarningsForMonth(monthKey);
+    if (total <= 0) return false;
+
+    setPayment(total);
+    setHoursList((prev) =>
+      prev.filter((item) => getEntryMonthKey(item) !== monthKey)
+    );
+    return true;
+  }, [getWorkHoursEarningsForMonth, getEntryMonthKey]);
+
+  const applyWorkHoursToPayment = useCallback(() => {
+    const total = (hoursList || []).reduce(
+      (sum, item) =>
+        sum + (Number(item?.hours) || 0) * (Number(item?.rate) || 0),
+      0
+    );
+    if (total <= 0) return false;
+
+    setPayment(total);
+    setHoursList([]);
+    setTotalHours(0);
+    localStorage.removeItem("hoursList");
+    localStorage.removeItem("totalHours");
+    return true;
+  }, [hoursList]);
 
   // --- Context Value ---
   const contextValue = {
@@ -203,6 +282,10 @@ export const AppProvider = ({ children }) => {
     totalHours, setTotalHours,
     hoursList, setHoursList,
     workDayStatus, setWorkDayStatus,
+    workHoursTotalEarnings,
+    previousMonthWorkHoursEarnings,
+    applyWorkHoursToPayment,
+    applyPreviousMonthWorkHoursToPayment,
 
     // Helpers
     formatMoney,
