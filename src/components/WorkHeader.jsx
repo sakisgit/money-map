@@ -3,15 +3,20 @@ import { useContext, useMemo } from "react";
 import { AppContext } from "../context/AppContext";
 import TotalEarnings from "./TotalEarnings";
 import { useDateOnly } from "../hooks/useDateOnly";
+import { useToday } from "../hooks/useToday";
 import { isEntryInVisibleWorkMonths } from "../utils/dateKey";
 
 const WorkHeader = () => {
   const { hoursList } = useContext(AppContext);
   const dateOnly = useDateOnly();
+  const { today } = useToday();
 
   const visibleEntries = useMemo(
-    () => hoursList.filter((item) => isEntryInVisibleWorkMonths(item.dateKey)),
-    [hoursList]
+    () =>
+      hoursList.filter((item) =>
+        isEntryInVisibleWorkMonths(item.dateKey, today)
+      ),
+    [hoursList, today]
   );
 
   const visibleHours = useMemo(

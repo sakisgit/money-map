@@ -2,6 +2,7 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import Swal from "sweetalert2";
+import { useToday } from "../hooks/useToday";
 import {
   getWorkDateMax,
   getWorkDateMin,
@@ -29,16 +30,17 @@ const WorkShiftPanel = () => {
   const [startDraft, setStartDraft] = useState({ hour: "", minute: "" });
   const [endDraft, setEndDraft] = useState({ hour: "", minute: "" });
   const [workDate, setWorkDate] = useState(() => toLocalDateKey() || "");
+  const { today } = useToday();
 
-  const workDateMin = useMemo(() => getWorkDateMin(), []);
-  const workDateMax = useMemo(() => getWorkDateMax(), []);
+  const workDateMin = useMemo(() => getWorkDateMin(today), [today]);
+  const workDateMax = useMemo(() => getWorkDateMax(today), [today]);
 
   useEffect(() => {
     if (!workDate || !workDateMax) return;
-    if (!isWorkDateAllowed(workDate)) {
+    if (!isWorkDateAllowed(workDate, today)) {
       setWorkDate(workDateMax);
     }
-  }, [workDate, workDateMax]);
+  }, [workDate, workDateMax, today]);
 
   useEffect(() => {
     const savedRate = localStorage.getItem("hourlyRate");
@@ -173,11 +175,11 @@ const WorkShiftPanel = () => {
       return;
     }
 
-    if (!isWorkDateAllowed(workDate)) {
+    if (!isWorkDateAllowed(workDate, today)) {
       Swal.fire({
         icon: "warning",
         title: "Invalid date",
-        text: isFirstDayOfMonth()
+        text: isFirstDayOfMonth(today)
           ? "On the 1st you can pick any day this month, or yesterday for an overnight shift."
           : "Pick any day in the current month.",
         confirmButtonText: "OK",
@@ -332,7 +334,7 @@ const WorkShiftPanel = () => {
             max={workDateMax ?? undefined}
             onChange={(e) => {
               const next = e.target.value;
-              if (!next || isWorkDateAllowed(next)) {
+              if (!next || isWorkDateAllowed(next, today)) {
                 setWorkDate(next);
               }
             }}

@@ -11,9 +11,22 @@ export const useDateOnly = () => {
     };
 
     updateDate();
-    const interval = setInterval(updateDate, 60000);
+    const interval = setInterval(updateDate, 30000);
 
-    return () => clearInterval(interval);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") updateDate();
+    };
+
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", updateDate);
+    window.addEventListener("pageshow", updateDate);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", updateDate);
+      window.removeEventListener("pageshow", updateDate);
+    };
   }, []);
 
   return fullDate;

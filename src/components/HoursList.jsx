@@ -9,14 +9,16 @@ import {
   formatEntryDisplayDate,
   isEntryInVisibleWorkMonths,
 } from "../utils/dateKey";
+import { useToday } from "../hooks/useToday";
 import Swal from "sweetalert2";
 
 const HoursList = () => {
   const { hoursList, setHoursList, setTotalHours, formatMoney } =
     useContext(AppContext);
   const [editingIndex, setEditingIndex] = useState(null);
+  const { today } = useToday();
 
-  const listTitle = useMemo(() => getWorkHoursListLabel(), []);
+  const listTitle = useMemo(() => getWorkHoursListLabel(today), [today]);
 
   const editingEntry =
     editingIndex !== null ? hoursList[editingIndex] ?? null : null;
@@ -25,7 +27,7 @@ const HoursList = () => {
     () =>
       hoursList
         .map((item, listIndex) => ({ item, listIndex }))
-        .filter(({ item }) => isEntryInVisibleWorkMonths(item.dateKey))
+        .filter(({ item }) => isEntryInVisibleWorkMonths(item.dateKey, today))
         .sort((a, b) => {
           const byDate = (b.item.dateKey || "").localeCompare(
             a.item.dateKey || ""
@@ -36,7 +38,7 @@ const HoursList = () => {
           const idB = Number(b.item.id) || 0;
           return idB - idA;
         }),
-    [hoursList]
+    [hoursList, today]
   );
 
   const handleClear = () => {
@@ -52,10 +54,10 @@ const HoursList = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         const remaining = hoursList.filter(
-          (item) => !isEntryInVisibleWorkMonths(item.dateKey)
+          (item) => !isEntryInVisibleWorkMonths(item.dateKey, today)
         );
         const removedHours = hoursList
-          .filter((item) => isEntryInVisibleWorkMonths(item.dateKey))
+          .filter((item) => isEntryInVisibleWorkMonths(item.dateKey, today))
           .reduce((sum, item) => sum + (Number(item?.hours) || 0), 0);
 
         setHoursList(remaining);

@@ -119,6 +119,10 @@ export const getWorkHoursListLabel = (today = new Date()) => {
 
 /** Local calendar day as YYYY-MM-DD (not UTC). */
 export const toLocalDateKey = (date = new Date()) => {
+  if (typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return date;
+  }
+
   const d = date instanceof Date ? date : new Date(date);
   if (Number.isNaN(d.getTime())) return null;
   const year = d.getFullYear();

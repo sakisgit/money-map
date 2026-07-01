@@ -3,6 +3,7 @@ import { useCallback, useContext, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import Swal from "sweetalert2";
 import { AppContext } from "../context/AppContext";
+import { useToday } from "../hooks/useToday";
 import Time24Input from "./Time24Input";
 import {
   getWorkDateMax,
@@ -21,6 +22,7 @@ import {
 
 const EditHoursEntryModal = ({ entry, onClose, onSave }) => {
   const { formatMoney } = useContext(AppContext);
+  const { today } = useToday();
 
   const idPrefix = `edit-${entry.id}`;
   const [startTime, setStartTime] = useState(entry.startTime || "");
@@ -29,8 +31,8 @@ const EditHoursEntryModal = ({ entry, onClose, onSave }) => {
   const [endDraft, setEndDraft] = useState({ hour: "", minute: "" });
   const [workDate, setWorkDate] = useState(entry.dateKey || "");
 
-  const workDateMin = useMemo(() => getWorkDateMin(), []);
-  const workDateMax = useMemo(() => getWorkDateMax(), []);
+  const workDateMin = useMemo(() => getWorkDateMin(today), [today]);
+  const workDateMax = useMemo(() => getWorkDateMax(today), [today]);
 
   const handleStartDraft = useCallback((hour, minute) => {
     setStartDraft({ hour, minute });
@@ -87,11 +89,11 @@ const EditHoursEntryModal = ({ entry, onClose, onSave }) => {
       return;
     }
 
-    if (!isWorkDateAllowed(workDate)) {
+    if (!isWorkDateAllowed(workDate, today)) {
       Swal.fire({
         icon: "warning",
         title: "Invalid date",
-        text: isFirstDayOfMonth()
+        text: isFirstDayOfMonth(today)
           ? "On the 1st you can pick any day this month, or yesterday for an overnight shift."
           : "Pick any day in the current month.",
         confirmButtonText: "OK",
@@ -196,7 +198,7 @@ const EditHoursEntryModal = ({ entry, onClose, onSave }) => {
               max={workDateMax ?? undefined}
               onChange={(e) => {
                 const next = e.target.value;
-                if (!next || isWorkDateAllowed(next)) {
+                if (!next || isWorkDateAllowed(next, today)) {
                   setWorkDate(next);
                 }
               }}

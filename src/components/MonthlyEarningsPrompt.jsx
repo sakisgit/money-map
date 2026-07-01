@@ -1,5 +1,6 @@
 import { useContext, useEffect, useRef } from "react";
 import { AppContext } from "../context/AppContext";
+import { useToday } from "../hooks/useToday";
 import {
   getCurrentMonthKey,
   getPreviousMonthKey,
@@ -19,12 +20,16 @@ const MonthlyEarningsPrompt = () => {
     formatMoney,
   } = useContext(AppContext);
   const hasCheckedRef = useRef(false);
+  const { today, todayKey } = useToday();
 
   useEffect(() => {
+    if (!isFirstDayOfMonth(today)) {
+      hasCheckedRef.current = false;
+      return;
+    }
     if (hasCheckedRef.current) return;
-    if (!isFirstDayOfMonth()) return;
 
-    const monthKey = getCurrentMonthKey();
+    const monthKey = getCurrentMonthKey(today);
     const lastPromptMonth = localStorage.getItem(STORAGE_KEY);
     if (lastPromptMonth === monthKey) return;
     if (!previousMonthWorkHoursEarnings || previousMonthWorkHoursEarnings <= 0)
@@ -32,7 +37,7 @@ const MonthlyEarningsPrompt = () => {
 
     hasCheckedRef.current = true;
 
-    const previousMonthKey = getPreviousMonthKey();
+    const previousMonthKey = getPreviousMonthKey(today);
     const previousMonthName = formatMonthName(previousMonthKey);
     const amount = formatMoney(previousMonthWorkHoursEarnings);
 
@@ -75,6 +80,8 @@ const MonthlyEarningsPrompt = () => {
 
     showPrompt();
   }, [
+    today,
+    todayKey,
     previousMonthWorkHoursEarnings,
     applyPreviousMonthWorkHoursToPayment,
     formatMoney,
