@@ -1,5 +1,6 @@
 import { useContext, useMemo, useState } from "react";
 import { AppContext } from "../context/AppContext";
+import { useToday } from "../hooks/useToday";
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTH_LABELS = [
@@ -89,10 +90,19 @@ const WorkCalendar = () => {
     lossItems,
     formatMoney,
   } = useContext(AppContext);
+  const { today } = useToday();
   const [monthCursor, setMonthCursor] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
+
+  const currentMonthStart = useMemo(
+    () => new Date(today.getFullYear(), today.getMonth(), 1),
+    [today]
+  );
+
+  const monthIndex = (d) => d.getFullYear() * 12 + d.getMonth();
+  const canGoNext = monthIndex(monthCursor) < monthIndex(currentMonthStart);
 
   const workedDays = useMemo(() => {
     const list = Array.isArray(hoursList) ? hoursList : [];
@@ -242,7 +252,14 @@ const WorkCalendar = () => {
   };
 
   const goNextMonth = () => {
-    setMonthCursor((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+    if (!canGoNext) return;
+    setMonthCursor((prev) => {
+      const next = new Date(prev.getFullYear(), prev.getMonth() + 1, 1);
+      if (monthIndex(next) > monthIndex(currentMonthStart)) {
+        return currentMonthStart;
+      }
+      return next;
+    });
   };
 
   return (
@@ -260,7 +277,14 @@ const WorkCalendar = () => {
           <span className="fw-semibold calendar-month-label">
             {MONTH_LABELS[monthCursor.getMonth()]} {monthCursor.getFullYear()}
           </span>
-          <button type="button" className="btn btn-outline-secondary btn-sm calendar-nav-btn" onClick={goNextMonth}>
+          <button
+            type="button"
+            className="btn btn-outline-secondary btn-sm calendar-nav-btn"
+            onClick={goNextMonth}
+            disabled={!canGoNext}
+            aria-label="Next month"
+            title={canGoNext ? "Next month" : "Current month"}
+          >
             <i className="fa-solid fa-chevron-right"></i>
           </button>
         </div>
