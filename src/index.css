@@ -2924,6 +2924,27 @@ body.dark .progress-percent-label {
   .hours-list-simple {
     padding: 0.85rem !important;
   }
+
+  .money-section__search .form-control,
+  .money-section__search .input-group-text {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .money-section--expense {
+    margin-bottom: 0.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+  }
+
+  .money-section--income {
+    padding-top: 0.5rem;
+  }
+
+  body.dark .money-section--expense {
+    border-bottom-color: rgba(148, 163, 184, 0.2);
+  }
 }
 
 @media (max-width: 767.98px) {

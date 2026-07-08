@@ -5,8 +5,6 @@ import Header from "../components/Header";
 import Stats from "../components/Stats";
 import Filter from "../components/Filter";
 import Items from "../components/Items";
-import AddMoneyLoss from "../components/AddMoneyLoss";
-import AddMoneyProfit from "../components/AddMoneyProfit";
 import WorkCalendar from "../components/WorkCalendar";
 import loaderGif from '../assets/spinner.gif'
 
@@ -39,10 +37,7 @@ const HomePage = () => {
             <WorkCalendar />
             <Stats/>
             <Filter/>
-            <Items>
-              <AddMoneyLoss/>
-              <AddMoneyProfit/>
-            </Items>
+            <Items />
           </div>
         </>
       )}

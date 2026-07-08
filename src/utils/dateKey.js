@@ -65,7 +65,7 @@ export const isEntryInVisibleWorkMonths = (dateKey, today = new Date()) => {
   return false;
 };
 
-/** Earliest selectable work date (local). On the 1st: yesterday only. */
+/** Earliest selectable work date (local). On the 1st: yesterday is allowed; from the 2nd: 1st of month. */
 export const getWorkDateMin = (today = new Date()) => {
   const d = today instanceof Date ? today : new Date(today);
   if (Number.isNaN(d.getTime())) return null;
@@ -85,6 +85,9 @@ export const getWorkDateMax = (today = new Date()) => {
   const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0);
   return toLocalDateKey(lastDay);
 };
+
+/** Default work date when logging a shift: always today (not pre-selected to yesterday). */
+export const getDefaultWorkDate = (today = new Date()) => toLocalDateKey(today);
 
 export const isWorkDateAllowed = (dateKey, today = new Date()) => {
   if (!dateKey) return false;

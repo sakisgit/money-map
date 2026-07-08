@@ -4,11 +4,11 @@ import { AppContext } from "../context/AppContext";
 import Swal from "sweetalert2";
 import { useToday } from "../hooks/useToday";
 import {
+  getDefaultWorkDate,
   getWorkDateMax,
   getWorkDateMin,
   isFirstDayOfMonth,
   isWorkDateAllowed,
-  toLocalDateKey,
 } from "../utils/dateKey";
 import {
   buildTime24Draft,
@@ -29,18 +29,18 @@ const WorkShiftPanel = () => {
   const [endTime, setEndTime] = useState("");
   const [startDraft, setStartDraft] = useState({ hour: "", minute: "" });
   const [endDraft, setEndDraft] = useState({ hour: "", minute: "" });
-  const [workDate, setWorkDate] = useState(() => toLocalDateKey() || "");
-  const { today } = useToday();
+  const [workDate, setWorkDate] = useState(() => getDefaultWorkDate() || "");
+  const { today, todayKey } = useToday();
 
   const workDateMin = useMemo(() => getWorkDateMin(today), [today]);
   const workDateMax = useMemo(() => getWorkDateMax(today), [today]);
 
   useEffect(() => {
-    if (!workDate || !workDateMax) return;
-    if (!isWorkDateAllowed(workDate, today)) {
-      setWorkDate(workDateMax);
-    }
-  }, [workDate, workDateMax, today]);
+    setWorkDate((prev) => {
+      if (prev && isWorkDateAllowed(prev, today)) return prev;
+      return getDefaultWorkDate(today) || "";
+    });
+  }, [todayKey, today]);
 
   useEffect(() => {
     const savedRate = localStorage.getItem("hourlyRate");
@@ -224,6 +224,7 @@ const WorkShiftPanel = () => {
     setEndTime("");
     setStartDraft({ hour: "", minute: "" });
     setEndDraft({ hour: "", minute: "" });
+    setWorkDate(getDefaultWorkDate(today) || "");
 
     Swal.fire({
       icon: "success",
