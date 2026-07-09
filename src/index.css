@@ -310,6 +310,31 @@ body.dark .form-control:focus {
   margin-bottom: 2rem;
 }
 
+.money-section__add-btn,
+.money-form__submit-btn {
+  font-size: 0.875rem;
+  padding: 0.375rem 0.875rem !important;
+  font-weight: 600 !important;
+  min-height: auto !important;
+  line-height: 1.4;
+  width: auto;
+}
+
+.money-section__add-btn:hover,
+.money-section__add-btn:active,
+.money-form__submit-btn:hover,
+.money-form__submit-btn:active {
+  transform: none;
+}
+
+@media (max-width: 767.98px) {
+  .money-section__add-btn,
+  .money-form__submit-btn {
+    width: 100%;
+    min-height: 40px !important;
+  }
+}
+
 /* ---------- Mobile Optimizations ---------- */
 @media (max-width: 575.98px) {
   .container {
@@ -1862,17 +1887,16 @@ body.dark .shift-preview__pay {
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease;
   box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
 }
 
 .shift-submit-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
 }
 
 .shift-submit-btn:active {
-  transform: translateY(0);
+  transform: none;
 }
 
 /* ---------- Work Calendar ---------- */
@@ -2375,6 +2399,179 @@ body.dark .day-cell:hover {
   }
 }
 
+/* ---------- Collapsible work panels ---------- */
+.collapsible-work-panel.is-collapsed {
+  gap: 0;
+}
+
+.collapsible-work-panel__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.collapsible-work-panel__trigger:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.45);
+  outline-offset: 3px;
+  border-radius: 0.65rem;
+}
+
+.collapsible-work-panel__header {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.collapsible-work-panel__titles {
+  min-width: 0;
+}
+
+.collapsible-work-panel__chevron {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.65rem;
+  background: rgba(148, 163, 184, 0.12);
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+body.dark .collapsible-work-panel__chevron {
+  background: rgba(148, 163, 184, 0.16);
+  color: #94a3b8;
+}
+
+.collapsible-work-panel__body-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s ease;
+}
+
+.collapsible-work-panel__body-wrap.is-open {
+  grid-template-rows: 1fr;
+}
+
+.collapsible-work-panel__body {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-top: 0;
+  transition: padding-top 0.28s ease;
+}
+
+.collapsible-work-panel__body-wrap.is-open .collapsible-work-panel__body {
+  padding-top: 1.25rem;
+}
+
+/* No hover scale on work panels — expand on click only */
+.collapsible-work-panel__trigger,
+.collapsible-work-panel__trigger:hover,
+.collapsible-work-panel__trigger:active,
+.work-shift-panel button:hover,
+.work-shift-panel button:active,
+.collapsible-work-panel button:hover,
+.collapsible-work-panel button:active {
+  transform: none !important;
+}
+
+.collapsible-work-panel .shift-submit-btn:hover {
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+}
+
+.collapsible-work-panel .day-off-submit-btn:hover {
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+}
+
+.collapsible-work-panel .day-status-submit-btn:hover {
+  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.35);
+}
+
+/* ---------- Day off / Vacation panels ---------- */
+.day-off-panel__icon {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.22) 0%, rgba(251, 191, 36, 0.15) 100%);
+  color: #d97706;
+}
+
+body.dark .day-off-panel__icon {
+  color: #fcd34d;
+}
+
+.vacation-panel__icon {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.22) 0%, rgba(59, 130, 246, 0.15) 100%);
+  color: #0891b2;
+}
+
+body.dark .vacation-panel__icon {
+  color: #67e8f9;
+}
+
+.day-off-submit-btn {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+}
+
+.day-off-submit-btn:hover {
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+}
+
+.day-status-preview--vacation {
+  border-color: rgba(6, 182, 212, 0.35);
+  background: rgba(6, 182, 212, 0.08);
+}
+
+body.dark .day-status-preview--vacation {
+  background: rgba(6, 182, 212, 0.12);
+  border-color: rgba(6, 182, 212, 0.3);
+}
+
+.day-status-preview__count {
+  color: #0891b2;
+}
+
+body.dark .day-status-preview__count {
+  color: #67e8f9;
+}
+
+.day-status-range-row .shift-date-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.day-status-submit-btn {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.35);
+}
+
+.day-status-submit-btn:hover {
+  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.35);
+}
+
+@media (max-width: 575.98px) {
+  .day-status-range-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .day-status-range-row .shift-time-arrow {
+    transform: rotate(90deg);
+    height: 1.5rem;
+    width: auto;
+    padding: 0;
+  }
+}
+
 /* ---------- Hours list (simple) ---------- */
 .hours-list-scroll {
   min-height: clamp(12rem, 45vh, 24rem);
@@ -2439,6 +2636,43 @@ body.dark .hours-list-simple__label {
 .hours-list-simple__sep {
   margin: 0 0.4rem;
   color: #94a3b8;
+}
+
+.hours-list-simple__row--off {
+  border-left: 3px solid #f59e0b;
+}
+
+.hours-list-simple__row--vacation {
+  border-left: 3px solid #06b6d4;
+}
+
+.hours-list-status-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+}
+
+.hours-list-status-badge--off {
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+}
+
+.hours-list-status-badge--vacation {
+  background: rgba(6, 182, 212, 0.15);
+  color: #0e7490;
+}
+
+body.dark .hours-list-status-badge--off {
+  background: rgba(245, 158, 11, 0.22);
+  color: #fcd34d;
+}
+
+body.dark .hours-list-status-badge--vacation {
+  background: rgba(6, 182, 212, 0.22);
+  color: #67e8f9;
 }
 
 @media (max-width: 575.98px) {
@@ -2849,10 +3083,6 @@ body.dark .progress-percent-label {
 
   .items h2 {
     font-size: 1.05rem;
-  }
-
-  .items .btn-primary {
-    width: 100%;
   }
 
   .work-calendar-card {

@@ -17,7 +17,7 @@ const PaymentDropdown = () => {
       Swal.fire({
         icon: 'warning',
         title: 'No Work Hours',
-        text: 'Add worked hours on the Work Hours page first.',
+        text: 'Add worked hours on the Odd Hours page first.',
         confirmButtonText: 'OK',
       });
       return;

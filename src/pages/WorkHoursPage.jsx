@@ -4,6 +4,8 @@ import { useState } from 'react';
 import loaderGif from '../assets/spinner.gif'
 import WorkHeader from '../components/WorkHeader';
 import WorkShiftPanel from '../components/WorkShiftPanel';
+import DayOffPanel from '../components/DayOffPanel';
+import VacationRangePanel from '../components/VacationRangePanel';
 import HoursList from '../components/HoursList';
 
 const WorkHoursPage = () => {
@@ -22,6 +24,10 @@ const WorkHoursPage = () => {
         <WorkHeader/>
 
         <WorkShiftPanel />
+
+        <DayOffPanel />
+
+        <VacationRangePanel />
 
         <HoursList />
 

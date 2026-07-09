@@ -19,7 +19,7 @@ const Items = () => {
             </h2>
             <button
               type="button"
-              className="btn btn-primary btn-sm text-white fw-bold py-2 px-3 w-100 w-md-auto d-none d-md-inline-flex"
+              className="btn btn-primary btn-sm text-white money-section__add-btn"
               data-bs-toggle="collapse"
               data-bs-target="#collapse-loss"
               aria-expanded="false"
@@ -45,17 +45,6 @@ const Items = () => {
             </div>
           </div>
 
-          <button
-            type="button"
-            className="btn btn-primary btn-sm text-white fw-bold py-2 px-3 w-100 mb-3 d-md-none"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapse-loss"
-            aria-expanded="false"
-            aria-controls="collapse-loss"
-          >
-            <i className="fa-solid fa-plus" aria-hidden></i> Add Expense
-          </button>
-
           <AddMoneyLoss />
         </div>
 
@@ -67,7 +56,7 @@ const Items = () => {
             </h2>
             <button
               type="button"
-              className="btn btn-primary btn-sm text-white fw-bold py-2 px-3 w-100 w-md-auto d-none d-md-inline-flex"
+              className="btn btn-primary btn-sm text-white money-section__add-btn"
               data-bs-toggle="collapse"
               data-bs-target="#collapse-profit"
               aria-expanded="false"
@@ -92,17 +81,6 @@ const Items = () => {
               />
             </div>
           </div>
-
-          <button
-            type="button"
-            className="btn btn-primary btn-sm text-white fw-bold py-2 px-3 w-100 mb-3 d-md-none"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapse-profit"
-            aria-expanded="false"
-            aria-controls="collapse-profit"
-          >
-            <i className="fa-solid fa-plus" aria-hidden></i> Add Income
-          </button>
 
           <AddMoneyProfit />
         </div>

@@ -169,7 +169,7 @@ const AddMoneyProfit = () => {
                 onChange={(e) => setIncomeAmount(e.target.value)}
               />
             </div>
-            <button type="submit" className="btn btn-primary text-white w-100 w-sm-auto mb-2">Add Income</button>
+            <button type="submit" className="btn btn-primary btn-sm text-white money-form__submit-btn mb-2">Add Income</button>
           </form>
         </div>
       </div>

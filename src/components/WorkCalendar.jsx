@@ -1,6 +1,8 @@
 import { useContext, useMemo, useState } from "react";
 import { AppContext } from "../context/AppContext";
+import Swal from "sweetalert2";
 import { useToday } from "../hooks/useToday";
+import { getRestDayBlockReason } from "../utils/workDayConflicts";
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTH_LABELS = [
@@ -26,7 +28,7 @@ const STATUS_CLASSES = {
 
 const STATUS_LABELS = {
   work: "Work",
-  off: "Off",
+  off: "Day off",
   vacation: "Vacation",
 };
 
@@ -226,10 +228,38 @@ const WorkCalendar = () => {
   }, [monthCursor]);
 
   const updateStatusForDate = (dateKey) => {
+    if (workedDays.has(dateKey)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Work hours on this day",
+        text: "Remove the work shift from the list before marking day off or vacation.",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
     const statuses = [undefined, "off", "vacation"];
     const current = workDayStatus[dateKey];
     const currentIndex = statuses.indexOf(current);
     const nextStatus = statuses[(currentIndex + 1) % statuses.length];
+
+    if (nextStatus) {
+      const block = getRestDayBlockReason(
+        hoursList,
+        workDayStatus,
+        dateKey,
+        nextStatus
+      );
+      if (block) {
+        Swal.fire({
+          icon: "warning",
+          title: block.title,
+          text: block.text,
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+    }
 
     setWorkDayStatus((prev) => {
       const next = { ...prev };
@@ -383,7 +413,7 @@ const WorkCalendar = () => {
 
       <div className="calendar-legend mb-3">
         <span className="legend-item"><i className="legend-dot status-work"></i> Work</span>
-        <span className="legend-item"><i className="legend-dot status-off"></i> Off</span>
+        <span className="legend-item"><i className="legend-dot status-off"></i> Day off</span>
         <span className="legend-item"><i className="legend-dot status-vacation"></i> Vacation</span>
       </div>
 

@@ -19,9 +19,10 @@ import {
   isCompleteTime24,
   parseTimeToMinutes,
 } from "../utils/workHours";
+import { getWorkHoursBlockReason, dateHasWorkHours } from "../utils/workDayConflicts";
 
 const EditHoursEntryModal = ({ entry, onClose, onSave }) => {
-  const { formatMoney } = useContext(AppContext);
+  const { formatMoney, workDayStatus, hoursList } = useContext(AppContext);
   const { today } = useToday();
 
   const idPrefix = `edit-${entry.id}`;
@@ -99,6 +100,29 @@ const EditHoursEntryModal = ({ entry, onClose, onSave }) => {
         confirmButtonText: "OK",
       });
       return;
+    }
+
+    if (workDate !== entry.dateKey) {
+      const restBlock = getWorkHoursBlockReason(workDayStatus, workDate);
+      if (restBlock) {
+        Swal.fire({
+          icon: "warning",
+          title: restBlock.title,
+          text: restBlock.text,
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+
+      if (dateHasWorkHours(hoursList, workDate, entry.id)) {
+        Swal.fire({
+          icon: "warning",
+          title: "Work hours already logged",
+          text: "This day already has another work shift.",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
     }
 
     const hoursValue = calculateHoursFromTimeRange(finalStart, finalEnd);

@@ -180,7 +180,7 @@ const AddMoneyLoss = () => {
                 onChange={(e) => setLossAmount(e.target.value)}
               />
             </div>
-            <button type="submit" className="btn btn-primary text-white w-100 w-sm-auto mb-2">Add Expense</button>
+            <button type="submit" className="btn btn-primary btn-sm text-white money-form__submit-btn mb-2">Add Expense</button>
           </form>
         </div>
       </div>

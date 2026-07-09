@@ -29,8 +29,8 @@ const Header = () => {
                 className="btn btn-outline-light btn-sm header-action-btn rounded-work-hours d-flex align-items-center justify-content-center"
               >
                 <i className="fa-solid fa-clock d-sm-none"></i>
-                <span className="d-none d-sm-inline">Work Hours</span>
-                <span className="d-sm-none ms-1">Hours</span>
+                <span className="d-none d-sm-inline">Odd Hours</span>
+                <span className="d-sm-none ms-1">Odd Hours</span>
               </Link> 
 
               <button 

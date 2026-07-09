@@ -19,9 +19,11 @@ import {
   parseTimeToMinutes,
 } from "../utils/workHours";
 import Time24Input from "./Time24Input";
+import { getWorkHoursBlockReason } from "../utils/workDayConflicts";
+import CollapsibleWorkPanel from "./CollapsibleWorkPanel";
 
 const WorkShiftPanel = () => {
-  const { hoursList, setHoursList, rateInput, setRateInput, formatMoney } =
+  const { hoursList, setHoursList, rateInput, setRateInput, workDayStatus, formatMoney } =
     useContext(AppContext);
 
   const [rateConfirmed, setRateConfirmed] = useState(false);
@@ -187,6 +189,17 @@ const WorkShiftPanel = () => {
       return;
     }
 
+    const restBlock = getWorkHoursBlockReason(workDayStatus, workDate);
+    if (restBlock) {
+      Swal.fire({
+        icon: "warning",
+        title: restBlock.title,
+        text: restBlock.text,
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
     const hoursValue = calculateHoursFromTimeRange(finalStart, finalEnd);
 
     if (hoursValue === null || hoursValue <= 0) {
@@ -236,19 +249,12 @@ const WorkShiftPanel = () => {
   };
 
   return (
-    <div className="work-shift-panel">
-      <div className="work-shift-panel__header">
-        <div className="work-shift-panel__icon" aria-hidden>
-          <i className="fa-solid fa-briefcase"></i>
-        </div>
-        <div>
-          <h5 className="work-shift-panel__title">Work shift</h5>
-          <p className="work-shift-panel__subtitle">
-            Set your rate, then log your hours
-          </p>
-        </div>
-      </div>
-
+    <CollapsibleWorkPanel
+      title="Work shift"
+      subtitle="Set your rate, then log your hours"
+      icon="fa-solid fa-briefcase"
+      defaultOpen
+    >
       <section className="work-shift-rate" aria-label="Hourly rate">
         <span className="work-shift-rate__label">Hourly rate</span>
         {rateConfirmed && hasValidRate ? (
@@ -385,7 +391,7 @@ const WorkShiftPanel = () => {
           Record shift
         </button>
       </form>
-    </div>
+    </CollapsibleWorkPanel>
   );
 };
 

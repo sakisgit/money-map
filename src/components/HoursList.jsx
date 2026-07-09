@@ -7,14 +7,27 @@ import EditHoursEntryModal from "./EditHoursEntryModal";
 import {
   getWorkHoursListLabel,
   formatEntryDisplayDate,
+  formatDateKeyDisplay,
   isEntryInVisibleWorkMonths,
 } from "../utils/dateKey";
 import { useToday } from "../hooks/useToday";
 import Swal from "sweetalert2";
+import { dateHasWorkHours } from "../utils/workDayConflicts";
+
+const STATUS_LABELS = {
+  off: "Day off",
+  vacation: "Vacation",
+};
 
 const HoursList = () => {
-  const { hoursList, setHoursList, setTotalHours, formatMoney } =
-    useContext(AppContext);
+  const {
+    hoursList,
+    setHoursList,
+    setTotalHours,
+    workDayStatus,
+    setWorkDayStatus,
+    formatMoney,
+  } = useContext(AppContext);
   const [editingIndex, setEditingIndex] = useState(null);
   const { today } = useToday();
 
@@ -23,28 +36,43 @@ const HoursList = () => {
   const editingEntry =
     editingIndex !== null ? hoursList[editingIndex] ?? null : null;
 
-  const visibleEntries = useMemo(
-    () =>
-      hoursList
-        .map((item, listIndex) => ({ item, listIndex }))
-        .filter(({ item }) => isEntryInVisibleWorkMonths(item.dateKey, today))
-        .sort((a, b) => {
-          const byDate = (b.item.dateKey || "").localeCompare(
-            a.item.dateKey || ""
-          );
-          if (byDate !== 0) return byDate;
+  const visibleEntries = useMemo(() => {
+    const shifts = hoursList
+      .map((item, listIndex) => ({
+        kind: "shift",
+        item,
+        listIndex,
+        dateKey: item.dateKey || "",
+        sortId: Number(item.id) || 0,
+      }))
+      .filter(({ item }) => isEntryInVisibleWorkMonths(item.dateKey, today));
 
-          const idA = Number(a.item.id) || 0;
-          const idB = Number(b.item.id) || 0;
-          return idB - idA;
-        }),
-    [hoursList, today]
-  );
+    const statuses = Object.entries(workDayStatus)
+      .filter(
+        ([dateKey, status]) =>
+          status &&
+          isEntryInVisibleWorkMonths(dateKey, today) &&
+          !dateHasWorkHours(hoursList, dateKey)
+      )
+      .map(([dateKey, status]) => ({
+        kind: "status",
+        dateKey,
+        status,
+        sortId: 0,
+      }));
+
+    return [...shifts, ...statuses].sort((a, b) => {
+      const byDate = (b.dateKey || "").localeCompare(a.dateKey || "");
+      if (byDate !== 0) return byDate;
+      if (a.kind !== b.kind) return a.kind === "shift" ? -1 : 1;
+      return (b.sortId || 0) - (a.sortId || 0);
+    });
+  }, [hoursList, workDayStatus, today]);
 
   const handleClear = () => {
     Swal.fire({
       title: "Are you sure?",
-      text: `Clear all hours shown for ${listTitle}?`,
+      text: `Clear all entries shown for ${listTitle}?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -63,10 +91,20 @@ const HoursList = () => {
         setHoursList(remaining);
         setTotalHours((prev) => Math.max(0, prev - removedHours));
 
+        setWorkDayStatus((prev) => {
+          const next = { ...prev };
+          Object.keys(next).forEach((dateKey) => {
+            if (isEntryInVisibleWorkMonths(dateKey, today)) {
+              delete next[dateKey];
+            }
+          });
+          return next;
+        });
+
         Swal.fire({
           icon: "success",
           title: "Cleared!",
-          text: "Visible month hours have been removed.",
+          text: "Visible month entries have been removed.",
           timer: 1500,
           showConfirmButton: false,
         });
@@ -74,13 +112,21 @@ const HoursList = () => {
     });
   };
 
-  const handleDelete = (listIndex) => {
+  const handleDeleteShift = (listIndex) => {
     const hoursItem = hoursList[listIndex];
     if (!hoursItem) return;
 
     const newHoursList = hoursList.filter((_, i) => i !== listIndex);
     setHoursList(newHoursList);
     setTotalHours((prev) => prev - (Number(hoursItem.hours) || 0));
+  };
+
+  const handleDeleteStatus = (dateKey) => {
+    setWorkDayStatus((prev) => {
+      const next = { ...prev };
+      delete next[dateKey];
+      return next;
+    });
   };
 
   const handleUpdate = (listIndex, updatedEntry) => {
@@ -118,7 +164,45 @@ const HoursList = () => {
 
       <div className="hours-list-scroll">
         <ul className="hours-list-simple__list">
-          {visibleEntries.map(({ item: hoursItem, listIndex }) => {
+          {visibleEntries.map((entry) => {
+            if (entry.kind === "status") {
+              return (
+                <li
+                  key={`status-${entry.dateKey}`}
+                  className={`hours-list-simple__row hours-list-simple__row--${entry.status}`}
+                >
+                  <div className="hours-list-simple__content">
+                    <span className="badge date-badge hours-list-simple__date">
+                      {formatDateKeyDisplay(entry.dateKey)}
+                    </span>
+
+                    <div className="hours-list-simple__line">
+                      <span
+                        className={`hours-list-status-badge hours-list-status-badge--${entry.status}`}
+                      >
+                        {entry.status === "off" ? (
+                          <i className="fa-solid fa-mug-hot me-1" aria-hidden></i>
+                        ) : (
+                          <i
+                            className="fa-solid fa-plane-departure me-1"
+                            aria-hidden
+                          ></i>
+                        )}
+                        {STATUS_LABELS[entry.status]}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="hours-list-actions">
+                    <DeleteButton
+                      onDelete={() => handleDeleteStatus(entry.dateKey)}
+                    />
+                  </div>
+                </li>
+              );
+            }
+
+            const { item: hoursItem, listIndex } = entry;
             const hours = Number(hoursItem.hours) || 0;
             const earnings = hours * (Number(hoursItem.rate) || 0);
             const hasTimes = hoursItem.startTime && hoursItem.endTime;
@@ -126,7 +210,7 @@ const HoursList = () => {
             return (
               <li
                 key={hoursItem.id ?? `hours-list-${listIndex}`}
-                className="hours-list-simple__row"
+                className="hours-list-simple__row hours-list-simple__row--shift"
               >
                 <div className="hours-list-simple__content">
                   <span className="badge date-badge hours-list-simple__date">
@@ -153,7 +237,7 @@ const HoursList = () => {
 
                 <div className="hours-list-actions">
                   <EditButton onEdit={() => setEditingIndex(listIndex)} />
-                  <DeleteButton onDelete={() => handleDelete(listIndex)} />
+                  <DeleteButton onDelete={() => handleDeleteShift(listIndex)} />
                 </div>
               </li>
             );
