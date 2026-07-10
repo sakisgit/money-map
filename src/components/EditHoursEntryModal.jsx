@@ -1,9 +1,10 @@
 
-import { useCallback, useContext, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import Swal from "sweetalert2";
 import { AppContext } from "../context/AppContext";
 import { useToday } from "../hooks/useToday";
+import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
 import Time24Input from "./Time24Input";
 import {
   getWorkDateMax,
@@ -34,6 +35,16 @@ const EditHoursEntryModal = ({ entry, onClose, onSave }) => {
 
   const workDateMin = useMemo(() => getWorkDateMin(today), [today]);
   const workDateMax = useMemo(() => getWorkDateMax(today), [today]);
+
+  useBodyScrollLock(true);
+
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [onClose]);
 
   const handleStartDraft = useCallback((hour, minute) => {
     setStartDraft({ hour, minute });

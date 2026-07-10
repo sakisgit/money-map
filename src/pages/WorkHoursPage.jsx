@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react';
 import loaderGif from '../assets/spinner.gif'
+import Header from '../components/Header';
 import WorkHeader from '../components/WorkHeader';
 import WorkShiftPanel from '../components/WorkShiftPanel';
 import DayOffPanel from '../components/DayOffPanel';
@@ -18,9 +19,9 @@ const WorkHoursPage = () => {
         <img src={loaderGif} alt="Loading..." className="page-loader" />
       </div>
     ) : (
-      <div className="container my-4 my-md-5">
-
-        {/* Header */}
+      <>
+        <Header />
+        <div className="container page-content my-4 my-md-5">
         <WorkHeader/>
 
         <WorkShiftPanel />
@@ -41,8 +42,8 @@ const WorkHoursPage = () => {
             <span className="d-sm-none">Back</span>
           </Link>
         </div>
-
       </div>
+      </>
     )}     
   </>
   );

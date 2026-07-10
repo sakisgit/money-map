@@ -1,6 +1,7 @@
 
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
+import SearchInput from "./SearchInput";
 
 const Filter = () => {
   const { 
@@ -12,34 +13,22 @@ const Filter = () => {
     <section className="filter my-4 my-md-5 d-none d-md-block">
       <div className="row g-3">
         <div className="col-12 col-md-6">
-          <div className="input-group">
-            <span className="input-group-text bg-light border-end-0">
-              <i className="fa-solid fa-magnifying-glass"></i>
-            </span>
-            <input
-              type="text"
-              id="filter-loss"
-              className="form-control border-start-0"
-              placeholder="Search expenses..."
-              value={filterLoss}
-              onChange={(e) => setFilterLoss(e.target.value)}
-            />
-          </div>
+          <SearchInput
+            id="filter-loss"
+            value={filterLoss}
+            onChange={setFilterLoss}
+            placeholder="Search expenses..."
+            clearLabel="Clear expense search"
+          />
         </div>
         <div className="col-12 col-md-6">
-          <div className="input-group">
-            <span className="input-group-text bg-light border-end-0">
-              <i className="fa-solid fa-magnifying-glass"></i>
-            </span>
-            <input
-              type="text"
-              id="filter-profit"
-              className="form-control border-start-0"
-              placeholder="Search income..."
-              value={filterProfit}
-              onChange={(e) => setFilterProfit(e.target.value)}
-            />
-          </div>
+          <SearchInput
+            id="filter-profit"
+            value={filterProfit}
+            onChange={setFilterProfit}
+            placeholder="Search income..."
+            clearLabel="Clear income search"
+          />
         </div>
       </div>
     </section>

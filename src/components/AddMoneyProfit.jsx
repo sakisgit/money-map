@@ -1,11 +1,12 @@
 
 import { useContext, useState, useEffect, useRef } from "react";
 import { AppContext } from "../context/AppContext";
-import DeleteButton from "../buttons/DeleteButton";
 import { useGiphyGif } from "../hooks/useGiphyGif";
 import { useFullDate } from "../hooks/useFullDate";
 import Swal from "sweetalert2";
-import { toLocalDateKey, formatEntryDisplayDate } from "../utils/dateKey";
+import { toLocalDateKey } from "../utils/dateKey";
+import PaymentMethodToggle from "./PaymentMethodToggle";
+import MoneyListItem from "./MoneyListItem";
 
 const AddMoneyProfit = () => {
   const { 
@@ -15,6 +16,7 @@ const AddMoneyProfit = () => {
 
   const [incomeText, setIncomeText] = useState('');
   const [incomeAmount, setIncomeAmount] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('cash');
   const [showTopFade, setShowTopFade] = useState(false);
   const [showBottomFade, setShowBottomFade] = useState(false);
   const listContainerRef = useRef(null);
@@ -117,6 +119,7 @@ const AddMoneyProfit = () => {
       dateKey: toLocalDateKey(),
       text: incomeText,
       amount: amountValue,
+      paymentMethod,
     };
 
     const updatedIncomeItems = [...incomeItems, newItem];
@@ -133,6 +136,7 @@ const AddMoneyProfit = () => {
     }).then(() => {
       setIncomeText('');
       setIncomeAmount('');
+      setPaymentMethod('cash');
     });
   };
 
@@ -150,9 +154,10 @@ const AddMoneyProfit = () => {
                 className="form-control"
                 id="profit-name"
                 placeholder="Enter Income Source"
+                maxLength={28}
                 onChange={(e) => {
                   let value = e.target.value.replace(/\d/g, '');
-                  const maxLength = 15;
+                  const maxLength = 28;
                   if (value.length > maxLength) value = value.slice(0, maxLength);
                   setIncomeText(value);
                 }}
@@ -169,6 +174,11 @@ const AddMoneyProfit = () => {
                 onChange={(e) => setIncomeAmount(e.target.value)}
               />
             </div>
+            <PaymentMethodToggle
+              idPrefix="profit"
+              value={paymentMethod}
+              onChange={setPaymentMethod}
+            />
             <button type="submit" className="btn btn-primary btn-sm text-white money-form__submit-btn mb-2">Add Income</button>
           </form>
         </div>
@@ -226,57 +236,17 @@ const AddMoneyProfit = () => {
               className="income-list-container"
             >
             {filteredItems.map((item) => (
-              <div className="card my-2 shadow-sm" key={item.id}>
-                <div className="card-body p-3">
-                  <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2">
-                    
-                    {/* Left section: text + date */}
-                    <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2 flex-grow-1 money-item-row">
-                      {/* Income text */}
-                      <span className="fw-semibold money-item-text">
-                        {item.text}
-                      </span>
-
-                      {/* Date badge */}
-                      <span className="badge date-badge">
-                        {formatEntryDisplayDate(item)}
-                      </span>
-                    </div>
-
-                    {/* Right section: amount + GIF + delete */}
-                    <div className="d-flex align-items-center gap-2">
-                      {/* Amount */}
-                      <span className="fw-bold text-success money-item-amount">
-                        {formatMoney(item.amount)} €
-                      </span>
-
-                      {/* GIF */}
-                      {gifUrl && item.id === incomeItems[incomeItems.length - 1]?.id && (
-                        <img
-                          src={gifUrl}
-                          alt="income gif"
-                          className="d-none d-sm-block"
-                          style={{
-                            width: "40px",
-                            height: "40px",
-                            objectFit: "cover",
-                            borderRadius: "8px"
-                          }}
-                        />
-                      )}
-
-                      {/* Delete button */}
-                      <DeleteButton
-                        onDelete={() => {
-                          const updated = incomeItems.filter(li => li.id !== item.id);
-                          setIncomeItems(updated);
-                          localStorage.setItem('incomeItems', JSON.stringify(updated));
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <MoneyListItem
+                key={item.id}
+                item={item}
+                amountClass="text-success"
+                formatMoney={formatMoney}
+                onDelete={() => {
+                  const updated = incomeItems.filter((li) => li.id !== item.id);
+                  setIncomeItems(updated);
+                  localStorage.setItem("incomeItems", JSON.stringify(updated));
+                }}
+              />
             ))}
             </div>
           </>

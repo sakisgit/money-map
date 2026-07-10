@@ -120,8 +120,8 @@ const Stats = () => {
             </div>
           </div>
 
-          {/* Remaining Budget */}
-          <div className="col-12 col-md-4">
+          {/* Remaining Budget — hidden on mobile (same value as Net Balance above) */}
+          <div className="col-12 col-md-4 d-none d-md-block">
             <div
               className={`card text-center shadow-sm h-100 ${
                 moneyRemaining < 0

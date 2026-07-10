@@ -4,6 +4,7 @@ import { AppContext } from "../context/AppContext";
 import DeleteButton from "../buttons/DeleteButton";
 import EditButton from "../buttons/EditButton";
 import EditHoursEntryModal from "./EditHoursEntryModal";
+import EditRestDayModal from "./EditRestDayModal";
 import {
   getWorkHoursListLabel,
   formatEntryDisplayDate,
@@ -29,6 +30,7 @@ const HoursList = () => {
     formatMoney,
   } = useContext(AppContext);
   const [editingIndex, setEditingIndex] = useState(null);
+  const [editingStatus, setEditingStatus] = useState(null);
   const { today } = useToday();
 
   const listTitle = useMemo(() => getWorkHoursListLabel(today), [today]);
@@ -129,6 +131,25 @@ const HoursList = () => {
     });
   };
 
+  const handleUpdateStatus = ({ originalDateKey, dateKey, status }) => {
+    setWorkDayStatus((prev) => {
+      const next = { ...prev };
+      if (originalDateKey !== dateKey) {
+        delete next[originalDateKey];
+      }
+      next[dateKey] = status;
+      return next;
+    });
+    setEditingStatus(null);
+
+    Swal.fire({
+      icon: "success",
+      title: "Entry updated",
+      timer: 1400,
+      showConfirmButton: false,
+    });
+  };
+
   const handleUpdate = (listIndex, updatedEntry) => {
     setHoursList((prev) =>
       prev.map((item, i) => (i === listIndex ? updatedEntry : item))
@@ -194,6 +215,14 @@ const HoursList = () => {
                   </div>
 
                   <div className="hours-list-actions">
+                    <EditButton
+                      onEdit={() =>
+                        setEditingStatus({
+                          dateKey: entry.dateKey,
+                          status: entry.status,
+                        })
+                      }
+                    />
                     <DeleteButton
                       onDelete={() => handleDeleteStatus(entry.dateKey)}
                     />
@@ -251,6 +280,16 @@ const HoursList = () => {
           entry={editingEntry}
           onClose={() => setEditingIndex(null)}
           onSave={(updated) => handleUpdate(editingIndex, updated)}
+        />
+      )}
+
+      {editingStatus && (
+        <EditRestDayModal
+          key={`${editingStatus.dateKey}-${editingStatus.status}`}
+          dateKey={editingStatus.dateKey}
+          status={editingStatus.status}
+          onClose={() => setEditingStatus(null)}
+          onSave={handleUpdateStatus}
         />
       )}
     </div>
