@@ -187,10 +187,13 @@ const AddMoneyLoss = () => {
             </div>
             <PaymentMethodToggle
               idPrefix="loss"
+              variant="expense"
               value={paymentMethod}
               onChange={setPaymentMethod}
             />
-            <button type="submit" className="btn btn-primary btn-sm text-white money-form__submit-btn mb-2">Add Expense</button>
+            <div className="money-form__actions">
+              <button type="submit" className="btn btn-primary btn-sm text-white money-form__submit-btn mb-2">Add Expense</button>
+            </div>
           </form>
         </div>
       </div>

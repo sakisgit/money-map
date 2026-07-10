@@ -325,6 +325,11 @@ body.dark .form-control:focus {
   flex: 1 1 auto;
 }
 
+.money-form__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .money-section__add-btn,
 .money-form__submit-btn {
   font-size: 0.875rem;
@@ -352,7 +357,7 @@ body.dark .form-control:focus {
   }
 
   .money-form__submit-btn {
-    width: 100%;
+    width: auto;
     min-height: 44px !important;
   }
 }
