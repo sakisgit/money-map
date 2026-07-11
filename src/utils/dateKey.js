@@ -110,6 +110,29 @@ export const isWorkDateAllowed = (dateKey, today = new Date()) => {
   return false;
 };
 
+/** Vacation: from 1st of current month through future months. */
+export const getVacationDateMin = (today = new Date()) => {
+  const d = today instanceof Date ? today : new Date(today);
+  if (Number.isNaN(d.getTime())) return null;
+  return toLocalDateKey(new Date(d.getFullYear(), d.getMonth(), 1));
+};
+
+/** Vacation: up to 24 months ahead (last day of that month). */
+export const getVacationDateMax = (today = new Date()) => {
+  const d = today instanceof Date ? today : new Date(today);
+  if (Number.isNaN(d.getTime())) return null;
+  const lastDay = new Date(d.getFullYear(), d.getMonth() + 25, 0);
+  return toLocalDateKey(lastDay);
+};
+
+export const isVacationDateAllowed = (dateKey, today = new Date()) => {
+  if (!dateKey) return false;
+  const min = getVacationDateMin(today);
+  const max = getVacationDateMax(today);
+  if (!min || !max) return false;
+  return dateKey >= min && dateKey <= max;
+};
+
 /** Label for filtered hours list on Work Hours page. */
 export const getWorkHoursListLabel = (today = new Date()) => {
   const d = today instanceof Date ? today : new Date(today);

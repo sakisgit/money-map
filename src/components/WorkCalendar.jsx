@@ -2,7 +2,7 @@ import { useContext, useMemo, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import Swal from "sweetalert2";
 import { useToday } from "../hooks/useToday";
-import { getRestDayBlockReason } from "../utils/workDayConflicts";
+import { getRestDayBlockReason, dateHasPaidVacation } from "../utils/workDayConflicts";
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTH_LABELS = [
@@ -108,7 +108,11 @@ const WorkCalendar = () => {
 
   const workedDays = useMemo(() => {
     const list = Array.isArray(hoursList) ? hoursList : [];
-    return new Set(list.map((entry) => entry.dateKey).filter(Boolean));
+    return new Set(
+      list
+        .filter((entry) => entry?.dateKey && !entry.paidVacation)
+        .map((entry) => entry.dateKey)
+    );
   }, [hoursList]);
 
   const monthlyStats = useMemo(() => {
@@ -228,6 +232,16 @@ const WorkCalendar = () => {
   }, [monthCursor]);
 
   const updateStatusForDate = (dateKey) => {
+    if (dateHasPaidVacation(hoursList, dateKey)) {
+      Swal.fire({
+        icon: "info",
+        title: "Paid vacation",
+        text: "This day is paid vacation. Remove it from the Worked Hours list to change its status here.",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
     if (workedDays.has(dateKey)) {
       Swal.fire({
         icon: "warning",
@@ -273,6 +287,12 @@ const WorkCalendar = () => {
   };
 
   const getStatusForDate = (dateKey) => {
+    if (
+      workDayStatus[dateKey] === "vacation" ||
+      dateHasPaidVacation(hoursList, dateKey)
+    ) {
+      return "vacation";
+    }
     if (workedDays.has(dateKey)) return "work";
     return workDayStatus[dateKey];
   };
@@ -430,6 +450,12 @@ const WorkCalendar = () => {
           const dateKey = toDateKey(cell.date);
           const status = getStatusForDate(dateKey);
           const statusClass = status ? STATUS_CLASSES[status] : "";
+          const isPaidVacationDay = dateHasPaidVacation(hoursList, dateKey);
+          const statusTitle = status
+            ? isPaidVacationDay
+              ? "Paid vacation"
+              : STATUS_LABELS[status]
+            : "No status";
 
           return (
             <button
@@ -437,7 +463,7 @@ const WorkCalendar = () => {
               type="button"
               className={`calendar-cell day-cell ${statusClass}`}
               onClick={() => updateStatusForDate(dateKey)}
-              title={status ? STATUS_LABELS[status] : "No status"}
+              title={statusTitle}
             >
               {cell.date.getDate()}
             </button>

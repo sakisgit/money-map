@@ -40,7 +40,7 @@ const HeaderMobileMenu = () => {
   }, [open]);
 
   return (
-    <div className="header-mobile-menu d-md-none" ref={ref}>
+    <div className="header-mobile-menu" ref={ref}>
       <button
         type="button"
         className="header-mobile-menu__toggle"

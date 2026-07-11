@@ -10,6 +10,7 @@ import {
 import Swal from "sweetalert2";
 import { getRestDayBlockReason } from "../utils/workDayConflicts";
 import CollapsibleWorkPanel from "./CollapsibleWorkPanel";
+import WorkDatePicker from "./WorkDatePicker";
 
 const DayOffPanel = () => {
   const { hoursList, workDayStatus, setWorkDayStatus } = useContext(AppContext);
@@ -72,26 +73,20 @@ const DayOffPanel = () => {
       panelClassName="day-off-panel"
     >
       <form className="work-shift-form" onSubmit={handleSubmit}>
-        <label className="shift-date-field">
-          <span className="shift-date-field__label">
-            <i className="fa-regular fa-calendar me-1"></i>
-            Rest day date
-          </span>
-          <input
-            type="date"
-            className="shift-date-field__input"
-            value={selectedDate}
-            min={workDateMin ?? undefined}
-            max={workDateMax ?? undefined}
-            onChange={(e) => {
-              const next = e.target.value;
-              if (!next || isWorkDateAllowed(next, today)) {
-                setSelectedDate(next);
-              }
-            }}
-            required
-          />
-        </label>
+        <WorkDatePicker
+          label={
+            <>
+              <i className="fa-regular fa-calendar me-1"></i>
+              Rest day date
+            </>
+          }
+          value={selectedDate}
+          min={workDateMin}
+          max={workDateMax}
+          tone="off"
+          isDateAllowed={(dateKey) => isWorkDateAllowed(dateKey, today)}
+          onChange={setSelectedDate}
+        />
 
         <button type="submit" className="shift-submit-btn day-off-submit-btn">
           <i className="fa-solid fa-mug-hot me-2"></i>

@@ -1,5 +1,5 @@
 const METHODS = [
-  { value: "cash", label: "Cash", icon: "fa-money-bill-wave" },
+  { value: "cash", label: "Cash", icon: "fa-coins" },
   { value: "card", label: "Card", icon: "fa-credit-card" },
 ];
 

@@ -10,14 +10,25 @@ import {
   formatEntryDisplayDate,
   formatDateKeyDisplay,
   isEntryInVisibleWorkMonths,
+  isVacationDateAllowed,
 } from "../utils/dateKey";
 import { useToday } from "../hooks/useToday";
 import Swal from "sweetalert2";
-import { dateHasWorkHours } from "../utils/workDayConflicts";
+import {
+  dateHasWorkHours,
+  getPaidVacationEntryForDate,
+  isPaidVacationEntry,
+} from "../utils/workDayConflicts";
 
 const STATUS_LABELS = {
   off: "Day off",
   vacation: "Vacation",
+  paidVacation: "Paid vacation",
+};
+
+const isStatusEntryVisible = (dateKey, status, today) => {
+  if (status === "vacation") return isVacationDateAllowed(dateKey, today);
+  return isEntryInVisibleWorkMonths(dateKey, today);
 };
 
 const HoursList = () => {
@@ -47,15 +58,18 @@ const HoursList = () => {
         dateKey: item.dateKey || "",
         sortId: Number(item.id) || 0,
       }))
-      .filter(({ item }) => isEntryInVisibleWorkMonths(item.dateKey, today));
+      .filter(
+        ({ item }) =>
+          isEntryInVisibleWorkMonths(item.dateKey, today) &&
+          !isPaidVacationEntry(item)
+      );
 
     const statuses = Object.entries(workDayStatus)
-      .filter(
-        ([dateKey, status]) =>
-          status &&
-          isEntryInVisibleWorkMonths(dateKey, today) &&
-          !dateHasWorkHours(hoursList, dateKey)
-      )
+      .filter(([dateKey, status]) => {
+        if (!status || !isStatusEntryVisible(dateKey, status, today)) return false;
+        if (status === "vacation") return true;
+        return !dateHasWorkHours(hoursList, dateKey);
+      })
       .map(([dateKey, status]) => ({
         kind: "status",
         dateKey,
@@ -96,7 +110,8 @@ const HoursList = () => {
         setWorkDayStatus((prev) => {
           const next = { ...prev };
           Object.keys(next).forEach((dateKey) => {
-            if (isEntryInVisibleWorkMonths(dateKey, today)) {
+            const status = next[dateKey];
+            if (isStatusEntryVisible(dateKey, status, today)) {
               delete next[dateKey];
             }
           });
@@ -124,11 +139,18 @@ const HoursList = () => {
   };
 
   const handleDeleteStatus = (dateKey) => {
+    const paidEntry = getPaidVacationEntryForDate(hoursList, dateKey);
+
     setWorkDayStatus((prev) => {
       const next = { ...prev };
       delete next[dateKey];
       return next;
     });
+
+    if (paidEntry) {
+      setHoursList((prev) => prev.filter((item) => item.id !== paidEntry.id));
+      setTotalHours((prev) => prev - (Number(paidEntry.hours) || 0));
+    }
   };
 
   const handleUpdateStatus = ({ originalDateKey, dateKey, status }) => {
@@ -187,10 +209,18 @@ const HoursList = () => {
         <ul className="hours-list-simple__list">
           {visibleEntries.map((entry) => {
             if (entry.kind === "status") {
+              const paidEntry = getPaidVacationEntryForDate(hoursList, entry.dateKey);
+              const isPaid = Boolean(paidEntry);
+              const paidHours = Number(paidEntry?.hours) || 0;
+              const paidEarnings =
+                paidHours * (Number(paidEntry?.rate) || 0);
+
               return (
                 <li
                   key={`status-${entry.dateKey}`}
-                  className={`hours-list-simple__row hours-list-simple__row--${entry.status}`}
+                  className={`hours-list-simple__row hours-list-simple__row--${entry.status}${
+                    isPaid ? " hours-list-simple__row--paid-vacation" : ""
+                  }`}
                 >
                   <div className="hours-list-simple__content">
                     <span className="badge date-badge hours-list-simple__date">
@@ -199,7 +229,9 @@ const HoursList = () => {
 
                     <div className="hours-list-simple__line">
                       <span
-                        className={`hours-list-status-badge hours-list-status-badge--${entry.status}`}
+                        className={`hours-list-status-badge hours-list-status-badge--${entry.status}${
+                          isPaid ? " hours-list-status-badge--paid" : ""
+                        }`}
                       >
                         {entry.status === "off" ? (
                           <i className="fa-solid fa-mug-hot me-1" aria-hidden></i>
@@ -209,9 +241,22 @@ const HoursList = () => {
                             aria-hidden
                           ></i>
                         )}
-                        {STATUS_LABELS[entry.status]}
+                        {isPaid
+                          ? STATUS_LABELS.paidVacation
+                          : STATUS_LABELS[entry.status]}
                       </span>
                     </div>
+
+                    {isPaid && (
+                      <div className="hours-list-simple__line">
+                        <span className="hours-list-simple__label">Paid:</span>{" "}
+                        {paidHours.toFixed(2)} h
+                        <span className="hours-list-simple__sep">·</span>
+                        <span className="text-success fw-semibold">
+                          €{formatMoney(paidEarnings)}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="hours-list-actions">

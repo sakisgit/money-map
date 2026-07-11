@@ -5,12 +5,15 @@ import { AppContext } from "../context/AppContext";
 import { useToday } from "../hooks/useToday";
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
 import {
-  formatDateKeyDisplay,
   getWorkDateMax,
   getWorkDateMin,
+  getVacationDateMax,
+  getVacationDateMin,
   isWorkDateAllowed,
+  isVacationDateAllowed,
 } from "../utils/dateKey";
 import { getRestDayBlockReason } from "../utils/workDayConflicts";
+import WorkDatePicker from "./WorkDatePicker";
 
 const STATUS_OPTIONS = [
   { value: "off", label: "Day off", icon: "fa-mug-hot" },
@@ -25,8 +28,25 @@ const EditRestDayModal = ({ dateKey, status, onClose, onSave }) => {
   const [selectedDate, setSelectedDate] = useState(dateKey);
   const [selectedStatus, setSelectedStatus] = useState(status);
 
-  const workDateMin = useMemo(() => getWorkDateMin(today), [today]);
-  const workDateMax = useMemo(() => getWorkDateMax(today), [today]);
+  const workDateMin = useMemo(
+    () =>
+      selectedStatus === "vacation"
+        ? getVacationDateMin(today)
+        : getWorkDateMin(today),
+    [today, selectedStatus]
+  );
+  const workDateMax = useMemo(
+    () =>
+      selectedStatus === "vacation"
+        ? getVacationDateMax(today)
+        : getWorkDateMax(today),
+    [today, selectedStatus]
+  );
+
+  const isDateAllowed = (dateKey) =>
+    selectedStatus === "vacation"
+      ? isVacationDateAllowed(dateKey, today)
+      : isWorkDateAllowed(dateKey, today);
 
   useBodyScrollLock(true);
 
@@ -41,11 +61,14 @@ const EditRestDayModal = ({ dateKey, status, onClose, onSave }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!selectedDate || !isWorkDateAllowed(selectedDate, today)) {
+    if (!selectedDate || !isDateAllowed(selectedDate)) {
       Swal.fire({
         icon: "warning",
         title: "Invalid date",
-        text: "Pick a day within the allowed range.",
+        text:
+          selectedStatus === "vacation"
+            ? "Pick a date from the current month through future months."
+            : "Pick a day within the current month.",
         confirmButtonText: "OK",
       });
       return;
@@ -105,24 +128,17 @@ const EditRestDayModal = ({ dateKey, status, onClose, onSave }) => {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <label className="shift-date-field mb-3">
-            <span className="shift-date-field__label">Date</span>
-            <input
-              type="date"
-              className="shift-date-field__input"
-              id={`${idPrefix}-date`}
+          <div className="mb-3">
+            <WorkDatePicker
+              label="Date"
               value={selectedDate}
-              min={workDateMin ?? undefined}
-              max={workDateMax ?? undefined}
-              onChange={(e) => {
-                const next = e.target.value;
-                if (!next || isWorkDateAllowed(next, today)) {
-                  setSelectedDate(next);
-                }
-              }}
-              required
+              min={workDateMin}
+              max={workDateMax}
+              tone={selectedStatus === "vacation" ? "from" : "off"}
+              isDateAllowed={isDateAllowed}
+              onChange={setSelectedDate}
             />
-          </label>
+          </div>
 
           <div className="mb-3">
             <span className="shift-date-field__label d-block mb-2">Type</span>
@@ -155,12 +171,6 @@ const EditRestDayModal = ({ dateKey, status, onClose, onSave }) => {
               })}
             </div>
           </div>
-
-          {selectedDate && (
-            <p className="text-muted small mb-3">
-              {formatDateKeyDisplay(selectedDate)}
-            </p>
-          )}
 
           <div className="hours-edit-modal__actions">
             <button

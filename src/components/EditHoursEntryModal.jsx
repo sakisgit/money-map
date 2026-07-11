@@ -20,7 +20,8 @@ import {
   isCompleteTime24,
   parseTimeToMinutes,
 } from "../utils/workHours";
-import { getWorkHoursBlockReason, dateHasWorkHours } from "../utils/workDayConflicts";
+import { getWorkHoursBlockReason, getShiftConflictType } from "../utils/workDayConflicts";
+import WorkDatePicker from "./WorkDatePicker";
 
 const EditHoursEntryModal = ({ entry, onClose, onSave }) => {
   const { formatMoney, workDayStatus, hoursList } = useContext(AppContext);
@@ -75,7 +76,7 @@ const EditHoursEntryModal = ({ entry, onClose, onSave }) => {
   const estimatedPay =
     calculatedHours && rateValue > 0 ? calculatedHours * rateValue : null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const finalStart = finalizeTime24(startTime, startDraft.hour, startDraft.minute);
@@ -124,16 +125,6 @@ const EditHoursEntryModal = ({ entry, onClose, onSave }) => {
         });
         return;
       }
-
-      if (dateHasWorkHours(hoursList, workDate, entry.id)) {
-        Swal.fire({
-          icon: "warning",
-          title: "Work hours already logged",
-          text: "This day already has another work shift.",
-          confirmButtonText: "OK",
-        });
-        return;
-      }
     }
 
     const hoursValue = calculateHoursFromTimeRange(finalStart, finalEnd);
@@ -156,6 +147,40 @@ const EditHoursEntryModal = ({ entry, onClose, onSave }) => {
         confirmButtonText: "OK",
       });
       return;
+    }
+
+    const shiftConflict = getShiftConflictType(
+      hoursList,
+      workDate,
+      {
+        hours: hoursValue,
+        startTime: finalStart,
+        endTime: finalEnd,
+      },
+      entry.id
+    );
+
+    if (shiftConflict === "duplicate") {
+      Swal.fire({
+        icon: "warning",
+        title: "Duplicate shift",
+        text: "A shift with the same hours already exists on this date.",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
+    if (shiftConflict === "split-shift") {
+      const { isConfirmed } = await Swal.fire({
+        title: "Split shift?",
+        text: "This date already has a work shift with different hours. Was this a split shift?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, split shift",
+        cancelButtonText: "No, cancel",
+      });
+
+      if (!isConfirmed) return;
     }
 
     onSave({
@@ -219,27 +244,20 @@ const EditHoursEntryModal = ({ entry, onClose, onSave }) => {
             />
           </div>
 
-          <label className="shift-date-field">
-            <span className="shift-date-field__label">
-              <i className="fa-regular fa-calendar me-1"></i>
-              Work date
-            </span>
-            <input
-              id={`${idPrefix}-date`}
-              type="date"
-              className="shift-date-field__input"
-              value={workDate}
-              min={workDateMin ?? undefined}
-              max={workDateMax ?? undefined}
-              onChange={(e) => {
-                const next = e.target.value;
-                if (!next || isWorkDateAllowed(next, today)) {
-                  setWorkDate(next);
-                }
-              }}
-              required
-            />
-          </label>
+          <WorkDatePicker
+            label={
+              <>
+                <i className="fa-regular fa-calendar me-1"></i>
+                Work date
+              </>
+            }
+            value={workDate}
+            min={workDateMin}
+            max={workDateMax}
+            tone="work"
+            isDateAllowed={(dateKey) => isWorkDateAllowed(dateKey, today)}
+            onChange={setWorkDate}
+          />
 
           <div
             className={`shift-preview ${

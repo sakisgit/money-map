@@ -1,15 +1,21 @@
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import { useToday } from "../hooks/useToday";
 import {
-  getWorkDateMax,
-  getWorkDateMin,
-  isWorkDateAllowed,
+  getVacationDateMax,
+  getVacationDateMin,
+  isVacationDateAllowed,
   toLocalDateKey,
 } from "../utils/dateKey";
+import { formatWorkDateLabel } from "../utils/workHours";
 import Swal from "sweetalert2";
 import { getRestDayBlockReason } from "../utils/workDayConflicts";
 import CollapsibleWorkPanel from "./CollapsibleWorkPanel";
+import WorkDatePicker from "./WorkDatePicker";
+
+const VACATION_PAID_HOURS = 8;
+const VACATION_SHIFT_START = "09:00";
+const VACATION_SHIFT_END = "17:00";
 
 const eachDateInRange = (startKey, endKey) => {
   const start = new Date(`${startKey}T00:00:00`);
@@ -26,16 +32,86 @@ const eachDateInRange = (startKey, endKey) => {
 };
 
 const VacationRangePanel = () => {
-  const { hoursList, workDayStatus, setWorkDayStatus } = useContext(AppContext);
-  const { today } = useToday();
+  const {
+    hoursList,
+    setHoursList,
+    workDayStatus,
+    setWorkDayStatus,
+    rateInput,
+  } = useContext(AppContext);
+  const { today, todayKey } = useToday();
 
-  const [vacationStart, setVacationStart] = useState("");
-  const [vacationEnd, setVacationEnd] = useState("");
+  const [vacationStart, setVacationStart] = useState(() => todayKey);
+  const [vacationEnd, setVacationEnd] = useState(() => todayKey);
 
-  const workDateMin = useMemo(() => getWorkDateMin(today), [today]);
-  const workDateMax = useMemo(() => getWorkDateMax(today), [today]);
+  const startMonthKey = vacationStart?.slice(0, 7) ?? "";
+  const endMonthKey = vacationEnd?.slice(0, 7) ?? "";
+  const monthsDiffer = Boolean(
+    startMonthKey && endMonthKey && startMonthKey !== endMonthKey
+  );
 
-  const handleSubmit = (e) => {
+  const vacationDateMin = useMemo(() => getVacationDateMin(today), [today]);
+  const vacationDateMax = useMemo(() => getVacationDateMax(today), [today]);
+
+  useEffect(() => {
+    setVacationStart((prev) => {
+      if (prev && isVacationDateAllowed(prev, today)) return prev;
+      return todayKey;
+    });
+    setVacationEnd((prev) => {
+      if (prev && isVacationDateAllowed(prev, today)) return prev;
+      return todayKey;
+    });
+  }, [todayKey, today]);
+
+  const saveVacationDays = (allowedKeys, includePaidHours, skipped) => {
+    setWorkDayStatus((prev) => {
+      const next = { ...prev };
+      allowedKeys.forEach((dateKey) => {
+        next[dateKey] = "vacation";
+      });
+      return next;
+    });
+
+    if (includePaidHours) {
+      const rateValue = Number(rateInput);
+      const paidEntries = allowedKeys.map((dateKey, index) => ({
+        id: `vacation-paid-${dateKey}-${Date.now()}-${index}`,
+        fullDate: formatWorkDateLabel(dateKey),
+        dateKey,
+        startTime: VACATION_SHIFT_START,
+        endTime: VACATION_SHIFT_END,
+        hours: VACATION_PAID_HOURS,
+        rate: rateValue,
+        paidVacation: true,
+      }));
+
+      setHoursList((prev) => [...paidEntries, ...prev]);
+    }
+
+    const paidNote = includePaidHours
+      ? `<br><small class="text-muted">${allowedKeys.length} × ${VACATION_PAID_HOURS}h added to work hours</small>`
+      : "";
+
+    Swal.fire({
+      icon: "success",
+      title: "Vacation saved",
+      html: `<strong>${allowedKeys.length}</strong> ${
+        allowedKeys.length === 1 ? "day" : "days"
+      } marked as vacation${paidNote}${
+        skipped > 0
+          ? `<br><small class="text-muted">${skipped} skipped (already booked)</small>`
+          : ""
+      }`,
+      timer: 2200,
+      showConfirmButton: false,
+    });
+
+    setVacationStart(todayKey);
+    setVacationEnd(todayKey);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!vacationStart || !vacationEnd) {
@@ -59,14 +135,14 @@ const VacationRangePanel = () => {
     }
 
     const dateKeys = eachDateInRange(vacationStart, vacationEnd).filter((key) =>
-      isWorkDateAllowed(key, today)
+      isVacationDateAllowed(key, today)
     );
 
     if (!dateKeys.length) {
       Swal.fire({
         icon: "warning",
         title: "No valid days",
-        text: "The range must fall within the current month.",
+        text: "The range must start from the current month and can extend into future months.",
         confirmButtonText: "OK",
       });
       return;
@@ -84,81 +160,105 @@ const VacationRangePanel = () => {
         text:
           skipped > 0
             ? "All days in this range already have work hours or another rest mark."
-            : "The range must fall within the current month.",
+            : "The range must start from the current month and can extend into future months.",
         confirmButtonText: "OK",
       });
       return;
     }
 
-    setWorkDayStatus((prev) => {
-      const next = { ...prev };
-      allowedKeys.forEach((dateKey) => {
-        next[dateKey] = "vacation";
-      });
-      return next;
+    const dayLabel = allowedKeys.length === 1 ? "day" : "days";
+
+    const choice = await Swal.fire({
+      title: "Vacation pay",
+      html: `
+        <p>You selected <strong>${allowedKeys.length}</strong> ${dayLabel} of vacation.</p>
+        <p class="mb-0">
+          <strong>Yes</strong> — mark as vacation <em>and</em> add each day as
+          <strong>${VACATION_PAID_HOURS} paid work hours</strong> at your hourly rate.
+        </p>
+        <p class="mb-0 mt-2">
+          <strong>No</strong> — mark as vacation only (no work hours added).
+        </p>
+      `,
+      icon: "question",
+      showCancelButton: true,
+      showDenyButton: true,
+      confirmButtonText: "Yes, paid vacation",
+      denyButtonText: "No, vacation only",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#3085d6",
+      denyButtonColor: "#6c757d",
     });
 
-    Swal.fire({
-      icon: "success",
-      title: "Vacation saved",
-      html: `<strong>${allowedKeys.length}</strong> ${
-        allowedKeys.length === 1 ? "day" : "days"
-      } added to your list${
-        skipped > 0
-          ? `<br><small class="text-muted">${skipped} skipped (already booked)</small>`
-          : ""
-      }`,
-      timer: 1800,
-      showConfirmButton: false,
-    });
-    setVacationStart("");
-    setVacationEnd("");
+    if (choice.isDismissed) return;
+
+    if (choice.isConfirmed) {
+      const rateValue = Number(rateInput);
+      if (!Number.isFinite(rateValue) || rateValue <= 0) {
+        Swal.fire({
+          icon: "warning",
+          title: "Hourly rate required",
+          text: "Set your hourly rate in Work shift before adding paid vacation days.",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+
+      saveVacationDays(allowedKeys, true, skipped);
+      return;
+    }
+
+    if (choice.isDenied) {
+      saveVacationDays(allowedKeys, false, skipped);
+    }
   };
 
   const rangePreviewDays =
     vacationStart && vacationEnd && vacationStart <= vacationEnd
       ? eachDateInRange(vacationStart, vacationEnd).filter((key) =>
-          isWorkDateAllowed(key, today)
+          isVacationDateAllowed(key, today)
         ).length
       : 0;
 
   return (
     <CollapsibleWorkPanel
       title="Vacation range"
-      subtitle="Mark several vacation days at once"
+      subtitle="From this month through future months"
       icon="fa-solid fa-plane-departure"
       iconWrapClassName="vacation-panel__icon"
       panelClassName="vacation-panel"
     >
       <form className="work-shift-form" onSubmit={handleSubmit}>
-        <div className="shift-time-row day-status-range-row">
-          <label className="shift-date-field">
-            <span className="shift-time-field__label">From</span>
-            <input
-              type="date"
-              className="shift-date-field__input"
-              value={vacationStart}
-              min={workDateMin ?? undefined}
-              max={workDateMax ?? undefined}
-              onChange={(e) => setVacationStart(e.target.value)}
-            />
-          </label>
+        <div
+          className={`shift-time-row day-status-range-row vacation-date-range${
+            monthsDiffer ? " vacation-date-range--multi-month" : ""
+          }`}
+        >
+          <WorkDatePicker
+            label="From"
+            labelVariant="time"
+            value={vacationStart}
+            min={vacationDateMin}
+            max={vacationDateMax}
+            tone="from"
+            isDateAllowed={(dateKey) => isVacationDateAllowed(dateKey, today)}
+            onChange={setVacationStart}
+          />
 
           <div className="shift-time-arrow" aria-hidden>
             <i className="fa-solid fa-arrow-right"></i>
           </div>
 
-          <label className="shift-date-field">
-            <span className="shift-time-field__label">To</span>
-            <input
-              type="date"
-              className="shift-date-field__input"
-              value={vacationEnd}
-              min={workDateMin ?? undefined}
-              max={workDateMax ?? undefined}
-              onChange={(e) => setVacationEnd(e.target.value)}
-            />
-          </label>
+          <WorkDatePicker
+            label="To"
+            labelVariant="time"
+            value={vacationEnd}
+            min={vacationDateMin}
+            max={vacationDateMax}
+            tone="to"
+            isDateAllowed={(dateKey) => isVacationDateAllowed(dateKey, today)}
+            onChange={setVacationEnd}
+          />
         </div>
 
         <div
@@ -178,7 +278,7 @@ const VacationRangePanel = () => {
             </>
           ) : (
             <span className="shift-preview__placeholder">
-              Select from and to to see how many days
+              Select from and to (this month through future months)
             </span>
           )}
         </div>

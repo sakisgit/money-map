@@ -2636,6 +2636,29 @@ body.dark .day-cell:hover {
   font-size: 1.25rem;
 }
 
+.header-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: inherit !important;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  padding: 0.15rem 0.35rem;
+  margin: -0.15rem -0.35rem;
+}
+
+.header-home-link:hover,
+.header-home-link:focus,
+.header-home-link:focus-visible,
+.header-home-link:visited,
+.header-home-link:active {
+  color: inherit !important;
+  text-decoration: none;
+  background: transparent;
+  opacity: 1;
+  transform: none;
+}
+
 .header-mobile-menu {
   position: relative;
   flex-shrink: 0;
@@ -2956,9 +2979,309 @@ body.dark .day-status-preview__count {
   color: #67e8f9;
 }
 
-.day-status-range-row .shift-date-field {
+.day-status-range-row .shift-date-field,
+.day-status-range-row .work-date-picker {
   flex: 1;
   min-width: 0;
+}
+
+.work-date-picker {
+  gap: 0.35rem;
+}
+
+.work-date-picker__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  height: 2.75rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0f172a;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.work-date-picker__trigger:focus-visible {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.work-date-picker__trigger i {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.work-date-picker__trigger--from {
+  border-color: rgba(6, 182, 212, 0.35);
+}
+
+.work-date-picker__trigger--to {
+  border-color: rgba(139, 92, 246, 0.35);
+}
+
+.work-date-picker__trigger--work {
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.work-date-picker__trigger--off {
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.vacation-date-range--multi-month .work-date-picker__trigger--from {
+  background: rgba(6, 182, 212, 0.06);
+  border-color: rgba(6, 182, 212, 0.5);
+}
+
+.vacation-date-range--multi-month .work-date-picker__trigger--to {
+  background: rgba(139, 92, 246, 0.06);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.work-date-picker__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10100;
+  border: none;
+  padding: 0;
+  background: rgba(15, 23, 42, 0.45);
+  cursor: pointer;
+}
+
+body.dark .work-date-picker__backdrop {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.work-date-picker__popover {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 10110;
+  width: min(19rem, calc(100vw - 2rem));
+  padding: 0.75rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: #fff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  transform: translate(-50%, -50%);
+}
+
+.work-date-picker__month-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+  padding: 0.55rem 0.45rem;
+  border-radius: 0.75rem;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.work-date-picker__month-bar--changing {
+  animation: workDatePickerMonthChange 0.4s ease;
+}
+
+.work-date-picker__popover--from .work-date-picker__month-bar {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(14, 165, 233, 0.1) 100%);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+}
+
+.work-date-picker__popover--to .work-date-picker__month-bar {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(124, 58, 237, 0.1) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+}
+
+.work-date-picker__popover--work .work-date-picker__month-bar {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.1) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.work-date-picker__popover--off .work-date-picker__month-bar {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.22) 0%, rgba(217, 119, 6, 0.1) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.work-date-picker__month-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  min-width: 0;
+  text-align: center;
+}
+
+.work-date-picker__month-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.work-date-picker__month-value {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.work-date-picker__popover--from .work-date-picker__month-value {
+  color: #0e7490;
+}
+
+.work-date-picker__popover--to .work-date-picker__month-value {
+  color: #6d28d9;
+}
+
+.work-date-picker__popover--work .work-date-picker__month-value {
+  color: #047857;
+}
+
+.work-date-picker__popover--off .work-date-picker__month-value {
+  color: #b45309;
+}
+
+.work-date-picker__nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 0.55rem;
+  background: rgba(255, 255, 255, 0.75);
+  color: #334155;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.work-date-picker__nav:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.work-date-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.3rem;
+}
+
+.work-date-picker__weekday {
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #64748b;
+  padding: 0.15rem 0;
+}
+
+.work-date-picker__cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.1rem;
+  border: 1px solid transparent;
+  border-radius: 0.55rem;
+  background: #f8fafc;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+}
+
+.work-date-picker__cell--empty {
+  background: transparent;
+  border: none;
+  min-height: 0;
+  padding: 0;
+  cursor: default;
+}
+
+.work-date-picker__cell--selected {
+  color: #fff;
+}
+
+.work-date-picker__popover--from .work-date-picker__cell--selected {
+  background: #0891b2;
+  border-color: #0891b2;
+}
+
+.work-date-picker__popover--to .work-date-picker__cell--selected {
+  background: #7c3aed;
+  border-color: #7c3aed;
+}
+
+.work-date-picker__popover--work .work-date-picker__cell--selected {
+  background: #059669;
+  border-color: #059669;
+}
+
+.work-date-picker__popover--off .work-date-picker__cell--selected {
+  background: #d97706;
+  border-color: #d97706;
+}
+
+.work-date-picker__cell--disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+@keyframes workDatePickerMonthChange {
+  0% {
+    opacity: 0.5;
+    transform: translateY(-3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body.dark .work-date-picker__trigger {
+  background: #0f172a;
+  border-color: rgba(148, 163, 184, 0.25);
+  color: #f8fafc;
+}
+
+body.dark .work-date-picker__popover {
+  background: #0f172a;
+  border-color: rgba(148, 163, 184, 0.25);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+body.dark .work-date-picker__month-label {
+  color: #94a3b8;
+}
+
+body.dark .work-date-picker__popover--from .work-date-picker__month-value {
+  color: #67e8f9;
+}
+
+body.dark .work-date-picker__popover--to .work-date-picker__month-value {
+  color: #c4b5fd;
+}
+
+body.dark .work-date-picker__popover--work .work-date-picker__month-value {
+  color: #6ee7b7;
+}
+
+body.dark .work-date-picker__popover--off .work-date-picker__month-value {
+  color: #fcd34d;
+}
+
+body.dark .work-date-picker__nav {
+  background: rgba(15, 23, 42, 0.75);
+  color: #e2e8f0;
+}
+
+body.dark .work-date-picker__cell {
+  background: rgba(30, 41, 59, 0.85);
+  color: #e2e8f0;
 }
 
 .day-status-submit-btn {
@@ -3077,6 +3400,17 @@ body.dark .hours-list-simple__label {
   color: #0e7490;
 }
 
+.hours-list-status-badge--paid {
+  background: rgba(6, 182, 212, 0.22);
+  color: #0e7490;
+  border: 1px solid rgba(6, 182, 212, 0.35);
+}
+
+.hours-list-simple__row--paid-vacation {
+  border-left-width: 3px;
+  border-left-color: #06b6d4;
+}
+
 body.dark .hours-list-status-badge--off {
   background: rgba(245, 158, 11, 0.22);
   color: #fcd34d;
@@ -3085,6 +3419,12 @@ body.dark .hours-list-status-badge--off {
 body.dark .hours-list-status-badge--vacation {
   background: rgba(6, 182, 212, 0.22);
   color: #67e8f9;
+}
+
+body.dark .hours-list-status-badge--paid {
+  background: rgba(6, 182, 212, 0.28);
+  color: #67e8f9;
+  border-color: rgba(34, 211, 238, 0.35);
 }
 
 @media (max-width: 575.98px) {
@@ -3121,6 +3461,17 @@ body.dark .hours-list-status-badge--vacation {
   .shift-time-24 {
     height: 3rem;
     min-height: 44px;
+  }
+
+  .work-date-picker__nav {
+    width: 2.75rem;
+    height: 2.75rem;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .work-date-picker__cell:not(.work-date-picker__cell--empty) {
+    min-height: 2.75rem;
   }
 
   .shift-time-24__part {
