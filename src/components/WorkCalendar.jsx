@@ -1,8 +1,13 @@
+import { Link } from "react-router-dom";
 import { useContext, useMemo, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import Swal from "sweetalert2";
 import { useToday } from "../hooks/useToday";
-import { getRestDayBlockReason, dateHasPaidVacation } from "../utils/workDayConflicts";
+import {
+  dateHasPaidVacation,
+  getWorkShiftsForDate,
+} from "../utils/workDayConflicts";
+import CalendarQuickShiftModal from "./CalendarQuickShiftModal";
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTH_LABELS = [
@@ -27,10 +32,28 @@ const STATUS_CLASSES = {
 };
 
 const STATUS_LABELS = {
-  work: "Work",
-  off: "Day off",
+  work: "Worked",
+  off: "Rest day",
   vacation: "Vacation",
 };
+
+const LEGEND_ITEMS = [
+  {
+    status: "work",
+    label: "Worked",
+    hint: "Tap an empty day to log hours",
+  },
+  {
+    status: "off",
+    label: "Rest",
+    hint: "Cancel in the hours box, or tap Rest days again",
+  },
+  {
+    status: "vacation",
+    label: "Vacations",
+    hint: "Vacation — tap a day to mark",
+  },
+];
 
 const toDateKey = (date) => {
   const year = date.getFullYear();
@@ -83,9 +106,13 @@ const getEntryDate = (entry) => {
 const startOfLocalDay = (d) =>
   new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
+const getManualStatus = (status) =>
+  status === "off" || status === "vacation" ? status : null;
+
 const WorkCalendar = () => {
   const {
     hoursList,
+    setHoursList,
     workDayStatus,
     setWorkDayStatus,
     incomeItems,
@@ -93,6 +120,7 @@ const WorkCalendar = () => {
     formatMoney,
   } = useContext(AppContext);
   const { today } = useToday();
+  const [quickShift, setQuickShift] = useState(null);
   const [monthCursor, setMonthCursor] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
@@ -145,12 +173,12 @@ const WorkCalendar = () => {
       return isInSelectedMonthUpToToday(entryDate);
     });
 
-    const totalMonthHours = monthlyEntries.reduce(
+    const workHoursThisMonth = monthlyEntries.reduce(
       (sum, entry) => sum + (Number(entry?.hours) || 0),
       0
     );
 
-    const totalMonthEarnings = monthlyEntries.reduce(
+    const workPayThisMonth = monthlyEntries.reduce(
       (sum, entry) =>
         sum + (Number(entry?.hours) || 0) * (Number(entry?.rate) || 0),
       0
@@ -169,39 +197,39 @@ const WorkCalendar = () => {
       .filter(inSelectedMonth)
       .reduce((sum, item) => sum + (Number(item?.amount) || 0), 0);
 
-    const monthTotalIn = totalMonthEarnings + totalMonthListIncome;
-    const monthBalance = monthTotalIn - totalMonthListExpenses;
-    const overSalary = Math.max(0, totalMonthListExpenses - totalMonthEarnings);
+    const monthTotalIn = workPayThisMonth + totalMonthListIncome;
+    const monthNetBalance = monthTotalIn - totalMonthListExpenses;
+    const expensesOverWorkPay = Math.max(0, totalMonthListExpenses - workPayThisMonth);
 
-    let balanceStatus = "zero";
-    let balanceLabel = "Left over";
-    let balanceAmount = 0;
+    let monthBalanceStatus = "zero";
+    let monthBalanceLabel = "Money left";
+    let monthBalanceAmount = 0;
 
-    if (monthBalance > 0) {
-      balanceStatus = "surplus";
-      balanceAmount = monthBalance;
-    } else if (monthBalance === 0) {
-      balanceStatus = "zero";
-      balanceAmount = 0;
-    } else if (overSalary > 0) {
-      balanceStatus = "over-salary";
-      balanceLabel = "Over salary";
-      balanceAmount = overSalary;
+    if (monthNetBalance > 0) {
+      monthBalanceStatus = "surplus";
+      monthBalanceAmount = monthNetBalance;
+    } else if (monthNetBalance === 0) {
+      monthBalanceStatus = "zero";
+      monthBalanceAmount = 0;
+    } else if (expensesOverWorkPay > 0) {
+      monthBalanceStatus = "over-salary";
+      monthBalanceLabel = "Over work pay";
+      monthBalanceAmount = expensesOverWorkPay;
     } else {
-      balanceStatus = "deficit";
-      balanceLabel = "Over spent";
-      balanceAmount = Math.abs(monthBalance);
+      monthBalanceStatus = "deficit";
+      monthBalanceLabel = "Shortfall";
+      monthBalanceAmount = Math.abs(monthNetBalance);
     }
 
     return {
-      totalMonthHours,
-      totalMonthEarnings,
+      workHoursThisMonth,
+      workPayThisMonth,
       totalMonthListIncome,
       totalMonthListExpenses,
-      monthBalance,
-      balanceStatus,
-      balanceLabel,
-      balanceAmount,
+      monthNetBalance,
+      monthBalanceStatus,
+      monthBalanceLabel,
+      monthBalanceAmount,
       isViewingCurrentMonth,
     };
   }, [hoursList, incomeItems, lossItems, monthCursor]);
@@ -231,6 +259,63 @@ const WorkCalendar = () => {
     return [...leading, ...monthDays];
   }, [monthCursor]);
 
+  const openQuickShift = (dateKey, entry = null) => {
+    setQuickShift({ dateKey, entry });
+  };
+
+  const closeQuickShift = () => {
+    setQuickShift(null);
+  };
+
+  const handleQuickShiftCancel = (dateKey) => {
+    closeQuickShift();
+    if (!workedDays.has(dateKey)) {
+      setWorkDayStatus((prev) => ({ ...prev, [dateKey]: "off" }));
+    }
+  };
+
+  const handleQuickShiftSave = (savedEntry) => {
+    const dateKey = savedEntry.dateKey;
+    setHoursList((prev) => {
+      const list = Array.isArray(prev) ? prev : [];
+      const existingIndex = list.findIndex(
+        (item) => String(item?.id) === String(savedEntry.id)
+      );
+      if (existingIndex >= 0) {
+        return list.map((item, index) =>
+          index === existingIndex ? { ...item, ...savedEntry } : item
+        );
+      }
+      return [savedEntry, ...list];
+    });
+    setWorkDayStatus((prev) => {
+      const next = { ...prev };
+      delete next[dateKey];
+      return next;
+    });
+    closeQuickShift();
+  };
+
+  const handleQuickShiftDelete = (entry) => {
+    const dateKey = entry?.dateKey;
+
+    setHoursList((prev) =>
+      (Array.isArray(prev) ? prev : []).filter(
+        (item) => String(item?.id) !== String(entry.id)
+      )
+    );
+
+    if (dateKey) {
+      setWorkDayStatus((prev) => {
+        const next = { ...prev };
+        delete next[dateKey];
+        return next;
+      });
+    }
+
+    closeQuickShift();
+  };
+
   const updateStatusForDate = (dateKey) => {
     if (dateHasPaidVacation(hoursList, dateKey)) {
       Swal.fire({
@@ -242,48 +327,29 @@ const WorkCalendar = () => {
       return;
     }
 
-    if (workedDays.has(dateKey)) {
-      Swal.fire({
-        icon: "warning",
-        title: "Work hours on this day",
-        text: "Remove the work shift from the list before marking day off or vacation.",
-        confirmButtonText: "OK",
+    const manualStatus = getManualStatus(workDayStatus[dateKey]);
+    const shiftsOnDay = getWorkShiftsForDate(hoursList, dateKey);
+
+    if (shiftsOnDay.length > 0) {
+      openQuickShift(dateKey, shiftsOnDay[0]);
+      return;
+    }
+
+    if (manualStatus === "off") {
+      setWorkDayStatus((prev) => ({ ...prev, [dateKey]: "vacation" }));
+      return;
+    }
+
+    if (manualStatus === "vacation") {
+      setWorkDayStatus((prev) => {
+        const next = { ...prev };
+        delete next[dateKey];
+        return next;
       });
       return;
     }
 
-    const statuses = [undefined, "off", "vacation"];
-    const current = workDayStatus[dateKey];
-    const currentIndex = statuses.indexOf(current);
-    const nextStatus = statuses[(currentIndex + 1) % statuses.length];
-
-    if (nextStatus) {
-      const block = getRestDayBlockReason(
-        hoursList,
-        workDayStatus,
-        dateKey,
-        nextStatus
-      );
-      if (block) {
-        Swal.fire({
-          icon: "warning",
-          title: block.title,
-          text: block.text,
-          confirmButtonText: "OK",
-        });
-        return;
-      }
-    }
-
-    setWorkDayStatus((prev) => {
-      const next = { ...prev };
-      if (!nextStatus) {
-        delete next[dateKey];
-      } else {
-        next[dateKey] = nextStatus;
-      }
-      return next;
-    });
+    openQuickShift(dateKey);
   };
 
   const getStatusForDate = (dateKey) => {
@@ -294,6 +360,7 @@ const WorkCalendar = () => {
       return "vacation";
     }
     if (workedDays.has(dateKey)) return "work";
+    if (quickShift?.dateKey === dateKey && !quickShift.entry) return "work";
     return workDayStatus[dateKey];
   };
 
@@ -317,8 +384,6 @@ const WorkCalendar = () => {
       <div className="calendar-topbar d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-3">
         <div>
           <h6 className="m-0 fw-bold">Work Calendar</h6>
-          <small className="text-muted d-none d-sm-inline">Click a day to cycle: none - off - vacation</small>
-          <small className="text-muted d-sm-none">Tap day: off / vacation</small>
         </div>
         <div className="calendar-month-controls d-flex align-items-center gap-2">
           <button type="button" className="btn btn-outline-secondary btn-sm calendar-nav-btn" onClick={goPrevMonth}>
@@ -341,22 +406,23 @@ const WorkCalendar = () => {
       </div>
 
       <div className="calendar-month-summary mb-3">
-        {monthlyStats.isViewingCurrentMonth && (
-          <div className="calendar-month-summary-note text-muted small mb-2">
-            <i className="fa-solid fa-calendar-day me-1"></i>
-            Current month: totals are <strong>through today</strong> (future dates in this month are excluded).
-          </div>
-        )}
+        <p className="calendar-month-summary-note text-muted small mb-2 mb-md-3">
+          <i className="fa-solid fa-chart-pie me-1" aria-hidden></i>
+          Quick overview for this calendar month — hours, pay, expenses, income, and balance.{" "}
+          <Link to="/stats" className="calendar-stats-link">
+            See all stats here
+          </Link>
+        </p>
         <div className="calendar-stats-grid" role="list">
           <article className="calendar-stat-tile calendar-stat-tile--hours" role="listitem">
             <div className="calendar-stat-tile__icon-wrap" aria-hidden>
               <i className="fa-regular fa-clock"></i>
             </div>
             <div className="calendar-stat-tile__content">
-              <span className="calendar-stat-tile__label">Month hours</span>
+              <span className="calendar-stat-tile__label">Hours worked</span>
               <span className="calendar-stat-tile__value">
-                {(Number.isFinite(Number(monthlyStats.totalMonthHours))
-                  ? Number(monthlyStats.totalMonthHours)
+                {(Number.isFinite(Number(monthlyStats.workHoursThisMonth))
+                  ? Number(monthlyStats.workHoursThisMonth)
                   : 0
                 ).toFixed(2)}
                 <span className="calendar-stat-tile__unit">h</span>
@@ -369,9 +435,9 @@ const WorkCalendar = () => {
               <i className="fa-solid fa-briefcase"></i>
             </div>
             <div className="calendar-stat-tile__content">
-              <span className="calendar-stat-tile__label">Pay (hours)</span>
+              <span className="calendar-stat-tile__label">Pay from hours</span>
               <span className="calendar-stat-tile__value">
-                {formatMoney(monthlyStats.totalMonthEarnings)}
+                {formatMoney(monthlyStats.workPayThisMonth)}
                 <span className="calendar-stat-tile__currency">€</span>
               </span>
             </div>
@@ -404,26 +470,26 @@ const WorkCalendar = () => {
           </article>
 
           <article
-            className={`calendar-stat-tile calendar-stat-tile--balance calendar-stat-tile--balance-${monthlyStats.balanceStatus}`}
+            className={`calendar-stat-tile calendar-stat-tile--balance calendar-stat-tile--balance-${monthlyStats.monthBalanceStatus}`}
             role="listitem"
           >
             <div className="calendar-stat-tile__icon-wrap" aria-hidden>
               <i
                 className={
-                  monthlyStats.balanceStatus === "surplus"
+                  monthlyStats.monthBalanceStatus === "surplus"
                     ? "fa-solid fa-piggy-bank"
                     : "fa-solid fa-triangle-exclamation"
                 }
               ></i>
             </div>
             <div className="calendar-stat-tile__content">
-              <span className="calendar-stat-tile__label">{monthlyStats.balanceLabel}</span>
+              <span className="calendar-stat-tile__label">{monthlyStats.monthBalanceLabel}</span>
               <span
                 className={`calendar-stat-tile__value calendar-stat-tile__value--${
-                  monthlyStats.balanceStatus === "surplus" ? "positive" : "negative"
+                  monthlyStats.monthBalanceStatus === "surplus" ? "positive" : "negative"
                 }`}
               >
-                {formatMoney(monthlyStats.balanceAmount)}
+                {formatMoney(monthlyStats.monthBalanceAmount)}
                 <span className="calendar-stat-tile__currency">€</span>
               </span>
             </div>
@@ -431,11 +497,35 @@ const WorkCalendar = () => {
         </div>
       </div>
 
-      <div className="calendar-legend mb-3">
-        <span className="legend-item"><i className="legend-dot status-work"></i> Work</span>
-        <span className="legend-item"><i className="legend-dot status-off"></i> Day off</span>
-        <span className="legend-item"><i className="legend-dot status-vacation"></i> Vacation</span>
+      <div className="calendar-legend-wrap mb-3">
+        <div className="calendar-legend" role="list" aria-label="Calendar day colors">
+          {LEGEND_ITEMS.map(({ status, label, hint }) => (
+            <span
+              key={status}
+              className="legend-item"
+              role="listitem"
+              title={hint}
+            >
+              <i className={`legend-dot ${STATUS_CLASSES[status]}`} aria-hidden></i>
+              {label}
+            </span>
+          ))}
+        </div>
+        <p className="calendar-legend-note text-muted mb-0">
+          Tap empty day → log hours (Cancel = Rest) · Rest → Vacations → clear
+        </p>
       </div>
+
+      {quickShift && (
+        <CalendarQuickShiftModal
+          dateKey={quickShift.dateKey}
+          entry={quickShift.entry}
+          onCancel={() => handleQuickShiftCancel(quickShift.dateKey)}
+          onClose={closeQuickShift}
+          onSave={handleQuickShiftSave}
+          onDelete={handleQuickShiftDelete}
+        />
+      )}
 
       <div className="work-calendar-grid">
         {DAY_LABELS.map((day) => (
@@ -463,6 +553,7 @@ const WorkCalendar = () => {
               type="button"
               className={`calendar-cell day-cell ${statusClass}`}
               onClick={() => updateStatusForDate(dateKey)}
+              aria-label={`${cell.date.getDate()} ${MONTH_LABELS[monthCursor.getMonth()]} — ${statusTitle}. Tap to change.`}
               title={statusTitle}
             >
               {cell.date.getDate()}

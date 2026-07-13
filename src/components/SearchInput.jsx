@@ -2,6 +2,7 @@ const SearchInput = ({
   id,
   value,
   onChange,
+  onFocus,
   placeholder,
   clearLabel = "Clear search",
 }) => (
@@ -16,6 +17,7 @@ const SearchInput = ({
       placeholder={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      onFocus={onFocus}
     />
     {value && (
       <button

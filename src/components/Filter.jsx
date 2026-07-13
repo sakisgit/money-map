@@ -2,12 +2,23 @@
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 import SearchInput from "./SearchInput";
+import { closeMoneyFormCollapse } from "../utils/moneyFormCollapse";
 
 const Filter = () => {
   const { 
     filterLoss, setFilterLoss, 
     filterProfit, setFilterProfit 
   } = useContext(AppContext);
+
+  const handleLossSearch = (value) => {
+    setFilterLoss(value);
+    closeMoneyFormCollapse("collapse-loss");
+  };
+
+  const handleProfitSearch = (value) => {
+    setFilterProfit(value);
+    closeMoneyFormCollapse("collapse-profit");
+  };
 
   return (
     <section className="filter my-4 my-md-5 d-none d-md-block">
@@ -16,7 +27,8 @@ const Filter = () => {
           <SearchInput
             id="filter-loss"
             value={filterLoss}
-            onChange={setFilterLoss}
+            onChange={handleLossSearch}
+            onFocus={() => closeMoneyFormCollapse("collapse-loss")}
             placeholder="Search expenses..."
             clearLabel="Clear expense search"
           />
@@ -25,7 +37,8 @@ const Filter = () => {
           <SearchInput
             id="filter-profit"
             value={filterProfit}
-            onChange={setFilterProfit}
+            onChange={handleProfitSearch}
+            onFocus={() => closeMoneyFormCollapse("collapse-profit")}
             placeholder="Search income..."
             clearLabel="Clear income search"
           />

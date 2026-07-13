@@ -5,6 +5,7 @@ import { useGiphyGif } from "../hooks/useGiphyGif";
 import { useFullDate } from "../hooks/useFullDate";
 import Swal from "sweetalert2";
 import { toLocalDateKey } from "../utils/dateKey";
+import { closeMoneyFormCollapse } from "../utils/moneyFormCollapse";
 import PaymentMethodToggle from "./PaymentMethodToggle";
 import MoneyListItem from "./MoneyListItem";
 
@@ -148,6 +149,7 @@ const AddMoneyLoss = () => {
       setLossText('');
       setLossAmount('');
       setPaymentMethod('cash');
+      closeMoneyFormCollapse('collapse-loss');
     });
   };
 

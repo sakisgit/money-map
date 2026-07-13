@@ -89,6 +89,18 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const readWorkDayStatus = () => {
+    const parsed = safeParse(
+      typeof localStorage !== "undefined"
+        ? localStorage.getItem("workDayStatus")
+        : null,
+      {}
+    );
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? parsed
+      : {};
+  };
+
   // --- HomePage States ---
   const [incomeItems, setIncomeItems] = useState([]);
   const [lossItems, setLossItems] = useState([]);
@@ -104,7 +116,7 @@ export const AppProvider = ({ children }) => {
   const [hoursInput, setHoursInput] = useState("");
   const [totalHours, setTotalHours] = useState(0);
   const [hoursList, setHoursList] = useState([]);
-  const [workDayStatus, setWorkDayStatus] = useState({});
+  const [workDayStatus, setWorkDayStatus] = useState(readWorkDayStatus);
   const [isHydrated, setIsHydrated] = useState(false);
 
   // --- Format Helper ---
@@ -148,8 +160,14 @@ export const AppProvider = ({ children }) => {
 
     const savedWorkDayStatus = localStorage.getItem("workDayStatus");
     const parsedWorkDayStatus = safeParse(savedWorkDayStatus, {});
-    if (parsedWorkDayStatus && typeof parsedWorkDayStatus === "object") {
-      setWorkDayStatus(parsedWorkDayStatus);
+    if (
+      parsedWorkDayStatus &&
+      typeof parsedWorkDayStatus === "object" &&
+      !Array.isArray(parsedWorkDayStatus)
+    ) {
+      setWorkDayStatus((prev) =>
+        Object.keys(prev).length > 0 ? prev : parsedWorkDayStatus
+      );
     }
 
     setIsHydrated(true);

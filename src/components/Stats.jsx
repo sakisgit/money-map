@@ -51,7 +51,7 @@ const Stats = () => {
   return (
     <>
       {/* Salary & Net Balance */}
-      <section className="stats my-4 my-md-5">
+      <section id="all-stats" className="stats my-4 my-md-5">
         <div className="row g-3 g-md-4 mb-3 mb-md-4">
           {/* Monthly Income */}
           <div className="col-12 col-md-6">
