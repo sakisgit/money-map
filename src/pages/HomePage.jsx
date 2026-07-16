@@ -1,7 +1,7 @@
 
 import { useContext, useState } from "react";
 import { AppContext } from "../context/AppContext";
-import Header from "../components/Header";
+import PageActions from "../components/PageActions";
 import Stats from "../components/Stats";
 import Filter from "../components/Filter";
 import Items from "../components/Items";
@@ -31,9 +31,8 @@ const HomePage = () => {
         </div>
       ) : (
         <>
-          <Header/>
-
           <div className="container page-content my-4">
+            <PageActions />
             <WorkCalendar />
             <Stats/>
             <Filter/>

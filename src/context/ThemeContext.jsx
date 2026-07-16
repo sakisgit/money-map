@@ -29,7 +29,7 @@ export const ThemeProvider = ({ children }) => {
   };
 
   // Theme context for the app
-  const contextValue = { theme, toggleTheme };
+  const contextValue = { theme, setTheme, toggleTheme };
 
   return (
     <ThemeContext.Provider value={contextValue}>

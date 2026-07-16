@@ -1,50 +1,43 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import { ThemeContext } from "../context/ThemeContext";
-import PaymentDropdown from "../buttons/PaymentDropdown";
-import ResetButton from "../buttons/ResetButton";
+import { useEffect, useRef } from "react";
+import { NavLink } from "react-router-dom";
+import { APP_NAV_LINKS } from "../constants/navLinks";
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
 
-const HeaderMobileMenu = () => {
-  const [open, setOpen] = useState(false);
+const HeaderMobileMenu = ({ open, onToggle, onClose }) => {
   const ref = useRef(null);
-  const { theme, toggleTheme } = useContext(ThemeContext);
-
-  const closeMenu = () => setOpen(false);
 
   useBodyScrollLock(open);
 
   useEffect(() => {
+    if (!open) return undefined;
+
     const handleOutsideClick = (e) => {
       if (ref.current && !ref.current.contains(e.target)) {
-        setOpen(false);
+        onClose();
       }
     };
 
-    if (open) {
-      document.addEventListener("pointerdown", handleOutsideClick);
-    }
-
+    document.addEventListener("pointerdown", handleOutsideClick);
     return () => document.removeEventListener("pointerdown", handleOutsideClick);
-  }, [open]);
+  }, [open, onClose]);
 
   useEffect(() => {
     if (!open) return undefined;
 
     const handleEscape = (e) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") onClose();
     };
 
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-  }, [open]);
+  }, [open, onClose]);
 
   return (
-    <div className="header-mobile-menu" ref={ref}>
+    <div className="header-mobile-menu d-lg-none" ref={ref}>
       <button
         type="button"
         className="header-mobile-menu__toggle"
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={onToggle}
         aria-expanded={open}
         aria-controls="header-mobile-menu-panel"
         aria-label={open ? "Close menu" : "Open menu"}
@@ -53,32 +46,32 @@ const HeaderMobileMenu = () => {
       </button>
 
       {open && (
-        <div id="header-mobile-menu-panel" className="header-mobile-menu__dropdown">
-          <PaymentDropdown variant="menu" onMenuClose={closeMenu} />
-          <ResetButton variant="menu" onMenuClose={closeMenu} />
-          <Link
-            to="/work-hours"
-            className="header-mobile-menu__item"
-            onClick={closeMenu}
-          >
-            <i className="fa-solid fa-clock" aria-hidden></i>
-            <span>Odd Hours</span>
-          </Link>
+        <>
           <button
             type="button"
-            className="header-mobile-menu__item"
-            onClick={() => {
-              toggleTheme();
-              closeMenu();
-            }}
-          >
-            <i
-              className={`fa-solid ${theme === "light" ? "fa-moon" : "fa-sun"}`}
-              aria-hidden
-            ></i>
-            <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
-          </button>
-        </div>
+            className="header-menu-backdrop"
+            aria-label="Close menu"
+            onClick={onClose}
+          />
+          <div id="header-mobile-menu-panel" className="header-mobile-menu__dropdown">
+            <nav className="header-mobile-menu__nav" aria-label="Main navigation">
+              {APP_NAV_LINKS.map(({ to, label, icon, end }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  end={end}
+                  className={({ isActive }) =>
+                    `header-mobile-menu__item${isActive ? " is-active" : ""}`
+                  }
+                  onClick={onClose}
+                >
+                  <i className={`fa-solid ${icon}`} aria-hidden></i>
+                  <span>{label}</span>
+                </NavLink>
+              ))}
+            </nav>
+          </div>
+        </>
       )}
     </div>
   );

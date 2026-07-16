@@ -50,24 +50,16 @@ const ResetButton = ({ variant = "header", onMenuClose }) => {
     });
   };
 
-  if (variant === "menu") {
-    return (
-      <button
-        type="button"
-        className="header-mobile-menu__item"
-        onClick={handleReset}
-      >
-        <i className="fa-solid fa-rotate" aria-hidden></i>
-        <span>Reset Stats</span>
-      </button>
-    );
-  }
+  const className =
+    variant === "page"
+      ? "btn btn-outline-danger page-actions__btn d-inline-flex align-items-center justify-content-center"
+      : "btn btn-outline-light btn-sm header-action-btn d-flex align-items-center justify-content-center";
 
   return (
     <button
       type="button"
       id="reset"
-      className="btn btn-outline-light btn-sm header-action-btn d-flex align-items-center justify-content-center"
+      className={className}
       onClick={handleReset}
     >
       <i className="fa-solid fa-rotate me-1" aria-hidden></i>

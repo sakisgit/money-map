@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import Header from "../components/Header";
+import PageActions from "../components/PageActions";
 import Stats from "../components/Stats";
 
 const StatsPage = () => {
   return (
     <>
-      <Header />
       <div className="container page-content my-4 my-md-5">
+        <PageActions />
         <Stats />
 
         <div className="text-center mt-4 mb-3">

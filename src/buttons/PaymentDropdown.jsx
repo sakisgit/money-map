@@ -10,7 +10,12 @@ const PaymentDropdown = ({ variant = "header", onMenuClose }) => {
   const [show, setShow] = useState(false);
   const ref = useRef(null);
   const isMenu = variant === "menu";
-  const inputId = isMenu ? "payment-input-mobile-menu" : "payment-input";
+  const isPage = variant === "page";
+  const inputId = isMenu
+    ? "payment-input-mobile-menu"
+    : isPage
+      ? "payment-input-page"
+      : "payment-input";
 
   const closePanel = () => {
     setShow(false);
@@ -125,7 +130,24 @@ const PaymentDropdown = ({ variant = "header", onMenuClose }) => {
     if (!ref.current) return {};
 
     const rect = ref.current.getBoundingClientRect();
-    const maxHeight = Math.min(420, window.innerHeight - rect.bottom - 16);
+    const viewportHeight =
+      window.visualViewport?.height ?? window.innerHeight;
+    const spaceBelow = Math.max(160, viewportHeight - rect.bottom - 16);
+    const maxHeight = Math.min(420, spaceBelow);
+    const isNarrow = window.innerWidth < 576;
+
+    if (isNarrow) {
+      return {
+        position: "absolute",
+        top: "calc(100% + 8px)",
+        left: "0",
+        right: "0",
+        width: "100%",
+        maxHeight: `${maxHeight}px`,
+        overflowY: "auto",
+        zIndex: 9999,
+      };
+    }
 
     return {
       position: "absolute",
@@ -199,11 +221,18 @@ const PaymentDropdown = ({ variant = "header", onMenuClose }) => {
     );
   }
 
+  const triggerClass = isPage
+    ? "btn btn-primary page-actions__btn d-inline-flex align-items-center justify-content-center"
+    : "btn btn-outline-light btn-sm header-action-btn d-flex align-items-center justify-content-center";
+
   return (
-    <div className="position-relative payment-dropdown-wrap" ref={ref}>
+    <div
+      className={`position-relative payment-dropdown-wrap${isPage ? " payment-dropdown-wrap--page" : ""}`}
+      ref={ref}
+    >
       <button
         type="button"
-        className="btn btn-outline-light btn-sm header-action-btn d-flex align-items-center justify-content-center"
+        className={triggerClass}
         onClick={toggleShow}
         aria-expanded={show}
       >
