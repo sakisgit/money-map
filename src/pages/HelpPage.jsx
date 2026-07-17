@@ -4,17 +4,17 @@ const HELP_SECTIONS = [
   {
     title: "Work Calendar",
     icon: "fa-calendar-days",
-    body: "Tap an empty day to log work hours. Cancel marks Rest. Tap Rest for Vacations, then again to clear. Green days open edit/delete for that shift.",
+    body: "Tap an empty day to log work hours. Cancel marks Rest. Tap Rest for Vacation, then again to clear. Green days open edit or delete for that shift.",
   },
   {
-    title: "Odd Hours",
+    title: "Work Hours",
     icon: "fa-clock",
     body: "Set your hourly rate, then log shifts with start and end times. You can also mark day off or vacation ranges from that page.",
   },
   {
-    title: "Payment Day & Reset",
+    title: "Set Payment & Reset",
     icon: "fa-wallet",
-    body: "Use Payment Day on Home or All Stats to set your monthly payment, or apply earnings from work hours. Reset Stats clears expenses, income, and payment.",
+    body: "Use Set Payment on Home or All Stats to set your monthly payment, or apply earnings from work hours. Reset Stats clears expenses, income, and payment.",
   },
   {
     title: "Expenses & Income",

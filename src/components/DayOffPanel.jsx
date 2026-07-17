@@ -67,7 +67,7 @@ const DayOffPanel = () => {
   return (
     <CollapsibleWorkPanel
       title="Day off"
-      subtitle="Rest day (repo) — you did not work"
+      subtitle="Rest day — you did not work"
       icon="fa-solid fa-mug-hot"
       iconWrapClassName="day-off-panel__icon"
       panelClassName="day-off-panel"

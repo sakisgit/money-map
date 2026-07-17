@@ -192,7 +192,7 @@ const HoursList = () => {
     <div className="card shadow-sm border-0 rounded-3 p-3 mt-4 hours-list-simple">
       <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2 mb-3">
         <div>
-          <h6 className="text-muted fw-bold m-0">Worked Hours</h6>
+          <h6 className="text-muted fw-bold m-0">Work hours</h6>
           <small className="text-muted">{listTitle}</small>
         </div>
         <button

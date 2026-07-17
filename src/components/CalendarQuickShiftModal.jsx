@@ -64,7 +64,7 @@ const CalendarQuickShiftModal = ({ dateKey, entry, onCancel, onClose, onSave, on
       Swal.fire({
         icon: "warning",
         title: "Set hourly rate",
-        text: "Set your hourly rate in Odd Hours first.",
+        text: "Set your hourly rate on the Work Hours page first.",
         confirmButtonText: "OK",
       });
       return;

@@ -21,21 +21,21 @@ const Stats = () => {
       
       if (progressBar >= 100 && lastProgressLevel < 100) {
         setProgressMessage({
-          text: "YOU'VE SPENT YOUR ENTIRE SALARY this month",
+          text: "You've spent your entire salary this month",
           date: currentDate,
           level: 100
         });
         setLastProgressLevel(100);
       } else if (progressBar >= 80 && lastProgressLevel < 80) {
         setProgressMessage({
-          text: "Warning: You've reached 80%",
+          text: "Warning: You've spent 80% of your monthly budget",
           date: currentDate,
           level: 80
         });
         setLastProgressLevel(80);
       } else if (progressBar >= 50 && lastProgressLevel < 50) {
         setProgressMessage({
-          text: "You've reached 50% of your salary",
+          text: "You've spent 50% of your monthly budget",
           date: currentDate,
           level: 50
         });

@@ -86,8 +86,8 @@ const AddMoneyProfit = () => {
     if (!incomeText || !incomeAmount) {
       Swal.fire({
         icon: 'warning',
-        title: 'Missing Fields',
-        text: 'Please complete all fields before adding an income.',
+        title: 'Missing fields',
+        text: 'Please complete all fields before adding income.',
         confirmButtonText: 'OK'
       });
       return;
@@ -107,8 +107,8 @@ const AddMoneyProfit = () => {
     if (/\d/.test(incomeText)) {
       Swal.fire({
         icon: 'warning',
-        title: 'Invalid Text',
-        text: 'The text must not contain numbers.',
+        title: 'Invalid name',
+        text: 'The name must not contain numbers.',
         confirmButtonText: 'OK'
       });
       return;
@@ -155,7 +155,7 @@ const AddMoneyProfit = () => {
                 type="text"
                 className="form-control"
                 id="profit-name"
-                placeholder="Enter Income Source"
+                placeholder="Enter income source"
                 maxLength={28}
                 onChange={(e) => {
                   let value = e.target.value.replace(/\d/g, '');
@@ -172,7 +172,7 @@ const AddMoneyProfit = () => {
                 type="number"
                 className="form-control"
                 id="profit-amount"
-                placeholder="Enter Amount (€)"
+                placeholder="Enter amount (€)"
                 onChange={(e) => setIncomeAmount(e.target.value)}
               />
             </div>

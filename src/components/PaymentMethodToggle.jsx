@@ -9,8 +9,8 @@ const VARIANT_CONFIG = {
     ariaLabel: "Payment method",
   },
   income: {
-    fieldLabel: "Receipt method",
-    ariaLabel: "Receipt method",
+    fieldLabel: "How received",
+    ariaLabel: "How received",
   },
 };
 

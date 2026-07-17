@@ -5,7 +5,7 @@ const DeleteButton = ({onDelete}) => {
   const handleClick= () =>{
     Swal.fire({
       title: 'Are you sure?',
-      text: "You won't be able to revert this!",
+      text: "This cannot be undone.",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',

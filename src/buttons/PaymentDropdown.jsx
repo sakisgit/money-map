@@ -29,7 +29,7 @@ const PaymentDropdown = ({ variant = "header", onMenuClose }) => {
       Swal.fire({
         icon: "warning",
         title: "No Work Hours",
-        text: "Add worked hours on the Odd Hours page first.",
+        text: "Add work hours on the Work Hours page first.",
         confirmButtonText: "OK",
       });
       return;
@@ -163,7 +163,7 @@ const PaymentDropdown = ({ variant = "header", onMenuClose }) => {
 
   const paymentContent = (
     <div className="payment-dropdown-content">
-      <h6 className="mb-3 fw-bold">Set Your Payment</h6>
+      <h6 className="mb-3 fw-bold">Set your payment</h6>
       <div className="mb-3">
         <label htmlFor={inputId} className="form-label mb-2">
           Payment (€)
@@ -172,7 +172,7 @@ const PaymentDropdown = ({ variant = "header", onMenuClose }) => {
           type="number"
           className="form-control"
           id={inputId}
-          placeholder="Enter Amount (€)"
+          placeholder="Enter amount (€)"
           value={inputValue || ""}
           onChange={(e) =>
             setInputValue(e.target.value ? Number(e.target.value) : "")
@@ -208,7 +208,7 @@ const PaymentDropdown = ({ variant = "header", onMenuClose }) => {
           aria-expanded={show}
         >
           <i className="fa-solid fa-calendar-days" aria-hidden></i>
-          <span>Payment Day</span>
+          <span>Set Payment</span>
           <i
             className={`fa-solid fa-chevron-${show ? "up" : "down"} header-mobile-menu__chevron`}
             aria-hidden
@@ -237,7 +237,7 @@ const PaymentDropdown = ({ variant = "header", onMenuClose }) => {
         aria-expanded={show}
       >
         <i className="fa-solid fa-calendar-days me-1" aria-hidden></i>
-        <span>Payment Day</span>
+        <span>Set Payment</span>
       </button>
       {show && (
         <div className="payment-dropdown" style={getDropdownStyle()}>

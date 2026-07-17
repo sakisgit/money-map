@@ -46,12 +46,12 @@ const LEGEND_ITEMS = [
   {
     status: "off",
     label: "Rest",
-    hint: "Cancel in the hours box, or tap Rest days again",
+    hint: "Cancel in the hours dialog to mark Rest, or tap Rest again",
   },
   {
     status: "vacation",
-    label: "Vacations",
-    hint: "Vacation — tap a day to mark",
+    label: "Vacation",
+    hint: "Tap a day to mark vacation",
   },
 ];
 
@@ -213,7 +213,7 @@ const WorkCalendar = () => {
       monthBalanceAmount = 0;
     } else if (expensesOverWorkPay > 0) {
       monthBalanceStatus = "over-salary";
-      monthBalanceLabel = "Over work pay";
+      monthBalanceLabel = "Spent over pay";
       monthBalanceAmount = expensesOverWorkPay;
     } else {
       monthBalanceStatus = "deficit";
@@ -321,7 +321,7 @@ const WorkCalendar = () => {
       Swal.fire({
         icon: "info",
         title: "Paid vacation",
-        text: "This day is paid vacation. Remove it from the Worked Hours list to change its status here.",
+        text: "This day is paid vacation. Remove it from the Work Hours list to change its status here.",
         confirmButtonText: "OK",
       });
       return;
@@ -410,7 +410,7 @@ const WorkCalendar = () => {
           <i className="fa-solid fa-chart-pie me-1" aria-hidden></i>
           Quick overview for this calendar month — hours, pay, expenses, income, and balance.{" "}
           <Link to="/stats" className="calendar-stats-link">
-            See all stats here
+            View all stats
           </Link>
         </p>
         <div className="calendar-stats-grid" role="list">
@@ -512,7 +512,10 @@ const WorkCalendar = () => {
           ))}
         </div>
         <p className="calendar-legend-note text-muted mb-0">
-          Tap empty day → log hours (Cancel = Rest) · Rest → Vacations → clear
+          <i className="fa-solid fa-info-circle calendar-legend-note__icon" aria-hidden></i>
+          <span>
+            Tap an empty day to log hours (Cancel = Rest). Tap Rest → Vacation → clear.
+          </span>
         </p>
       </div>
 
@@ -545,7 +548,7 @@ const WorkCalendar = () => {
             ? isPaidVacationDay
               ? "Paid vacation"
               : STATUS_LABELS[status]
-            : "No status";
+            : "No entry";
 
           return (
             <button

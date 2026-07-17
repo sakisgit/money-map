@@ -21,7 +21,7 @@ const ResetButton = ({ variant = "header", onMenuClose }) => {
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, reset it!",
+      confirmButtonText: "Yes, reset",
       cancelButtonText: "Cancel",
     }).then((result) => {
       if (result.isConfirmed) {

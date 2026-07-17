@@ -33,10 +33,10 @@ const HeaderMobileMenu = ({ open, onToggle, onClose }) => {
   }, [open, onClose]);
 
   return (
-    <div className="header-mobile-menu d-lg-none" ref={ref}>
+    <div className="header-mobile-menu d-md-none" ref={ref}>
       <button
         type="button"
-        className="header-mobile-menu__toggle"
+        className={`header-icon-btn${open ? " is-open" : ""}`}
         onClick={onToggle}
         aria-expanded={open}
         aria-controls="header-mobile-menu-panel"

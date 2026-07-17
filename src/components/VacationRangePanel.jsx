@@ -198,7 +198,7 @@ const VacationRangePanel = () => {
         Swal.fire({
           icon: "warning",
           title: "Hourly rate required",
-          text: "Set your hourly rate in Work shift before adding paid vacation days.",
+          text: "Set your hourly rate in Work Hours before adding paid vacation days.",
           confirmButtonText: "OK",
         });
         return;

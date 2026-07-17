@@ -31,7 +31,7 @@ const WorkHeader = () => {
         <div>
           <h1 className="work-page-header__title fw-bold d-flex align-items-center m-0">
             <i className="fa-solid fa-clock me-2"></i>
-            Odd Hours
+            Work Hours
           </h1>
           <p className="work-page-header__date d-md-none mb-0 mt-1">
             <i className="fa-solid fa-calendar-days me-1"></i>

@@ -97,7 +97,7 @@ const AddMoneyLoss = () => {
     if (!lossText || !lossAmount) {
       Swal.fire({
         icon: 'warning',
-        title: 'Incomplete Fields',
+        title: 'Missing fields',
         text: 'Please complete all fields before adding an expense.',
         confirmButtonText: 'OK'
       });
@@ -118,8 +118,8 @@ const AddMoneyLoss = () => {
     if (/\d/.test(lossText)) {
       Swal.fire({
         icon: 'warning',
-        title: 'Invalid Text',
-        text: 'The text must not contain numbers.',
+        title: 'Invalid name',
+        text: 'The name must not contain numbers.',
         confirmButtonText: 'OK'
       });
       return;
@@ -160,13 +160,13 @@ const AddMoneyLoss = () => {
         <div className="card card-body bg-light">
           <form id="loss-form" onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label htmlFor="loss-name" className="form-label">Expense Item</label>
+              <label htmlFor="loss-name" className="form-label">Expense name</label>
               <input
                 value={lossText}
                 type="text"
                 className="form-control"
                 id="loss-name"
-                placeholder="Enter Expense Item"
+                placeholder="Enter expense name"
                 maxLength={28}
                 onChange={(e) => {
                   let value = e.target.value.replace(/\d/g, ''); 
@@ -183,7 +183,7 @@ const AddMoneyLoss = () => {
                 type="number"
                 className="form-control"
                 id="loss-amount"
-                placeholder="Enter Amount (€)"
+                placeholder="Enter amount (€)"
                 onChange={(e) => setLossAmount(e.target.value)}
               />
             </div>

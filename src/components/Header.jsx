@@ -17,17 +17,17 @@ const Header = () => {
 
   return (
     <header
-      className={`${theme === "light" ? "header-light" : "header-dark"} py-3 px-3 px-lg-5`}
+      className={`${theme === "light" ? "header-light" : "header-dark"} py-3 px-3 px-md-4 px-lg-5`}
     >
       <div className="container-fluid">
-        <div className="d-flex justify-content-between align-items-center gap-2 gap-lg-3 header-top-row">
+        <div className="d-flex justify-content-between align-items-center gap-2 gap-md-3 header-top-row">
           <h1 className="mb-0 header-top-row__title">
             <Link to="/" className="header-home-link">
               <i className="fa-solid fa-coins" aria-hidden></i> Money Map
             </Link>
           </h1>
 
-          <nav className="header-nav d-none d-lg-flex" aria-label="Main navigation">
+          <nav className="header-nav d-none d-md-flex" aria-label="Main navigation">
             {APP_NAV_LINKS.map(({ to, label, icon, end }) => (
               <NavLink
                 key={to}
@@ -44,14 +44,14 @@ const Header = () => {
           </nav>
 
           <div className="header-top-row__actions">
-            <HeaderSettingsMenu
-              open={openMenu === "settings"}
-              onToggle={() => setMenu("settings")}
-              onClose={closeMenus}
-            />
             <HeaderMobileMenu
               open={openMenu === "nav"}
               onToggle={() => setMenu("nav")}
+              onClose={closeMenus}
+            />
+            <HeaderSettingsMenu
+              open={openMenu === "settings"}
+              onToggle={() => setMenu("settings")}
               onClose={closeMenus}
             />
           </div>

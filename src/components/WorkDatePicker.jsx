@@ -25,7 +25,7 @@ const isDateInRange = (dateKey, min, max) => {
   return true;
 };
 
-/** Custom date picker used across Odd Hours (shift, day off, vacation). */
+/** Custom date picker used across Work Hours (shift, day off, vacation). */
 const WorkDatePicker = ({
   label,
   value,

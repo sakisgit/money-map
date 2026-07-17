@@ -1,4 +1,5 @@
 import { useContext, useEffect, useRef } from "react";
+import Swal from "sweetalert2";
 import { ThemeContext } from "../context/ThemeContext";
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
 
@@ -33,11 +34,21 @@ const HeaderSettingsMenu = ({ open, onToggle, onClose }) => {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [open, onClose]);
 
+  const openManageProfile = () => {
+    onClose();
+    Swal.fire({
+      icon: "info",
+      title: "Manage profile",
+      text: "Profile management is coming soon.",
+      confirmButtonText: "OK",
+    });
+  };
+
   return (
     <div className="header-settings" ref={ref}>
       <button
         type="button"
-        className="header-settings__toggle"
+        className={`header-icon-btn${open ? " is-open" : ""}`}
         onClick={onToggle}
         aria-expanded={open}
         aria-controls="header-settings-panel"
@@ -82,7 +93,7 @@ const HeaderSettingsMenu = ({ open, onToggle, onClose }) => {
               type="button"
               role="menuitem"
               className="header-settings__item"
-              onClick={onClose}
+              onClick={openManageProfile}
             >
               <i className="fa-solid fa-user-gear" aria-hidden></i>
               <span>Manage profile</span>

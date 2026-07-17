@@ -36,7 +36,7 @@ const WorkHoursPage = () => {
             to='/'
             className="btn btn-outline-primary fw-bold px-4 py-2 rounded-3">
             <i className="fa-solid fa-arrow-left me-2"></i>
-            <span className="d-none d-sm-inline">Back to Money Map</span>
+            <span className="d-none d-sm-inline">Back to Home</span>
             <span className="d-sm-none">Back</span>
           </Link>
         </div>
