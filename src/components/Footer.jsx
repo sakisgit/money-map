@@ -55,7 +55,7 @@ const Footer = () => {
               <span className="app-footer__brand-icon" aria-hidden>
                 <i className="fa-solid fa-coins"></i>
               </span>
-              <span>
+              <span className="app-footer__brand-text">
                 <span className="app-footer__brand-name">Money Map</span>
                 <span className="app-footer__brand-tagline">
                   Expenses, income & work hours in one place
@@ -82,9 +82,27 @@ const Footer = () => {
         </div>
 
         <div className="app-footer__bottom">
-          <p className="app-footer__copy mb-0">
-            © {year} Money Map. Built for everyday budgeting.
-          </p>
+          <div className="app-footer__legal">
+            <p className="app-footer__copy mb-0">
+              © {year} Money Map. All rights reserved.
+            </p>
+            <p className="app-footer__rights mb-0">
+              Intellectual property rights belong to Money Map. Unauthorized
+              copying or redistribution is prohibited.
+            </p>
+            <p className="app-footer__credit mb-0">
+              Created by{" "}
+              <a
+                href="https://sakisdevlab.vercel.app/"
+                className="app-footer__credit-name"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Visit SakisDev Lab portfolio"
+              >
+                SakisDev Lab
+              </a>
+            </p>
+          </div>
 
           <div className="app-footer__actions">
             <Link

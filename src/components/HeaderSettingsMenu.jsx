@@ -1,22 +1,55 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Swal from "sweetalert2";
 import { ThemeContext } from "../context/ThemeContext";
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
 
 const HeaderSettingsMenu = ({ open, onToggle, onClose }) => {
-  const ref = useRef(null);
+  const rootRef = useRef(null);
+  const panelRef = useRef(null);
   const { theme, toggleTheme } = useContext(ThemeContext);
   const isLight = theme === "light";
+  const [panelStyle, setPanelStyle] = useState({});
 
   useBodyScrollLock(open);
+
+  useLayoutEffect(() => {
+    if (!open) return undefined;
+
+    const updatePosition = () => {
+      const btn = rootRef.current?.querySelector(".header-icon-btn");
+      if (!btn) return;
+
+      const rect = btn.getBoundingClientRect();
+      const width = Math.min(16.5 * 16, window.innerWidth - 24);
+      const right = Math.max(12, window.innerWidth - rect.right);
+      const top = rect.bottom + 8;
+
+      setPanelStyle({
+        position: "fixed",
+        top: `${top}px`,
+        right: `${right}px`,
+        width: `${width}px`,
+        zIndex: 10050,
+      });
+    };
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [open]);
 
   useEffect(() => {
     if (!open) return undefined;
 
     const handleOutsideClick = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) {
-        onClose();
-      }
+      const inRoot = rootRef.current?.contains(e.target);
+      const inPanel = panelRef.current?.contains(e.target);
+      if (!inRoot && !inPanel) onClose();
     };
 
     document.addEventListener("pointerdown", handleOutsideClick);
@@ -44,8 +77,57 @@ const HeaderSettingsMenu = ({ open, onToggle, onClose }) => {
     });
   };
 
+  const overlay =
+    open &&
+    createPortal(
+      <>
+        <button
+          type="button"
+          className="header-menu-backdrop"
+          aria-label="Close settings"
+          onClick={onClose}
+        />
+        <div
+          ref={panelRef}
+          id="header-settings-panel"
+          className="header-settings__dropdown"
+          style={panelStyle}
+          role="menu"
+        >
+          <button
+            type="button"
+            role="menuitem"
+            className="header-settings__item"
+            onClick={() => {
+              toggleTheme();
+              onClose();
+            }}
+          >
+            <i
+              className={`fa-solid ${isLight ? "fa-moon" : "fa-sun"}`}
+              aria-hidden
+            ></i>
+            <span>{isLight ? "Dark mode" : "Light mode"}</span>
+          </button>
+
+          <div className="header-settings__divider" role="separator" />
+
+          <button
+            type="button"
+            role="menuitem"
+            className="header-settings__item"
+            onClick={openManageProfile}
+          >
+            <i className="fa-solid fa-user-gear" aria-hidden></i>
+            <span>Manage profile</span>
+          </button>
+        </div>
+      </>,
+      document.body
+    );
+
   return (
-    <div className="header-settings" ref={ref}>
+    <div className="header-settings" ref={rootRef}>
       <button
         type="button"
         className={`header-icon-btn${open ? " is-open" : ""}`}
@@ -57,50 +139,7 @@ const HeaderSettingsMenu = ({ open, onToggle, onClose }) => {
       >
         <i className="fa-solid fa-gear" aria-hidden></i>
       </button>
-
-      {open && (
-        <>
-          <button
-            type="button"
-            className="header-menu-backdrop"
-            aria-label="Close settings"
-            onClick={onClose}
-          />
-          <div
-            id="header-settings-panel"
-            className="header-settings__dropdown"
-            role="menu"
-          >
-            <button
-              type="button"
-              role="menuitem"
-              className="header-settings__item"
-              onClick={() => {
-                toggleTheme();
-                onClose();
-              }}
-            >
-              <i
-                className={`fa-solid ${isLight ? "fa-moon" : "fa-sun"}`}
-                aria-hidden
-              ></i>
-              <span>{isLight ? "Dark mode" : "Light mode"}</span>
-            </button>
-
-            <div className="header-settings__divider" role="separator" />
-
-            <button
-              type="button"
-              role="menuitem"
-              className="header-settings__item"
-              onClick={openManageProfile}
-            >
-              <i className="fa-solid fa-user-gear" aria-hidden></i>
-              <span>Manage profile</span>
-            </button>
-          </div>
-        </>
-      )}
+      {overlay}
     </div>
   );
 };
