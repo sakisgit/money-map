@@ -5197,3 +5197,314 @@ body.dark .help-faq__item {
   resize: vertical;
   min-height: 140px;
 }
+/* ==========================================================================
+   Zenn — in-app assistant
+   ========================================================================== */
+
+.app-footer__chatbot {
+  width: auto;
+  min-width: 44px;
+  padding: 0 0.85rem;
+  gap: 0.45rem;
+  font-weight: 700;
+}
+
+.app-footer__chatbot-label {
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.app-footer__chatbot.is-active {
+  color: #fff;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  border-color: transparent;
+}
+
+@media (max-width: 575.98px) {
+  .app-footer__chatbot {
+    padding: 0 0.7rem;
+  }
+
+  .app-footer__chatbot-label {
+    font-size: 0.78rem;
+  }
+}
+
+.zenn__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 10060;
+}
+
+@media (min-width: 576px) {
+  .zenn__backdrop {
+    background: transparent;
+  }
+}
+
+.zenn {
+  position: fixed;
+  z-index: 10070;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.28);
+
+  /* Mobile first: a sheet pinned to the bottom of the screen. */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: min(85dvh, 640px);
+  height: auto;
+  border-radius: 1.1rem 1.1rem 0 0;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+@media (min-width: 576px) {
+  .zenn {
+    left: auto;
+    right: max(1rem, env(safe-area-inset-right, 0));
+    bottom: max(1rem, env(safe-area-inset-bottom, 0));
+    width: min(380px, calc(100vw - 2rem));
+    height: min(70dvh, 560px);
+    border-radius: 1.1rem;
+  }
+}
+
+body.dark .zenn {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-color: rgba(148, 163, 184, 0.25);
+}
+
+.zenn__header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 0.85rem;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.zenn__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.zenn__heading {
+  flex: 1;
+  min-width: 0;
+}
+
+.zenn__name {
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.zenn__status {
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
+
+.zenn__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.zenn__icon-btn:hover,
+.zenn__icon-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.zenn__messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  background: #f8fafc;
+}
+
+body.dark .zenn__messages {
+  background: #0b1220;
+}
+
+.zenn__msg {
+  max-width: 85%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 1rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.zenn__msg--zenn {
+  align-self: flex-start;
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  border-bottom-left-radius: 0.3rem;
+}
+
+body.dark .zenn__msg--zenn {
+  background: #1e293b;
+  border-color: rgba(148, 163, 184, 0.22);
+  color: #e2e8f0;
+}
+
+.zenn__msg--user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  color: #fff;
+  border-bottom-right-radius: 0.3rem;
+}
+
+.zenn__typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0.75rem 0.85rem;
+}
+
+.zenn__typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #94a3b8;
+  animation: zenn-bounce 1.1s infinite ease-in-out;
+}
+
+.zenn__typing span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.zenn__typing span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes zenn-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+.zenn__suggestions {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.55rem 0.7rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
+  flex-shrink: 0;
+}
+
+.zenn__suggestions::-webkit-scrollbar {
+  display: none;
+}
+
+.zenn__chip {
+  flex: 0 0 auto;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(37, 99, 235, 0.4);
+  background: transparent;
+  color: #2563eb;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+body.dark .zenn__chip {
+  border-color: rgba(147, 197, 253, 0.4);
+  color: #93c5fd;
+}
+
+.zenn__chip:hover:not(:disabled),
+.zenn__chip:focus-visible:not(:disabled) {
+  background: #2563eb;
+  color: #fff;
+}
+
+.zenn__chip:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.zenn__form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.7rem 0.75rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
+  flex-shrink: 0;
+}
+
+.zenn__input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 16px; /* keeps iOS from zooming on focus */
+}
+
+body.dark .zenn__input {
+  background: #1e293b;
+  border-color: rgba(148, 163, 184, 0.3);
+  color: #e2e8f0;
+}
+
+.zenn__input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+}
+
+.zenn__send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  color: #fff;
+  cursor: pointer;
+}
+
+.zenn__send:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

@@ -1,7 +1,7 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
-import Swal from "sweetalert2";
 import { ThemeContext } from "../context/ThemeContext";
+import ZennChat from "./ZennChat";
 
 const SOCIAL_LINKS = [
   {
@@ -35,14 +35,7 @@ const Footer = () => {
   const { theme } = useContext(ThemeContext);
   const year = new Date().getFullYear();
 
-  const openChatbot = () => {
-    Swal.fire({
-      icon: "info",
-      title: "Chatbot",
-      text: "The Money Map chatbot is coming soon.",
-      confirmButtonText: "OK",
-    });
-  };
+  const [zennOpen, setZennOpen] = useState(false);
 
   return (
     <footer
@@ -116,16 +109,19 @@ const Footer = () => {
 
             <button
               type="button"
-              className="app-footer__chatbot"
-              onClick={openChatbot}
-              aria-label="Open chatbot"
-              title="Chatbot"
+              className={`app-footer__chatbot${zennOpen ? " is-active" : ""}`}
+              onClick={() => setZennOpen((prev) => !prev)}
+              aria-label="Open Zenn, the Money Map assistant"
+              aria-expanded={zennOpen}
+              title="Ask Zenn"
             >
               <i className="fa-solid fa-robot" aria-hidden></i>
+              <span className="app-footer__chatbot-label">Zenn</span>
             </button>
           </div>
         </div>
       </div>
+      <ZennChat open={zennOpen} onClose={() => setZennOpen(false)} />
     </footer>
   );
 };
