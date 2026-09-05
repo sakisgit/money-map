@@ -27,7 +27,7 @@ export const AppProvider = ({ children }) => {
     const dateToken = afterComma.trim().split(/\s+/)[0];
     if (!dateToken) return null;
 
-    const parts = dateToken.split(/[/.\-]/).filter(Boolean);
+    const parts = dateToken.split(/[/.-]/).filter(Boolean);
     if (parts.length !== 3) return null;
 
     const nums = parts.map((p) => Number(p));

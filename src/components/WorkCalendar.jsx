@@ -64,7 +64,7 @@ const toDateKey = (date) => {
 
 const parseManualDateToken = (dateToken) => {
   if (!dateToken) return null;
-  const parts = dateToken.split(/[/.\-]/).filter(Boolean);
+  const parts = dateToken.split(/[/.-]/).filter(Boolean);
   if (parts.length !== 3) return null;
   const nums = parts.map((p) => Number(p));
   if (!nums.every(Number.isFinite)) return null;

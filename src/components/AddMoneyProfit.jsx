@@ -22,7 +22,7 @@ const AddMoneyProfit = () => {
   const [showBottomFade, setShowBottomFade] = useState(false);
   const listContainerRef = useRef(null);
 
-  const { gifUrl, showGif } = useGiphyGif();
+  const { showGif } = useGiphyGif();
   const fullDate = useFullDate();
 
   // Calculate filtered items first (case-insensitive)
@@ -47,8 +47,8 @@ const AddMoneyProfit = () => {
 
   // Convert to array and filter groups with multiple items
   const summaryGroups = Object.entries(groupedTotals)
-    .filter(([_, data]) => data.count > 1)
-    .map(([_, data]) => data);
+    .filter(([, data]) => data.count > 1)
+    .map(([, data]) => data);
 
   // Check scroll position for fade indicators
   useEffect(() => {

@@ -4707,12 +4707,6 @@ body.dark .progress-percent-label {
   }
 }
 
-/* ---------- Page loader ---------- */
-.page-loader {
-  width: 100px;
-  height: 100px;
-}
-
 /* ---------- Edit modal: stack times on tablet ---------- */
 @media (max-width: 767.98px) {
   .hours-edit-modal .shift-time-row {
@@ -5060,4 +5054,3 @@ video {
     scroll-behavior: auto !important;
   }
 }
-

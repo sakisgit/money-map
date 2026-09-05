@@ -13,7 +13,7 @@ const AddMoneyLoss = () => {
   const { 
     lossItems, setLossItems, 
     filterLoss, payment, 
-    moneyRemaining, formatMoney
+    formatMoney
   } = useContext(AppContext);
   
   const fullDate = useFullDate();
@@ -24,7 +24,7 @@ const AddMoneyLoss = () => {
   const [showBottomFade, setShowBottomFade] = useState(false);
   const listContainerRef = useRef(null);
 
-  const { gifUrl, showGif } = useGiphyGif();
+  const { showGif } = useGiphyGif();
 
   // Calculate filtered items first (case-insensitive)
   const filteredItems = lossItems.filter(item =>
@@ -48,7 +48,7 @@ const AddMoneyLoss = () => {
 
   // Convert to array - show all groups that have matches
   const summaryGroups = Object.entries(groupedTotals)
-    .map(([_, data]) => data)
+    .map(([, data]) => data)
     .sort((a, b) => b.total - a.total); // Sort by total descending
 
   // Check scroll position for fade indicators

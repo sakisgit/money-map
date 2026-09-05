@@ -106,14 +106,6 @@ const PaymentDropdown = ({ variant = "header", onMenuClose }) => {
   };
 
   useEffect(() => {
-    const savedPayment = localStorage.getItem("payment");
-    if (savedPayment) {
-      setPayment(Number(savedPayment));
-    }
-    setInputValue("");
-  }, []);
-
-  useEffect(() => {
     if (isMenu) return undefined;
 
     const handleOutsideClick = (e) => {
