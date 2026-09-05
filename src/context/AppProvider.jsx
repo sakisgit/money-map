@@ -1,106 +1,78 @@
-import { useState, useEffect, createContext, useCallback, useMemo } from "react";
-import { getPreviousMonthKey } from "../utils/dateKey";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { AppContext } from "./AppContext";
+import { getPreviousMonthKey, toLocalDateKey } from "../utils/dateKey";
 
-export const AppContext = createContext();
+const parseDateKeyFromFullDate = (fullDate) => {
+  if (!fullDate || typeof fullDate !== "string") return null;
+
+  const parsed = new Date(fullDate);
+  if (!Number.isNaN(parsed.getTime())) {
+    const parsedKey = toLocalDateKey(parsed);
+    if (parsedKey) return parsedKey;
+  }
+
+  const afterComma = fullDate.includes(", ")
+    ? fullDate.split(", ").slice(1).join(", ")
+    : fullDate;
+  const dateToken = afterComma.trim().split(/\s+/)[0];
+  if (!dateToken) return null;
+
+  const parts = dateToken.split(/[/.-]/).filter(Boolean);
+  if (parts.length !== 3) return null;
+
+  const nums = parts.map((p) => Number(p));
+  if (!nums.every(Number.isFinite)) return null;
+  const [day, month, rawYear] = nums;
+  const year = rawYear < 100 ? rawYear + 2000 : rawYear;
+
+  return toLocalDateKey(new Date(year, month - 1, day));
+};
+
+/** Backfill a missing dateKey from an entry's stored fullDate. */
+const ensureDateKey = (entry) => {
+  if (entry?.dateKey) return entry;
+  const dk = parseDateKeyFromFullDate(entry?.fullDate);
+  return dk ? { ...entry, dateKey: dk } : entry;
+};
+
+const normalizeHoursList = (list) => {
+  if (!Array.isArray(list)) return [];
+  const seenIds = new Set();
+
+  return list.map((entry, index) => {
+    const withDate = ensureDateKey(entry);
+    let id = withDate?.id;
+
+    if (id == null || id === "" || seenIds.has(String(id))) {
+      id = `hours-${withDate?.dateKey ?? "nd"}-${withDate?.startTime ?? "t"}-${withDate?.endTime ?? "t"}-${index}`;
+    }
+
+    seenIds.add(String(id));
+    return { ...withDate, id };
+  });
+};
+
+const safeParse = (value, fallback) => {
+  try {
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const readWorkDayStatus = () => {
+  const parsed = safeParse(
+    typeof localStorage !== "undefined"
+      ? localStorage.getItem("workDayStatus")
+      : null,
+    {}
+  );
+  return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+    ? parsed
+    : {};
+};
 
 export const AppProvider = ({ children }) => {
-  const toLocalDateKey = (date) => {
-    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return null;
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-
-  const parseDateKeyFromFullDate = (fullDate) => {
-    if (!fullDate || typeof fullDate !== "string") return null;
-
-    const parsed = new Date(fullDate);
-    if (!Number.isNaN(parsed.getTime())) {
-      const parsedKey = toLocalDateKey(parsed);
-      if (parsedKey) return parsedKey;
-    }
-
-    const afterComma = fullDate.includes(", ")
-      ? fullDate.split(", ").slice(1).join(", ")
-      : fullDate;
-    const dateToken = afterComma.trim().split(/\s+/)[0];
-    if (!dateToken) return null;
-
-    const parts = dateToken.split(/[/.-]/).filter(Boolean);
-    if (parts.length !== 3) return null;
-
-    const nums = parts.map((p) => Number(p));
-    if (!nums.every(Number.isFinite)) return null;
-    let [a, b, y] = nums;
-    if (y < 100) y += 2000;
-
-    let month;
-    let day;
-    if (a > 12) {
-      day = a;
-      month = b;
-    } else if (b > 12) {
-      day = a;
-      month = b;
-    } else {
-      day = a;
-      month = b;
-    }
-
-    const manual = new Date(y, month - 1, day);
-    return toLocalDateKey(manual);
-  };
-
-  const ensureDateKey = (entry) => {
-    if (entry?.dateKey) return entry;
-    const dk = parseDateKeyFromFullDate(entry?.fullDate);
-    return dk ? { ...entry, dateKey: dk } : entry;
-  };
-
-  const normalizeHoursList = (list) => {
-    if (!Array.isArray(list)) return [];
-    const seenIds = new Set();
-
-    return list.map((entry, index) => {
-      const withDate = ensureDateKey(entry);
-      let id = withDate?.id;
-
-      if (id == null || id === "" || seenIds.has(String(id))) {
-        id = `hours-${withDate?.dateKey ?? "nd"}-${withDate?.startTime ?? "t"}-${withDate?.endTime ?? "t"}-${index}`;
-      }
-
-      seenIds.add(String(id));
-      return { ...withDate, id };
-    });
-  };
-
-  const ensureIncomeLossDateKey = (entry) => {
-    if (entry?.dateKey) return entry;
-    const dk = parseDateKeyFromFullDate(entry?.fullDate);
-    return dk ? { ...entry, dateKey: dk } : entry;
-  };
-
-  const safeParse = (value, fallback) => {
-    try {
-      return value ? JSON.parse(value) : fallback;
-    } catch {
-      return fallback;
-    }
-  };
-
-  const readWorkDayStatus = () => {
-    const parsed = safeParse(
-      typeof localStorage !== "undefined"
-        ? localStorage.getItem("workDayStatus")
-        : null,
-      {}
-    );
-    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
-      ? parsed
-      : {};
-  };
-
   // --- HomePage States ---
   const [incomeItems, setIncomeItems] = useState([]);
   const [lossItems, setLossItems] = useState([]);
@@ -137,13 +109,13 @@ export const AppProvider = ({ children }) => {
     const savedIncome = localStorage.getItem("incomeItems");
     const parsedIncome = safeParse(savedIncome, []);
     if (Array.isArray(parsedIncome)) {
-      setIncomeItems(parsedIncome.map(ensureIncomeLossDateKey));
+      setIncomeItems(parsedIncome.map(ensureDateKey));
     }
 
     const savedLoss = localStorage.getItem("lossItems");
     const parsedLoss = safeParse(savedLoss, []);
     if (Array.isArray(parsedLoss)) {
-      setLossItems(parsedLoss.map(ensureIncomeLossDateKey));
+      setLossItems(parsedLoss.map(ensureDateKey));
     }
 
     const savedRate = localStorage.getItem("hourlyRate");

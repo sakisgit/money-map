@@ -1,7 +1,6 @@
 
-import { useState, useEffect, createContext } from "react";
-
-export const ThemeContext = createContext();
+import { useState, useEffect } from "react";
+import { ThemeContext } from "./ThemeContext";
 
 export const ThemeProvider = ({ children }) => {
   // Initial theme: saved preference or system preference

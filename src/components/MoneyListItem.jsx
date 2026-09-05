@@ -1,6 +1,6 @@
 import DeleteButton from "../buttons/DeleteButton";
 import { formatEntryDisplayDate } from "../utils/dateKey";
-import { getPaymentMethodIcon, getPaymentMethodLabel } from "./PaymentMethodToggle";
+import { getPaymentMethodIcon, getPaymentMethodLabel } from "../utils/paymentMethod";
 
 const MoneyListItem = ({
   item,

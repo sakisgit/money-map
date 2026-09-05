@@ -1,7 +1,4 @@
-const METHODS = [
-  { value: "cash", label: "Cash", icon: "fa-coins" },
-  { value: "card", label: "Card", icon: "fa-credit-card" },
-];
+import { PAYMENT_METHODS } from "../utils/paymentMethod";
 
 const VARIANT_CONFIG = {
   expense: {
@@ -30,7 +27,7 @@ const PaymentMethodToggle = ({
         role="group"
         aria-label={config.ariaLabel}
       >
-        {METHODS.map((method) => {
+        {PAYMENT_METHODS.map((method) => {
           const inputId = `${idPrefix}-${method.value}`;
           const isActive = value === method.value;
 
@@ -59,14 +56,6 @@ const PaymentMethodToggle = ({
   );
 };
 
-export const getPaymentMethodLabel = (method) => {
-  if (method === "card") return "Card";
-  return "Cash";
-};
 
-export const getPaymentMethodIcon = (method) => {
-  const match = METHODS.find((m) => m.value === method);
-  return match?.icon ?? METHODS[0].icon;
-};
 
 export default PaymentMethodToggle;

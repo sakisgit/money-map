@@ -1,6 +1,6 @@
 
 import { Routes, Route } from "react-router-dom";
-import { AppProvider } from "./context/AppContext";
+import { AppProvider } from "./context/AppProvider";
 import PageLayout from "./components/PageLayout";
 import HomePage from "./pages/HomePage";
 import WorkHoursPage from "./pages/WorkHoursPage";
@@ -8,7 +8,7 @@ import StatsPage from "./pages/StatsPage";
 import HelpPage from "./pages/HelpPage";
 import ContactPage from "./pages/ContactPage";
 import MonthlyEarningsPrompt from "./components/MonthlyEarningsPrompt";
-import { ThemeProvider } from "./context/ThemeContext";
+import { ThemeProvider } from "./context/ThemeProvider";
 
 const App = () => {
   return (
