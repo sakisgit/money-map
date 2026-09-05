@@ -5185,3 +5185,15 @@ body.dark .help-faq__item {
   line-height: 1.5;
   opacity: 0.9;
 }
+/* ==========================================================================
+   Contact form
+   ========================================================================== */
+
+.contact-form .form-label {
+  font-weight: 600;
+}
+
+.contact-form textarea.form-control {
+  resize: vertical;
+  min-height: 140px;
+}
