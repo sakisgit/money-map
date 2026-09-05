@@ -5508,3 +5508,45 @@ body.dark .zenn__input {
   opacity: 0.5;
   cursor: default;
 }
+/* ==========================================================================
+   Touch ergonomics — comfortable tap targets on phones and tablets
+   ========================================================================== */
+
+@media (hover: none) and (pointer: coarse) {
+  .header-home-link,
+  .calendar-stats-link,
+  .app-footer__credit-name,
+  a.info-page__contact-value,
+  .app-footer__social-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .calendar-stats-link,
+  .app-footer__credit-name,
+  a.info-page__contact-value {
+    padding-block: 0.4rem;
+  }
+
+  /* Anything tappable keeps a finger-sized hit area. */
+  .btn,
+  .zenn__chip,
+  .form-control,
+  .form-select {
+    min-height: 44px;
+  }
+
+  .zenn__chip {
+    padding-block: 0.5rem;
+  }
+}
+
+/* Never let iOS zoom the page when a field gets focus. */
+@media (max-width: 767.98px) {
+  input.form-control,
+  select.form-select,
+  textarea.form-control {
+    font-size: 16px;
+  }
+}
