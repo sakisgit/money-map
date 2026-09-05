@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { AppContext } from "./AppContext";
 import { getPreviousMonthKey, toLocalDateKey } from "../utils/dateKey";
+import { archivePastMonths, readWorkArchive, getArchivedMonths } from "../utils/workArchive";
 
 const parseDateKeyFromFullDate = (fullDate) => {
   if (!fullDate || typeof fullDate !== "string") return null;
@@ -90,6 +91,7 @@ export const AppProvider = ({ children }) => {
   const [hoursList, setHoursList] = useState([]);
   const [workDayStatus, setWorkDayStatus] = useState(readWorkDayStatus);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [workArchive, setWorkArchive] = useState(readWorkArchive);
 
   // --- Format Helper ---
   const formatMoney = (num) => {
@@ -189,6 +191,14 @@ export const AppProvider = ({ children }) => {
     localStorage.setItem("workDayStatus", JSON.stringify(workDayStatus));
   }, [workDayStatus, isHydrated]);
 
+  // --- Keep a full copy of every past month (hours + rest/vacation days) ---
+  // Runs whenever work data changes, so a month is preserved before anything
+  // clears it at the rollover.
+  useEffect(() => {
+    if (!isHydrated) return;
+    setWorkArchive(archivePastMonths(hoursList, workDayStatus));
+  }, [hoursList, workDayStatus, isHydrated]);
+
   // --- Derived State ---
   useEffect(() => {
     const newBalance = payment + totalIncome - totalLoss;
@@ -253,6 +263,11 @@ export const AppProvider = ({ children }) => {
     return true;
   }, [hoursList]);
 
+  const archivedMonths = useMemo(
+    () => getArchivedMonths(workArchive),
+    [workArchive]
+  );
+
   // --- Context Value ---
   const contextValue = {
     // HomePage
@@ -274,6 +289,8 @@ export const AppProvider = ({ children }) => {
     workDayStatus, setWorkDayStatus,
     workHoursTotalEarnings,
     previousMonthWorkHoursEarnings,
+    workArchive,
+    archivedMonths,
     applyWorkHoursToPayment,
     applyPreviousMonthWorkHoursToPayment,
 

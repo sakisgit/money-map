@@ -5,6 +5,8 @@
  * intents and answers from the user's own live data. Nothing is sent anywhere.
  */
 
+import { formatMonthKey } from "./dateKey";
+
 const money = (value, formatMoney) => `${formatMoney(Number(value) || 0)} €`;
 const hours = (value) => `${(Number(value) || 0).toFixed(2)} h`;
 
@@ -185,6 +187,40 @@ const INTENTS = [
       } marked. On the calendar, tap an empty day and choose Cancel to mark Rest, then tap it again for Vacation.`,
   },
   {
+    id: "archive",
+    keywords: [
+      "last month",
+      "previous month",
+      "past months",
+      "saved months",
+      "月",
+      "history",
+      "old months",
+      "past hours",
+    ],
+    reply: (s, formatMoney) => {
+      if (s.archivedMonths.length === 0) {
+        return "No finished months are saved yet. When a month ends, Money Map keeps that month's hours and its rest and vacation days automatically — you will find them under Saved months on the All Stats page.";
+      }
+
+      const lines = s.archivedMonths
+        .slice(0, 3)
+        .map(
+          (m) =>
+            `${formatMonthKey(m.monthKey)}: ${Number(m.totalHours || 0).toFixed(
+              2
+            )} h over ${m.shifts || 0} ${
+              m.shifts === 1 ? "shift" : "shifts"
+            }, ${formatMoney(m.earnings)} €, ${m.daysOff || 0} rest and ${
+              m.vacationDays || 0
+            } vacation days`
+        )
+        .join(". ");
+
+      return `Here is what I kept from your finished months. ${lines}. The full list is under Saved months on the All Stats page.`;
+    },
+  },
+  {
     id: "howto-expense",
     keywords: ["add an expense", "add expense", "log expense", "record spending", "add income", "add money"],
     reply: () =>
@@ -277,5 +313,6 @@ export const ZENN_SUGGESTIONS = [
   "How many hours did I work?",
   "What was my biggest expense?",
   "How do I log hours?",
+  "What did I do last month?",
   "What is Money Map?",
 ];
