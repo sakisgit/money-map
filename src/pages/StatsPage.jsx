@@ -1,6 +1,8 @@
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
+import { formatMonthKey, getCurrentMonthKey } from "../utils/dateKey";
+import { summarizeMonth } from "../utils/workArchive";
 
 const StatTile = ({ icon, label, value, hint }) => (
   <div className="col-6 col-md-4 col-lg-3">
@@ -15,6 +17,14 @@ const StatTile = ({ icon, label, value, hint }) => (
   </div>
 );
 
+const MonthRow = ({ icon, label, value }) => (
+  <li>
+    <i className={`fa-solid ${icon}`} aria-hidden></i>
+    <span>{label}</span>
+    <strong>{value}</strong>
+  </li>
+);
+
 const StatsPage = () => {
   const {
     incomeItems,
@@ -23,6 +33,7 @@ const StatsPage = () => {
     totalHours,
     workHoursTotalEarnings,
     workDayStatus,
+    archivedMonths,
     formatMoney,
   } = useContext(AppContext);
 
@@ -86,6 +97,96 @@ const StatsPage = () => {
       vacationDays: statuses.filter((s) => s === "vacation").length,
     };
   }, [safeHours, totalHours, workHoursTotalEarnings, workDayStatus]);
+
+  const currentMonthKey = getCurrentMonthKey();
+
+  // Every month that has work data: archived months, overlaid with anything
+  // still live (the current month, and past months not yet cleared).
+  const months = useMemo(() => {
+    const byMonth = {};
+    const touch = (key) =>
+      (byMonth[key] ??= { monthKey: key, hours: [], workDayStatus: {} });
+
+    for (const entry of archivedMonths || []) {
+      const bucket = touch(entry.monthKey);
+      bucket.hours = [...(entry.hours || [])];
+      bucket.workDayStatus = { ...(entry.workDayStatus || {}) };
+    }
+
+    for (const shift of safeHours) {
+      const key = String(shift?.dateKey || "").slice(0, 7);
+      if (key.length !== 7) continue;
+      const bucket = touch(key);
+      if (!bucket.hours.some((h) => String(h?.id) === String(shift?.id))) {
+        bucket.hours.push(shift);
+      }
+    }
+
+    for (const [dateKey, status] of Object.entries(workDayStatus || {})) {
+      const key = String(dateKey).slice(0, 7);
+      if (key.length !== 7 || !status) continue;
+      touch(key).workDayStatus[dateKey] = status;
+    }
+
+    return Object.fromEntries(
+      Object.entries(byMonth).map(([key, bucket]) => [
+        key,
+        { ...bucket, ...summarizeMonth(bucket.hours, bucket.workDayStatus) },
+      ])
+    );
+  }, [archivedMonths, safeHours, workDayStatus]);
+
+  const monthKeys = useMemo(() => {
+    const keys = Object.keys(months);
+    if (!keys.includes(currentMonthKey) && keys.length > 0) {
+      keys.push(currentMonthKey);
+    }
+    return keys.sort();
+  }, [months, currentMonthKey]);
+
+  // Open on the current month, the way the Work Calendar does.
+  const [cursor, setCursor] = useState(-1);
+  const [showAllTime, setShowAllTime] = useState(false);
+  const defaultCursor = Math.max(0, monthKeys.indexOf(currentMonthKey));
+  const activeCursor =
+    cursor < 0 || cursor > monthKeys.length - 1 ? defaultCursor : cursor;
+  const activeKey = monthKeys[activeCursor];
+  const shownMonth = months[activeKey] ?? {
+    monthKey: activeKey ?? currentMonthKey,
+    totalHours: 0,
+    earnings: 0,
+    shifts: 0,
+    daysOff: 0,
+    vacationDays: 0,
+  };
+
+  // All time: everything since the first shift or first marked day.
+  const allTime = useMemo(() => {
+    const totals = Object.values(months).reduce(
+      (acc, month) => ({
+        totalHours: acc.totalHours + month.totalHours,
+        earnings: acc.earnings + month.earnings,
+        shifts: acc.shifts + month.shifts,
+        daysOff: acc.daysOff + month.daysOff,
+        vacationDays: acc.vacationDays + month.vacationDays,
+      }),
+      { totalHours: 0, earnings: 0, shifts: 0, daysOff: 0, vacationDays: 0 }
+    );
+
+    const known = Object.keys(months).sort();
+    const range =
+      known.length === 0
+        ? "No records yet"
+        : known.length === 1
+          ? formatMonthKey(known[0])
+          : `${formatMonthKey(known[0])} – ${formatMonthKey(known[known.length - 1])}`;
+
+    return {
+      ...totals,
+      range,
+      averageShift: totals.shifts ? totals.totalHours / totals.shifts : 0,
+    };
+  }, [months]);
 
   const cashShare =
     money.totalLoss > 0 ? (money.expenseCash / money.totalLoss) * 100 : 0;
@@ -212,6 +313,125 @@ const StatsPage = () => {
               label="Vacation days"
               value={work.vacationDays}
             />
+          </div>
+        )}
+      </section>
+
+      {/* Work by month */}
+      <section className="stats mt-4 mt-md-5">
+        <div className="stats-month-topbar">
+          <h2 className="h5 fw-bold mb-0">
+            <i className="fa-solid fa-calendar-check me-2" aria-hidden></i>
+            Work by month
+          </h2>
+          <button
+            type="button"
+            className={`btn btn-sm fw-bold${showAllTime ? " btn-primary" : " btn-outline-primary"}`}
+            onClick={() => setShowAllTime((prev) => !prev)}
+            aria-pressed={showAllTime}
+          >
+            <i className="fa-solid fa-infinity me-2" aria-hidden></i>
+            {showAllTime ? "Back to months" : "All time"}
+          </button>
+        </div>
+
+        {monthKeys.length === 0 ? (
+          <div className="card shadow-sm">
+            <div className="card-body text-center py-4">
+              <p className="mb-2">No work recorded yet.</p>
+              <Link to="/work-hours" className="btn btn-outline-primary fw-bold">
+                Go to Work Hours
+              </Link>
+            </div>
+          </div>
+        ) : showAllTime ? (
+          <div className="card shadow-sm archived-month">
+            <div className="card-body">
+              <h3 className="h6 fw-bold mb-1">Everything so far</h3>
+              <p className="small opacity-75 mb-3">
+                {allTime.range} · {monthKeys.length}{" "}
+                {monthKeys.length === 1 ? "month" : "months"} tracked
+              </p>
+              <ul className="archived-month__list">
+                <MonthRow
+                  icon="fa-hourglass-half"
+                  label="Hours worked"
+                  value={`${allTime.totalHours.toFixed(2)} h`}
+                />
+                <MonthRow
+                  icon="fa-euro-sign"
+                  label="Earnings"
+                  value={`${formatMoney(allTime.earnings)} €`}
+                />
+                <MonthRow icon="fa-list-check" label="Shifts" value={allTime.shifts} />
+                <MonthRow
+                  icon="fa-stopwatch"
+                  label="Average shift"
+                  value={`${allTime.averageShift.toFixed(2)} h`}
+                />
+                <MonthRow icon="fa-bed" label="Rest days" value={allTime.daysOff} />
+                <MonthRow
+                  icon="fa-umbrella-beach"
+                  label="Vacation days"
+                  value={allTime.vacationDays}
+                />
+              </ul>
+            </div>
+          </div>
+        ) : (
+          <div className="card shadow-sm archived-month">
+            <div className="card-body">
+              <div className="stats-month-nav">
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary btn-sm calendar-nav-btn"
+                  onClick={() => setCursor(Math.max(0, activeCursor - 1))}
+                  disabled={activeCursor <= 0}
+                  aria-label="Previous month"
+                  title="Previous month"
+                >
+                  <i className="fa-solid fa-chevron-left" aria-hidden></i>
+                </button>
+                <span className="fw-semibold calendar-month-label">
+                  {formatMonthKey(shownMonth.monthKey)}
+                  {shownMonth.monthKey === currentMonthKey && (
+                    <span className="stats-month-badge">This month</span>
+                  )}
+                </span>
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary btn-sm calendar-nav-btn"
+                  onClick={() =>
+                    setCursor(Math.min(monthKeys.length - 1, activeCursor + 1))
+                  }
+                  disabled={activeCursor >= monthKeys.length - 1}
+                  aria-label="Next month"
+                  title="Next month"
+                >
+                  <i className="fa-solid fa-chevron-right" aria-hidden></i>
+                </button>
+              </div>
+
+              <ul className="archived-month__list">
+                <MonthRow
+                  icon="fa-hourglass-half"
+                  label="Hours worked"
+                  value={`${shownMonth.totalHours.toFixed(2)} h`}
+                />
+                <MonthRow
+                  icon="fa-euro-sign"
+                  label="Earnings"
+                  value={`${formatMoney(shownMonth.earnings)} €`}
+                />
+                <MonthRow icon="fa-list-check" label="Shifts" value={shownMonth.shifts} />
+                <MonthRow icon="fa-bed" label="Rest days" value={shownMonth.daysOff} />
+                <MonthRow
+                  icon="fa-umbrella-beach"
+                  label="Vacation days"
+                  value={shownMonth.vacationDays}
+                />
+              </ul>
+            </div>
           </div>
         )}
       </section>

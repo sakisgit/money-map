@@ -5055,6 +5055,7 @@ video {
   }
 }
 
+
 /* ==========================================================================
    Help page — hero, steps, FAQ
    ========================================================================== */
@@ -5185,6 +5186,7 @@ body.dark .help-faq__item {
   line-height: 1.5;
   opacity: 0.9;
 }
+
 /* ==========================================================================
    Contact form
    ========================================================================== */
@@ -5197,6 +5199,7 @@ body.dark .help-faq__item {
   resize: vertical;
   min-height: 140px;
 }
+
 /* ==========================================================================
    Zenn — in-app assistant
    ========================================================================== */
@@ -5508,6 +5511,7 @@ body.dark .zenn__input {
   opacity: 0.5;
   cursor: default;
 }
+
 /* ==========================================================================
    Touch ergonomics — comfortable tap targets on phones and tablets
    ========================================================================== */
@@ -5548,5 +5552,100 @@ body.dark .zenn__input {
   select.form-select,
   textarea.form-control {
     font-size: 16px;
+  }
+}
+
+/* ---------- All Stats: saved months ---------- */
+.archived-month__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.archived-month__list li {
+  display: grid;
+  grid-template-columns: 1.25rem 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.archived-month__list li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.archived-month__list i {
+  color: #4f46e5;
+  text-align: center;
+}
+
+.archived-month__list strong {
+  font-variant-numeric: tabular-nums;
+}
+
+body.dark .archived-month__list li {
+  border-bottom-color: rgba(148, 163, 184, 0.22);
+}
+
+body.dark .archived-month__list i {
+  color: #a5b4fc;
+}
+
+/* ---------- All Stats: month browser ---------- */
+.stats-month-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.stats-month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.85rem;
+  margin-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.stats-month-nav .calendar-month-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.stats-month-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(79, 70, 229, 0.12);
+  color: #4f46e5;
+}
+
+body.dark .stats-month-nav {
+  border-bottom-color: rgba(148, 163, 184, 0.22);
+}
+
+body.dark .stats-month-badge {
+  background: rgba(165, 180, 252, 0.16);
+  color: #a5b4fc;
+}
+
+@media (max-width: 400px) {
+  .stats-month-nav .calendar-month-label {
+    flex-direction: column;
+    gap: 0.2rem;
+    line-height: 1.2;
   }
 }
