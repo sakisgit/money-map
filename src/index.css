@@ -3031,6 +3031,121 @@ body.dark .calendar-cell {
   border-color: rgba(148, 163, 184, 0.25);
 }
 
+.day-cell {
+  flex-direction: column;
+  gap: 0.05rem;
+  line-height: 1.1;
+}
+
+.day-cell__hours {
+  font-size: 0.62rem;
+  font-weight: 600;
+  opacity: 0.92;
+  letter-spacing: 0.01em;
+}
+
+.day-cell.status-holiday,
+.legend-dot.status-holiday {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  border-color: #7c3aed;
+  color: #ffffff;
+}
+
+/* Weekends with nothing logged: a quiet non-working tint, not a status. */
+.day-cell.status-weekend,
+.legend-dot.status-weekend {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #94a3b8;
+}
+
+.legend-dot.status-weekend {
+  border: 1px solid #cbd5e1;
+}
+
+.day-cell.is-today {
+  box-shadow: 0 0 0 2px #2563eb;
+}
+
+body.dark .day-cell.status-holiday,
+body.dark .legend-dot.status-holiday {
+  background: linear-gradient(135deg, #3b0764 0%, #5b21b6 100%);
+  border-color: #a78bfa;
+  color: #ede9fe;
+}
+
+body.dark .day-cell.status-weekend,
+body.dark .legend-dot.status-weekend {
+  background: #1e293b;
+  border-color: rgba(148, 163, 184, 0.18);
+  color: #64748b;
+}
+
+body.dark .day-cell.is-today {
+  box-shadow: 0 0 0 2px #60a5fa;
+}
+
+.calendar-month-select {
+  width: auto;
+  text-align: center;
+  text-align-last: center;
+  cursor: pointer;
+}
+
+.calendar-today-btn {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.calendar-day-counts {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+.calendar-day-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+body.dark .calendar-day-counts {
+  color: #cbd5e1;
+}
+
+@media (max-width: 575.98px) {
+  .calendar-month-controls .calendar-month-select,
+  .stats-month-nav .calendar-month-select {
+    flex: 1 1 0;
+    min-width: 0;
+    width: 100%;
+    text-overflow: ellipsis;
+  }
+
+  .calendar-title-row {
+    width: 100%;
+  }
+
+  .calendar-today-btn {
+    min-height: 44px;
+  }
+
+  .calendar-day-counts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    font-size: 0.75rem;
+  }
+
+  .day-cell__hours {
+    font-size: 0.56rem;
+  }
+}
+
 body.dark .day-cell {
   color: #e2e8f0;
 }

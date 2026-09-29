@@ -3,10 +3,7 @@ import { useContext, useMemo, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import Swal from "sweetalert2";
 import { useToday } from "../hooks/useToday";
-import {
-  dateHasPaidVacation,
-  getWorkShiftsForDate,
-} from "../utils/workDayConflicts";
+import { getCurrentMonthKey, getVacationDateMax } from "../utils/dateKey";
 import CalendarQuickShiftModal from "./CalendarQuickShiftModal";
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -29,12 +26,22 @@ const STATUS_CLASSES = {
   work: "status-work",
   off: "status-off",
   vacation: "status-vacation",
+  holiday: "status-holiday",
+  weekend: "status-weekend",
 };
 
 const STATUS_LABELS = {
   work: "Worked",
   off: "Rest day",
   vacation: "Vacation",
+  holiday: "Holiday",
+};
+
+// Tapping a marked day moves it to the next mark; the last one clears it.
+const NEXT_STATUS = {
+  off: "vacation",
+  vacation: "holiday",
+  holiday: null,
 };
 
 const LEGEND_ITEMS = [
@@ -51,9 +58,31 @@ const LEGEND_ITEMS = [
   {
     status: "vacation",
     label: "Vacation",
-    hint: "Tap a day to mark vacation",
+    hint: "Tap a Rest day to mark vacation",
+  },
+  {
+    status: "holiday",
+    label: "Holiday",
+    hint: "Tap a Vacation day to mark it a holiday",
+  },
+  {
+    status: "weekend",
+    label: "Weekend",
+    hint: "Saturday and Sunday with nothing logged",
   },
 ];
+
+const monthKeyOf = (date) => getCurrentMonthKey(date);
+
+const monthKeyToDate = (monthKey) => {
+  const [year, month] = monthKey.split("-").map(Number);
+  return new Date(year, month - 1, 1);
+};
+
+const formatHoursShort = (hours) => {
+  const rounded = Math.round(hours * 100) / 100;
+  return `${Number.isInteger(rounded) ? rounded : rounded.toFixed(1)}h`;
+};
 
 const toDateKey = (date) => {
   const year = date.getFullYear();
@@ -107,17 +136,20 @@ const startOfLocalDay = (d) =>
   new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
 const getManualStatus = (status) =>
-  status === "off" || status === "vacation" ? status : null;
+  status === "off" || status === "vacation" || status === "holiday" ? status : null;
 
 const WorkCalendar = () => {
   const {
     hoursList,
     setHoursList,
-    workDayStatus,
     setWorkDayStatus,
     incomeItems,
     lossItems,
     formatMoney,
+    workMonths,
+    updateArchivedShift,
+    removeArchivedShift,
+    clearArchivedDay,
   } = useContext(AppContext);
   const { today } = useToday();
   const [quickShift, setQuickShift] = useState(null);
@@ -132,19 +164,79 @@ const WorkCalendar = () => {
   );
 
   const monthIndex = (d) => d.getFullYear() * 12 + d.getMonth();
-  const canGoNext = monthIndex(monthCursor) < monthIndex(currentMonthStart);
 
-  const workedDays = useMemo(() => {
-    const list = Array.isArray(hoursList) ? hoursList : [];
-    return new Set(
-      list
-        .filter((entry) => entry?.dateKey && !entry.paidVacation)
-        .map((entry) => entry.dateKey)
+  // Vacations and holidays can be planned up to two years ahead, so the
+  // calendar can show those months too.
+  const lastMonthStart = useMemo(() => {
+    const max = new Date(`${getVacationDateMax(today)}T00:00:00`);
+    return new Date(max.getFullYear(), max.getMonth(), 1);
+  }, [today]);
+
+  const canGoNext = monthIndex(monthCursor) < monthIndex(lastMonthStart);
+  const viewedMonthKey = monthKeyOf(monthCursor);
+  const currentMonthKey = monthKeyOf(currentMonthStart);
+  const isFutureMonth = viewedMonthKey > currentMonthKey;
+  const isCurrentMonth = viewedMonthKey === currentMonthKey;
+
+  // The viewed month's shifts and marked days: archived history plus live data,
+  // so a past month still shows after its hours were applied as payment.
+  const monthData = useMemo(
+    () => workMonths?.[viewedMonthKey] ?? { hours: [], workDayStatus: {} },
+    [workMonths, viewedMonthKey]
+  );
+
+  const liveIds = useMemo(
+    () =>
+      new Set((Array.isArray(hoursList) ? hoursList : []).map((e) => String(e?.id))),
+    [hoursList]
+  );
+
+  const dayInfo = useMemo(() => {
+    const shifts = {};
+    const paidVacation = {};
+    for (const entry of monthData.hours) {
+      if (!entry?.dateKey) continue;
+      if (entry.paidVacation) paidVacation[entry.dateKey] = entry;
+      else (shifts[entry.dateKey] ??= []).push(entry);
+    }
+    return { shifts, paidVacation, statuses: monthData.workDayStatus };
+  }, [monthData]);
+
+  const workedDays = useMemo(
+    () => new Set(Object.keys(dayInfo.shifts)),
+    [dayInfo]
+  );
+
+  const monthOptions = useMemo(() => {
+    const knownMonths = Object.keys(workMonths || {}).sort();
+    const fallbackStart = new Date(
+      currentMonthStart.getFullYear(),
+      currentMonthStart.getMonth() - 12,
+      1
     );
-  }, [hoursList]);
+    const candidates = [fallbackStart, monthCursor];
+    if (knownMonths.length > 0) candidates.push(monthKeyToDate(knownMonths[0]));
+    const start = candidates.reduce((a, b) => (monthIndex(a) <= monthIndex(b) ? a : b));
+
+    const withData = new Set(knownMonths);
+    const options = [];
+    for (
+      let d = new Date(start);
+      monthIndex(d) <= monthIndex(lastMonthStart);
+      d = new Date(d.getFullYear(), d.getMonth() + 1, 1)
+    ) {
+      const key = monthKeyOf(d);
+      options.push({
+        key,
+        label: `${MONTH_LABELS[d.getMonth()]} ${d.getFullYear()}`,
+        hasData: withData.has(key),
+      });
+    }
+    return options.reverse();
+  }, [workMonths, currentMonthStart, lastMonthStart, monthCursor]);
 
   const monthlyStats = useMemo(() => {
-    const safeHoursList = Array.isArray(hoursList) ? hoursList : [];
+    const safeHoursList = monthData.hours;
     const safeIncomeItems = Array.isArray(incomeItems) ? incomeItems : [];
     const safeLossItems = Array.isArray(lossItems) ? lossItems : [];
 
@@ -221,7 +313,26 @@ const WorkCalendar = () => {
       monthBalanceAmount = Math.abs(monthNetBalance);
     }
 
+    const statusValues = Object.values(dayInfo.statuses);
+    const vacationDates = new Set([
+      ...Object.keys(dayInfo.paidVacation),
+      ...Object.entries(dayInfo.statuses)
+        .filter(([, status]) => status === "vacation")
+        .map(([dateKey]) => dateKey),
+    ]);
+    const dayCounts = {
+      worked: new Set(
+        monthlyEntries
+          .filter((entry) => !entry?.paidVacation && entry?.dateKey)
+          .map((entry) => entry.dateKey)
+      ).size,
+      off: statusValues.filter((status) => status === "off").length,
+      vacation: vacationDates.size,
+      holiday: statusValues.filter((status) => status === "holiday").length,
+    };
+
     return {
+      dayCounts,
       workHoursThisMonth,
       workPayThisMonth,
       totalMonthListIncome,
@@ -232,7 +343,7 @@ const WorkCalendar = () => {
       monthBalanceAmount,
       isViewingCurrentMonth,
     };
-  }, [hoursList, incomeItems, lossItems, monthCursor]);
+  }, [monthData, dayInfo, incomeItems, lossItems, monthCursor]);
 
   const cells = useMemo(() => {
     const year = monthCursor.getFullYear();
@@ -276,6 +387,16 @@ const WorkCalendar = () => {
 
   const handleQuickShiftSave = (savedEntry) => {
     const dateKey = savedEntry.dateKey;
+    clearArchivedDay(dateKey);
+
+    // A shift whose live copy was cleared (applied as payment) lives only in
+    // the archive, so edit it there instead of re-adding it to the live list.
+    if (quickShift?.entry && !liveIds.has(String(savedEntry.id))) {
+      updateArchivedShift(savedEntry);
+      closeQuickShift();
+      return;
+    }
+
     setHoursList((prev) => {
       const list = Array.isArray(prev) ? prev : [];
       const existingIndex = list.findIndex(
@@ -299,6 +420,9 @@ const WorkCalendar = () => {
   const handleQuickShiftDelete = (entry) => {
     const dateKey = entry?.dateKey;
 
+    if (!liveIds.has(String(entry.id))) removeArchivedShift(entry.id);
+    if (dateKey) clearArchivedDay(dateKey);
+
     setHoursList((prev) =>
       (Array.isArray(prev) ? prev : []).filter(
         (item) => String(item?.id) !== String(entry.id)
@@ -316,8 +440,21 @@ const WorkCalendar = () => {
     closeQuickShift();
   };
 
+  const setDayStatus = (dateKey, status) => {
+    if (status) {
+      setWorkDayStatus((prev) => ({ ...prev, [dateKey]: status }));
+      return;
+    }
+    setWorkDayStatus((prev) => {
+      const next = { ...prev };
+      delete next[dateKey];
+      return next;
+    });
+    clearArchivedDay(dateKey);
+  };
+
   const updateStatusForDate = (dateKey) => {
-    if (dateHasPaidVacation(hoursList, dateKey)) {
+    if (dayInfo.paidVacation[dateKey]) {
       Swal.fire({
         icon: "info",
         title: "Paid vacation",
@@ -327,41 +464,38 @@ const WorkCalendar = () => {
       return;
     }
 
-    const manualStatus = getManualStatus(workDayStatus[dateKey]);
-    const shiftsOnDay = getWorkShiftsForDate(hoursList, dateKey);
+    const manualStatus = getManualStatus(dayInfo.statuses[dateKey]);
+    const shiftsOnDay = dayInfo.shifts[dateKey] ?? [];
 
     if (shiftsOnDay.length > 0) {
       openQuickShift(dateKey, shiftsOnDay[0]);
       return;
     }
 
-    if (manualStatus === "off") {
-      setWorkDayStatus((prev) => ({ ...prev, [dateKey]: "vacation" }));
+    if (manualStatus) {
+      setDayStatus(dateKey, NEXT_STATUS[manualStatus]);
       return;
     }
 
-    if (manualStatus === "vacation") {
-      setWorkDayStatus((prev) => {
-        const next = { ...prev };
-        delete next[dateKey];
-        return next;
-      });
+    // Future months can't have worked hours yet — plan days off instead.
+    if (isFutureMonth) {
+      setDayStatus(dateKey, "off");
       return;
     }
 
     openQuickShift(dateKey);
   };
 
-  const getStatusForDate = (dateKey) => {
-    if (
-      workDayStatus[dateKey] === "vacation" ||
-      dateHasPaidVacation(hoursList, dateKey)
-    ) {
+  const getStatusForDate = (dateKey, date) => {
+    const manual = getManualStatus(dayInfo.statuses[dateKey]);
+    if (manual === "vacation" || dayInfo.paidVacation[dateKey]) {
       return "vacation";
     }
     if (workedDays.has(dateKey)) return "work";
     if (quickShift?.dateKey === dateKey && !quickShift.entry) return "work";
-    return workDayStatus[dateKey];
+    if (manual) return manual;
+    const weekday = date.getDay();
+    return weekday === 0 || weekday === 6 ? "weekend" : undefined;
   };
 
   const goPrevMonth = () => {
@@ -372,33 +506,64 @@ const WorkCalendar = () => {
     if (!canGoNext) return;
     setMonthCursor((prev) => {
       const next = new Date(prev.getFullYear(), prev.getMonth() + 1, 1);
-      if (monthIndex(next) > monthIndex(currentMonthStart)) {
-        return currentMonthStart;
+      if (monthIndex(next) > monthIndex(lastMonthStart)) {
+        return lastMonthStart;
       }
       return next;
     });
   };
 
+  const goToMonth = (monthKey) => {
+    if (monthKey) setMonthCursor(monthKeyToDate(monthKey));
+  };
+
   return (
     <div className="card work-calendar-card shadow-sm border-0 rounded-3 p-3 p-md-4 mt-4">
       <div className="calendar-topbar d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-3">
-        <div>
+        <div className="calendar-title-row d-flex align-items-center justify-content-between gap-2">
           <h6 className="m-0 fw-bold">Work Calendar</h6>
+          {!isCurrentMonth && (
+            <button
+              type="button"
+              className="btn btn-outline-primary btn-sm calendar-today-btn"
+              onClick={() => setMonthCursor(currentMonthStart)}
+              title="Back to this month"
+            >
+              <i className="fa-solid fa-calendar-day me-1" aria-hidden></i>
+              Today
+            </button>
+          )}
         </div>
         <div className="calendar-month-controls d-flex align-items-center gap-2">
-          <button type="button" className="btn btn-outline-secondary btn-sm calendar-nav-btn" onClick={goPrevMonth}>
+          <button
+            type="button"
+            className="btn btn-outline-secondary btn-sm calendar-nav-btn"
+            onClick={goPrevMonth}
+            aria-label="Previous month"
+            title="Previous month"
+          >
             <i className="fa-solid fa-chevron-left"></i>
           </button>
-          <span className="fw-semibold calendar-month-label">
-            {MONTH_LABELS[monthCursor.getMonth()]} {monthCursor.getFullYear()}
-          </span>
+          <select
+            className="form-select form-select-sm fw-semibold calendar-month-label calendar-month-select"
+            value={viewedMonthKey}
+            onChange={(e) => goToMonth(e.target.value)}
+            aria-label="Choose month"
+          >
+            {monthOptions.map((option) => (
+              <option key={option.key} value={option.key}>
+                {option.label}
+                {option.hasData && option.key !== currentMonthKey ? " •" : ""}
+              </option>
+            ))}
+          </select>
           <button
             type="button"
             className="btn btn-outline-secondary btn-sm calendar-nav-btn"
             onClick={goNextMonth}
             disabled={!canGoNext}
             aria-label="Next month"
-            title={canGoNext ? "Next month" : "Current month"}
+            title={canGoNext ? "Next month" : "Last month you can plan"}
           >
             <i className="fa-solid fa-chevron-right"></i>
           </button>
@@ -408,7 +573,12 @@ const WorkCalendar = () => {
       <div className="calendar-month-summary mb-3">
         <p className="calendar-month-summary-note text-muted small mb-2 mb-md-3">
           <i className="fa-solid fa-chart-pie me-1" aria-hidden></i>
-          Quick overview for this calendar month — hours, pay, expenses, income, and balance.{" "}
+          {isCurrentMonth
+            ? "Quick overview for this month"
+            : isFutureMonth
+              ? "Planned days for this month"
+              : "Saved overview for this month"}{" "}
+          — hours, pay, expenses, income, and balance.{" "}
           <Link to="/stats" className="calendar-stats-link">
             View all stats
           </Link>
@@ -495,6 +665,26 @@ const WorkCalendar = () => {
             </div>
           </article>
         </div>
+
+        <ul className="calendar-day-counts" aria-label="Days this month">
+          <li className="calendar-day-count calendar-day-count--work">
+            <i className="legend-dot status-work" aria-hidden></i>
+            <strong>{monthlyStats.dayCounts.worked}</strong> worked
+          </li>
+          <li className="calendar-day-count calendar-day-count--off">
+            <i className="legend-dot status-off" aria-hidden></i>
+            <strong>{monthlyStats.dayCounts.off}</strong> rest
+          </li>
+          <li className="calendar-day-count calendar-day-count--vacation">
+            <i className="legend-dot status-vacation" aria-hidden></i>
+            <strong>{monthlyStats.dayCounts.vacation}</strong> vacation
+          </li>
+          <li className="calendar-day-count calendar-day-count--holiday">
+            <i className="legend-dot status-holiday" aria-hidden></i>
+            <strong>{monthlyStats.dayCounts.holiday}</strong>{" "}
+            {monthlyStats.dayCounts.holiday === 1 ? "holiday" : "holidays"}
+          </li>
+        </ul>
       </div>
 
       <div className="calendar-legend-wrap mb-3">
@@ -514,7 +704,9 @@ const WorkCalendar = () => {
         <p className="calendar-legend-note text-muted mb-0">
           <i className="fa-solid fa-info-circle calendar-legend-note__icon" aria-hidden></i>
           <span>
-            Tap an empty day to log hours (Cancel = Rest). Tap Rest → Vacation → clear.
+            {isFutureMonth
+              ? "Tap a day to plan it: Rest → Vacation → Holiday → clear."
+              : "Tap an empty day to log hours (Cancel = Rest). Tap Rest → Vacation → Holiday → clear."}
           </span>
         </p>
       </div>
@@ -541,25 +733,39 @@ const WorkCalendar = () => {
           }
 
           const dateKey = toDateKey(cell.date);
-          const status = getStatusForDate(dateKey);
+          const status = getStatusForDate(dateKey, cell.date);
           const statusClass = status ? STATUS_CLASSES[status] : "";
-          const isPaidVacationDay = dateHasPaidVacation(hoursList, dateKey);
-          const statusTitle = status
-            ? isPaidVacationDay
-              ? "Paid vacation"
-              : STATUS_LABELS[status]
-            : "No entry";
+          const isPaidVacationDay = Boolean(dayInfo.paidVacation[dateKey]);
+          const dayHours = (dayInfo.shifts[dateKey] ?? []).reduce(
+            (sum, entry) => sum + (Number(entry?.hours) || 0),
+            0
+          );
+          const isToday = dateKey === toDateKey(today);
+          const statusTitle =
+            status && status !== "weekend"
+              ? isPaidVacationDay
+                ? "Paid vacation"
+                : status === "work" && dayHours > 0
+                  ? `Worked ${dayHours.toFixed(2)} h`
+                  : STATUS_LABELS[status]
+              : status === "weekend"
+                ? "Weekend"
+                : "No entry";
 
           return (
             <button
               key={cell.id}
               type="button"
-              className={`calendar-cell day-cell ${statusClass}`}
+              className={`calendar-cell day-cell ${statusClass}${isToday ? " is-today" : ""}`}
               onClick={() => updateStatusForDate(dateKey)}
               aria-label={`${cell.date.getDate()} ${MONTH_LABELS[monthCursor.getMonth()]} — ${statusTitle}. Tap to change.`}
+              aria-current={isToday ? "date" : undefined}
               title={statusTitle}
             >
-              {cell.date.getDate()}
+              <span className="day-cell__date">{cell.date.getDate()}</span>
+              {status === "work" && dayHours > 0 && (
+                <span className="day-cell__hours">{formatHoursShort(dayHours)}</span>
+              )}
             </button>
           );
         })}
