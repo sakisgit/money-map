@@ -5447,23 +5447,48 @@ body.dark .zenn {
 .zenn__header {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.75rem 0.85rem;
-  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-  color: #fff;
+  gap: 0.7rem;
+  padding: 0.8rem 0.75rem 0.8rem 0.9rem;
+  background: #ffffff;
+  color: #0f172a;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
   flex-shrink: 0;
 }
 
+body.dark .zenn__header {
+  background: #0f172a;
+  color: #f1f5f9;
+  border-bottom-color: rgba(148, 163, 184, 0.18);
+}
+
 .zenn__avatar {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  font-size: 1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  color: #fff;
+  font-size: 1.05rem;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
   flex-shrink: 0;
+}
+
+.zenn__avatar-status {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid #ffffff;
+}
+
+body.dark .zenn__avatar-status {
+  border-color: #0f172a;
 }
 
 .zenn__heading {
@@ -5472,13 +5497,42 @@ body.dark .zenn {
 }
 
 .zenn__name {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.98rem;
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.zenn__badge {
+  padding: 0.08rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+body.dark .zenn__badge {
+  background: rgba(165, 180, 252, 0.14);
+  color: #a5b4fc;
 }
 
 .zenn__status {
-  font-size: 0.78rem;
-  opacity: 0.85;
+  margin-top: 0.1rem;
+  font-size: 0.75rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.dark .zenn__status {
+  color: #94a3b8;
 }
 
 .zenn__icon-btn {
@@ -5488,17 +5542,52 @@ body.dark .zenn {
   width: 36px;
   height: 36px;
   border: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
+  border-radius: 10px;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.95rem;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 0.2s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .zenn__icon-btn:hover,
 .zenn__icon-btn:focus-visible {
-  background: rgba(255, 255, 255, 0.3);
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.zenn__icon-btn--labeled {
+  width: auto;
+  gap: 0.4rem;
+  padding: 0 0.65rem;
+  font-size: 0.85rem;
+}
+
+.zenn__icon-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+@media (max-width: 359.98px) {
+  .zenn__icon-label {
+    display: none;
+  }
+
+  .zenn__icon-btn--labeled {
+    width: 36px;
+    padding: 0;
+  }
+}
+
+body.dark .zenn__icon-btn {
+  color: #94a3b8;
+}
+
+body.dark .zenn__icon-btn:hover,
+body.dark .zenn__icon-btn:focus-visible {
+  background: #1e293b;
+  color: #f1f5f9;
 }
 
 .zenn__messages {
@@ -5528,8 +5617,206 @@ body.dark .zenn__messages {
   overflow-wrap: anywhere;
 }
 
-.zenn__msg--zenn {
+.zenn__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  max-width: 92%;
+}
+
+.zenn__row--zenn {
   align-self: flex-start;
+}
+
+.zenn__row--user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.zenn__bubble {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.zenn__row--user .zenn__bubble {
+  align-items: flex-end;
+}
+
+.zenn__row .zenn__msg {
+  max-width: 100%;
+}
+
+.zenn__avatar-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+}
+
+.zenn__avatar-sm--zenn {
+  color: #fff;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+}
+
+.zenn__avatar-sm--user {
+  color: #475569;
+  background: #e2e8f0;
+}
+
+body.dark .zenn__avatar-sm--user {
+  color: #cbd5e1;
+  background: #334155;
+}
+
+.zenn__time {
+  margin-top: 0.2rem;
+  padding: 0 0.3rem;
+  font-size: 0.68rem;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+body.dark .zenn__time {
+  color: #94a3b8;
+}
+
+.zenn__ideas {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.zenn__ideas:hover,
+.zenn__ideas:focus-visible,
+.zenn__ideas.is-active {
+  color: #d97706;
+  border-color: rgba(217, 119, 6, 0.5);
+  background: rgba(245, 158, 11, 0.12);
+}
+
+body.dark .zenn__ideas {
+  color: #94a3b8;
+  border-color: rgba(148, 163, 184, 0.3);
+}
+
+body.dark .zenn__ideas:hover,
+body.dark .zenn__ideas:focus-visible,
+body.dark .zenn__ideas.is-active {
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.45);
+  background: rgba(251, 191, 36, 0.12);
+}
+
+.zenn__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.55rem;
+  white-space: normal;
+}
+
+.zenn__options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.6rem;
+  white-space: normal;
+}
+
+.zenn__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 40px;
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  background: transparent;
+  color: #1d4ed8;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.zenn__option i {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.zenn__option:hover:not(:disabled),
+.zenn__option:focus-visible {
+  background: rgba(37, 99, 235, 0.08);
+  border-color: #2563eb;
+}
+
+.zenn__option:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+body.dark .zenn__option {
+  border-color: rgba(147, 197, 253, 0.3);
+  color: #93c5fd;
+}
+
+body.dark .zenn__option:hover:not(:disabled),
+body.dark .zenn__option:focus-visible {
+  background: rgba(96, 165, 250, 0.12);
+  border-color: #60a5fa;
+}
+
+.zenn__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 34px;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 0;
+  background: rgba(37, 99, 235, 0.1);
+  color: #1d4ed8;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.zenn__action:hover,
+.zenn__action:focus-visible {
+  background: #2563eb;
+  color: #fff;
+}
+
+body.dark .zenn__action {
+  background: rgba(96, 165, 250, 0.16);
+  color: #93c5fd;
+}
+
+body.dark .zenn__action:hover,
+body.dark .zenn__action:focus-visible {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.zenn__msg--zenn {
   background: #ffffff;
   border: 1px solid rgba(148, 163, 184, 0.32);
   border-bottom-left-radius: 0.3rem;
@@ -5578,11 +5865,9 @@ body.dark .zenn__msg--zenn {
 
 .zenn__suggestions {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.4rem;
   padding: 0.55rem 0.7rem;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
   border-top: 1px solid rgba(148, 163, 184, 0.25);
   flex-shrink: 0;
 }
@@ -5593,6 +5878,9 @@ body.dark .zenn__msg--zenn {
 
 .zenn__chip {
   flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   padding: 0.35rem 0.7rem;
   border-radius: 999px;
   border: 1px solid rgba(37, 99, 235, 0.4);
