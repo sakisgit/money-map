@@ -730,6 +730,25 @@ body.dark .form-control:focus {
   background-color: #1e293b;
 }
 
+/* Dropdowns follow the theme (Bootstrap leaves them white). */
+body.dark .form-select {
+  background-color: #1e293b;
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #f1f5f9;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23cbd5e1' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  color-scheme: dark;
+}
+
+body.dark .form-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
+body.dark .form-select option {
+  background-color: #1e293b;
+  color: #f1f5f9;
+}
+
 /* ---------- Responsive Spacing ---------- */
 .page-content {
   max-width: 1200px;
