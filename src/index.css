@@ -4282,6 +4282,10 @@ body.dark .hours-list-simple__label {
   border-left: 3px solid #06b6d4;
 }
 
+.hours-list-simple__row--holiday {
+  border-left: 3px solid #8b5cf6;
+}
+
 .hours-list-status-badge {
   display: inline-flex;
   align-items: center;
@@ -4299,6 +4303,16 @@ body.dark .hours-list-simple__label {
 .hours-list-status-badge--vacation {
   background: rgba(6, 182, 212, 0.15);
   color: #0e7490;
+}
+
+.hours-list-status-badge--holiday {
+  background: rgba(139, 92, 246, 0.15);
+  color: #6d28d9;
+}
+
+body.dark .hours-list-status-badge--holiday {
+  background: rgba(139, 92, 246, 0.24);
+  color: #c4b5fd;
 }
 
 .hours-list-status-badge--paid {
@@ -4508,16 +4522,28 @@ body.dark .rest-day-type-toggle__option.is-active {
   color: #fcd34d;
 }
 
-.rest-day-type-toggle__option:last-child.is-active {
+.rest-day-type-toggle__option--vacation.is-active {
   border-color: #06b6d4;
   background: rgba(6, 182, 212, 0.12);
   color: #0e7490;
 }
 
-body.dark .rest-day-type-toggle__option:last-child.is-active {
+body.dark .rest-day-type-toggle__option--vacation.is-active {
   border-color: #22d3ee;
   background: rgba(6, 182, 212, 0.18);
   color: #67e8f9;
+}
+
+.rest-day-type-toggle__option--holiday.is-active {
+  border-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.12);
+  color: #6d28d9;
+}
+
+body.dark .rest-day-type-toggle__option--holiday.is-active {
+  border-color: #a78bfa;
+  background: rgba(139, 92, 246, 0.2);
+  color: #c4b5fd;
 }
 
 /* ---------- Edit hours modal ---------- */

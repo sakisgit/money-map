@@ -1,7 +1,12 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { AppContext } from "./AppContext";
 import { getPreviousMonthKey, toLocalDateKey } from "../utils/dateKey";
-import { archivePastMonths, readWorkArchive, getArchivedMonths } from "../utils/workArchive";
+import {
+  syncWorkArchive,
+  readWorkArchive,
+  getArchivedMonths,
+  buildWorkMonths,
+} from "../utils/workArchive";
 
 const parseDateKeyFromFullDate = (fullDate) => {
   if (!fullDate || typeof fullDate !== "string") return null;
@@ -191,13 +196,54 @@ export const AppProvider = ({ children }) => {
     localStorage.setItem("workDayStatus", JSON.stringify(workDayStatus));
   }, [workDayStatus, isHydrated]);
 
-  // --- Keep a full copy of every past month (hours + rest/vacation days) ---
+  // --- Keep a full copy of every month (hours + rest/vacation/holiday days) ---
   // Runs whenever work data changes, so a month is preserved before anything
-  // clears it at the rollover.
+  // clears it (payment, month rollover). Shifts and marks the user deletes are
+  // dropped from the copy too; shifts cleared by applying them as payment are
+  // kept, since that is bookkeeping, not a deletion.
+  const prevWorkRef = useRef(null);
+  const keepArchivedHoursRef = useRef(false);
+
   useEffect(() => {
     if (!isHydrated) return;
-    setWorkArchive(archivePastMonths(hoursList, workDayStatus));
+
+    const prev = prevWorkRef.current;
+    prevWorkRef.current = { hoursList, workDayStatus };
+
+    const removed = { ids: [], dateKeys: [] };
+    if (prev) {
+      if (!keepArchivedHoursRef.current) {
+        const liveIds = new Set(hoursList.map((e) => String(e?.id)));
+        removed.ids = prev.hoursList
+          .map((e) => String(e?.id))
+          .filter((id) => !liveIds.has(id));
+      }
+      removed.dateKeys = Object.keys(prev.workDayStatus).filter(
+        (dateKey) => !workDayStatus[dateKey]
+      );
+    }
+    keepArchivedHoursRef.current = false;
+
+    setWorkArchive(syncWorkArchive(hoursList, workDayStatus, removed));
   }, [hoursList, workDayStatus, isHydrated]);
+
+  /** Delete a shift that only exists in the archive (its live copy was cleared). */
+  const removeArchivedShift = useCallback((entryId) => {
+    setWorkArchive(
+      syncWorkArchive([], {}, { ids: [String(entryId)], dateKeys: [] })
+    );
+  }, []);
+
+  /** Replace a shift that only exists in the archive. */
+  const updateArchivedShift = useCallback((entry) => {
+    syncWorkArchive([], {}, { ids: [String(entry.id)], dateKeys: [] });
+    setWorkArchive(syncWorkArchive([entry], {}));
+  }, []);
+
+  /** Clear a day's rest/vacation/holiday mark that only exists in the archive. */
+  const clearArchivedDay = useCallback((dateKey) => {
+    setWorkArchive(syncWorkArchive([], {}, { ids: [], dateKeys: [dateKey] }));
+  }, []);
 
   // --- Derived State ---
   useEffect(() => {
@@ -241,6 +287,7 @@ export const AppProvider = ({ children }) => {
     if (total <= 0) return false;
 
     setPayment(total);
+    keepArchivedHoursRef.current = true;
     setHoursList((prev) =>
       prev.filter((item) => getEntryMonthKey(item) !== monthKey)
     );
@@ -256,6 +303,7 @@ export const AppProvider = ({ children }) => {
     if (total <= 0) return false;
 
     setPayment(total);
+    keepArchivedHoursRef.current = true;
     setHoursList([]);
     setTotalHours(0);
     localStorage.removeItem("hoursList");
@@ -266,6 +314,12 @@ export const AppProvider = ({ children }) => {
   const archivedMonths = useMemo(
     () => getArchivedMonths(workArchive),
     [workArchive]
+  );
+
+  // Every month's work data (archive + live), for the calendar and stats.
+  const workMonths = useMemo(
+    () => buildWorkMonths(workArchive, hoursList, workDayStatus),
+    [workArchive, hoursList, workDayStatus]
   );
 
   // --- Context Value ---
@@ -291,6 +345,10 @@ export const AppProvider = ({ children }) => {
     previousMonthWorkHoursEarnings,
     workArchive,
     archivedMonths,
+    workMonths,
+    removeArchivedShift,
+    updateArchivedShift,
+    clearArchivedDay,
     applyWorkHoursToPayment,
     applyPreviousMonthWorkHoursToPayment,
 

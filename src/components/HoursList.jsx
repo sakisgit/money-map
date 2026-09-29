@@ -23,11 +23,20 @@ import {
 const STATUS_LABELS = {
   off: "Day off",
   vacation: "Vacation",
+  holiday: "Holiday",
   paidVacation: "Paid vacation",
 };
 
+const STATUS_ICONS = {
+  off: "fa-mug-hot",
+  vacation: "fa-plane-departure",
+  holiday: "fa-star",
+};
+
 const isStatusEntryVisible = (dateKey, status, today) => {
-  if (status === "vacation") return isVacationDateAllowed(dateKey, today);
+  if (status === "vacation" || status === "holiday") {
+    return isVacationDateAllowed(dateKey, today);
+  }
   return isEntryInVisibleWorkMonths(dateKey, today);
 };
 
@@ -233,14 +242,12 @@ const HoursList = () => {
                           isPaid ? " hours-list-status-badge--paid" : ""
                         }`}
                       >
-                        {entry.status === "off" ? (
-                          <i className="fa-solid fa-mug-hot me-1" aria-hidden></i>
-                        ) : (
-                          <i
-                            className="fa-solid fa-plane-departure me-1"
-                            aria-hidden
-                          ></i>
-                        )}
+                        <i
+                          className={`fa-solid ${
+                            STATUS_ICONS[entry.status] || STATUS_ICONS.vacation
+                          } me-1`}
+                          aria-hidden
+                        ></i>
                         {isPaid
                           ? STATUS_LABELS.paidVacation
                           : STATUS_LABELS[entry.status]}

@@ -1,4 +1,6 @@
-/** A calendar day can only be work hours, day off, or vacation — never combined. */
+/** A calendar day can only be work hours, day off, vacation, or holiday — never combined. */
+
+const REST_STATUSES = ["off", "vacation", "holiday"];
 
 export const isPaidVacationEntry = (entry) => Boolean(entry?.paidVacation);
 
@@ -17,7 +19,7 @@ export const dateHasPaidVacation = (hoursList, dateKey) =>
 export const getRestStatusForDate = (workDayStatus, dateKey) => {
   if (!dateKey || !workDayStatus || typeof workDayStatus !== "object") return null;
   const status = workDayStatus[dateKey];
-  return status === "off" || status === "vacation" ? status : null;
+  return REST_STATUSES.includes(status) ? status : null;
 };
 
 export const dateHasWorkHours = (hoursList, dateKey, excludeEntryId = null) => {
@@ -82,12 +84,11 @@ export const getRestDayBlockReason = (
 
   const rest = getRestStatusForDate(workDayStatus, dateKey);
   if (rest && rest !== newStatus) {
+    const current = REST_STATUS_LABELS[rest].toLowerCase();
+    const wanted = (REST_STATUS_LABELS[newStatus] || newStatus).toLowerCase();
     return {
-      title: rest === "off" ? "Already marked day off" : "Already marked vacation",
-      text:
-        rest === "off"
-          ? "This day is already a day off. You cannot also mark it as vacation."
-          : "This day is already vacation. You cannot also mark it as day off.",
+      title: `Already marked ${current}`,
+      text: `This day is already marked ${current}. You cannot also mark it as ${wanted}.`,
     };
   }
 
@@ -100,16 +101,15 @@ export const getWorkHoursBlockReason = (workDayStatus, dateKey) => {
   const rest = getRestStatusForDate(workDayStatus, dateKey);
   if (!rest) return null;
 
+  const label = REST_STATUS_LABELS[rest];
   return {
-    title: rest === "off" ? "Day off" : "Vacation",
-    text:
-      rest === "off"
-        ? "This day is marked as day off. Remove it from the list before logging work hours."
-        : "This day is marked as vacation. Remove it from the list before logging work hours.",
+    title: label,
+    text: `This day is marked as ${label.toLowerCase()}. Remove it from the list before logging work hours.`,
   };
 };
 
 export const REST_STATUS_LABELS = {
   off: "Day off",
   vacation: "Vacation",
+  holiday: "Holiday",
 };

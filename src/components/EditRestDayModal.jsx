@@ -12,13 +12,17 @@ import {
   isWorkDateAllowed,
   isVacationDateAllowed,
 } from "../utils/dateKey";
-import { getRestDayBlockReason } from "../utils/workDayConflicts";
+import { getRestDayBlockReason, REST_STATUS_LABELS } from "../utils/workDayConflicts";
 import WorkDatePicker from "./WorkDatePicker";
 
 const STATUS_OPTIONS = [
   { value: "off", label: "Day off", icon: "fa-mug-hot" },
   { value: "vacation", label: "Vacation", icon: "fa-plane-departure" },
+  { value: "holiday", label: "Holiday", icon: "fa-star" },
 ];
+
+// Vacations and holidays can be planned ahead; days off are for this month.
+const isPlannable = (status) => status === "vacation" || status === "holiday";
 
 const EditRestDayModal = ({ dateKey, status, onClose, onSave }) => {
   const { hoursList, workDayStatus } = useContext(AppContext);
@@ -30,21 +34,21 @@ const EditRestDayModal = ({ dateKey, status, onClose, onSave }) => {
 
   const workDateMin = useMemo(
     () =>
-      selectedStatus === "vacation"
+      isPlannable(selectedStatus)
         ? getVacationDateMin(today)
         : getWorkDateMin(today),
     [today, selectedStatus]
   );
   const workDateMax = useMemo(
     () =>
-      selectedStatus === "vacation"
+      isPlannable(selectedStatus)
         ? getVacationDateMax(today)
         : getWorkDateMax(today),
     [today, selectedStatus]
   );
 
   const isDateAllowed = (dateKey) =>
-    selectedStatus === "vacation"
+    isPlannable(selectedStatus)
       ? isVacationDateAllowed(dateKey, today)
       : isWorkDateAllowed(dateKey, today);
 
@@ -66,7 +70,7 @@ const EditRestDayModal = ({ dateKey, status, onClose, onSave }) => {
         icon: "warning",
         title: "Invalid date",
         text:
-          selectedStatus === "vacation"
+          isPlannable(selectedStatus)
             ? "Pick a date from the current month through future months."
             : "Pick a day within the current month.",
         confirmButtonText: "OK",
@@ -115,7 +119,7 @@ const EditRestDayModal = ({ dateKey, status, onClose, onSave }) => {
       >
         <div className="hours-edit-modal__header">
           <h5 id={`${idPrefix}-title`} className="hours-edit-modal__title">
-            Edit {status === "off" ? "day off" : "vacation"}
+            Edit {(REST_STATUS_LABELS[status] || "day").toLowerCase()}
           </h5>
           <button
             type="button"
@@ -134,7 +138,7 @@ const EditRestDayModal = ({ dateKey, status, onClose, onSave }) => {
               value={selectedDate}
               min={workDateMin}
               max={workDateMax}
-              tone={selectedStatus === "vacation" ? "from" : "off"}
+              tone={isPlannable(selectedStatus) ? "from" : "off"}
               isDateAllowed={isDateAllowed}
               onChange={setSelectedDate}
             />
@@ -151,7 +155,7 @@ const EditRestDayModal = ({ dateKey, status, onClose, onSave }) => {
                   <label
                     key={option.value}
                     htmlFor={inputId}
-                    className={`payment-method-toggle__option rest-day-type-toggle__option${
+                    className={`payment-method-toggle__option rest-day-type-toggle__option rest-day-type-toggle__option--${option.value}${
                       isActive ? " is-active" : ""
                     }`}
                   >
