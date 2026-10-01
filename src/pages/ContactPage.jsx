@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 
 const CONTACT_EMAIL = "thanbogiann@gmail.com";
 const ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_KEY || "";
@@ -8,7 +9,10 @@ const ENDPOINT = "https://api.web3forms.com/submit";
 const EMPTY_FORM = { name: "", email: "", subject: "", message: "" };
 
 const ContactPage = () => {
-  const [form, setForm] = useState(EMPTY_FORM);
+  const { profile } = useContext(AppContext);
+  // Name and email come pre-filled from the profile, when it has them.
+  const startForm = { ...EMPTY_FORM, name: profile?.name || "", email: profile?.email || "" };
+  const [form, setForm] = useState(startForm);
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
   const [error, setError] = useState("");
 
@@ -54,7 +58,7 @@ const ContactPage = () => {
 
       if (response.ok && result?.success) {
         setStatus("sent");
-        setForm(EMPTY_FORM);
+        setForm(startForm);
       } else {
         setStatus("error");
         setError(result?.message || "Something went wrong. Please try again.");

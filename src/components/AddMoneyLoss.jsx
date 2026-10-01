@@ -11,7 +11,7 @@ import MoneyListItem from "./MoneyListItem";
 
 const AddMoneyLoss = () => {
   const { 
-    lossItems, monthLossItems, setLossItems, 
+    lossItems, monthLossItems, setLossItems, profile, 
     filterLoss, payment, 
     formatMoney
   } = useContext(AppContext);
@@ -19,7 +19,7 @@ const AddMoneyLoss = () => {
   const fullDate = useFullDate();
   const [lossText, setLossText] = useState('');
   const [lossAmount, setLossAmount] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [paymentMethod, setPaymentMethod] = useState(() => profile?.defaultMethod || 'cash');
   const [showTopFade, setShowTopFade] = useState(false);
   const [showBottomFade, setShowBottomFade] = useState(false);
   const listContainerRef = useRef(null);
@@ -149,7 +149,7 @@ const AddMoneyLoss = () => {
     }).then(() => {
       setLossText('');
       setLossAmount('');
-      setPaymentMethod('cash');
+      setPaymentMethod(profile?.defaultMethod || 'cash');
       closeMoneyFormCollapse('collapse-loss');
     });
   };

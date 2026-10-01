@@ -11,13 +11,13 @@ import MoneyListItem from "./MoneyListItem";
 
 const AddMoneyProfit = () => {
   const { 
-    incomeItems, monthIncomeItems, setIncomeItems, 
+    incomeItems, monthIncomeItems, setIncomeItems, profile, 
     filterProfit, formatMoney 
   } = useContext(AppContext);
 
   const [incomeText, setIncomeText] = useState('');
   const [incomeAmount, setIncomeAmount] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [paymentMethod, setPaymentMethod] = useState(() => profile?.defaultMethod || 'cash');
   const [showTopFade, setShowTopFade] = useState(false);
   const [showBottomFade, setShowBottomFade] = useState(false);
   const listContainerRef = useRef(null);
@@ -138,7 +138,7 @@ const AddMoneyProfit = () => {
     }).then(() => {
       setIncomeText('');
       setIncomeAmount('');
-      setPaymentMethod('cash');
+      setPaymentMethod(profile?.defaultMethod || 'cash');
       closeMoneyFormCollapse('collapse-profit');
     });
   };

@@ -3,6 +3,7 @@ import { AppContext } from "./AppContext";
 import { getPreviousMonthKey, toLocalDateKey } from "../utils/dateKey";
 import { filterCurrentMonth } from "../utils/moneyMonth";
 import { useToday } from "../hooks/useToday";
+import { readProfile, writeProfile } from "../utils/profile";
 import {
   syncWorkArchive,
   readWorkArchive,
@@ -100,6 +101,16 @@ export const AppProvider = ({ children }) => {
   const [workDayStatus, setWorkDayStatus] = useState(readWorkDayStatus);
   const [isHydrated, setIsHydrated] = useState(false);
   const [workArchive, setWorkArchive] = useState(readWorkArchive);
+
+  // --- Profile (local only: name, avatar, defaults) ---
+  const [profile, setProfileState] = useState(readProfile);
+  const updateProfile = useCallback((changes) => {
+    setProfileState((prev) => {
+      const next = { ...prev, ...changes };
+      writeProfile(next);
+      return next;
+    });
+  }, []);
 
   // Today's date, kept current (also across midnight while the app is open),
   // so the Home page switches to the new month on its own.
@@ -377,6 +388,9 @@ export const AppProvider = ({ children }) => {
     clearArchivedDay,
     applyWorkHoursToPayment,
     applyPreviousMonthWorkHoursToPayment,
+
+    // Profile
+    profile, updateProfile,
 
     // Helpers
     formatMoney,

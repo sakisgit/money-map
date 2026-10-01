@@ -1,13 +1,17 @@
 import { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeContext";
+import { AppContext } from "../context/AppContext";
+import ProfileAvatar from "./ProfileAvatar";
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
 
 const HeaderSettingsMenu = ({ open, onToggle, onClose }) => {
   const rootRef = useRef(null);
   const panelRef = useRef(null);
   const { theme, toggleTheme } = useContext(ThemeContext);
+  const { profile } = useContext(AppContext);
+  const navigate = useNavigate();
   const isLight = theme === "light";
   const [panelStyle, setPanelStyle] = useState({});
 
@@ -69,12 +73,7 @@ const HeaderSettingsMenu = ({ open, onToggle, onClose }) => {
 
   const openManageProfile = () => {
     onClose();
-    Swal.fire({
-      icon: "info",
-      title: "Manage profile",
-      text: "Profile management is coming soon.",
-      confirmButtonText: "OK",
-    });
+    navigate("/profile");
   };
 
   const overlay =
@@ -94,6 +93,21 @@ const HeaderSettingsMenu = ({ open, onToggle, onClose }) => {
           style={panelStyle}
           role="menu"
         >
+          <button
+            type="button"
+            role="menuitem"
+            className="header-settings__profile"
+            onClick={openManageProfile}
+          >
+            <ProfileAvatar profile={profile} size={36} />
+            <span className="header-settings__profile-text">
+              <strong>{profile.name || "Your profile"}</strong>
+              <small>{profile.email || "Set up your name and defaults"}</small>
+            </span>
+          </button>
+
+          <div className="header-settings__divider" role="separator" />
+
           <button
             type="button"
             role="menuitem"

@@ -4,11 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
 import { askZenn, buildZennSnapshot, ZENN_SUGGESTIONS } from "../utils/zenn";
+import { getFirstName } from "../utils/profile";
 
-const makeWelcome = () => ({
+const makeWelcome = (firstName = "") => ({
   id: "welcome",
   from: "zenn",
-  text: "Hi, I'm Zenn — your Money Map assistant. Ask about your balance, spending, work hours or days off, for any month. One word is enough, like \"hours\" or \"August\".",
+  text: `Hi${firstName ? ` ${firstName}` : ""}, I'm Zenn — your Money Map assistant. Ask about your balance, spending, work hours or days off, for any month. One word is enough, like "hours" or "August".`,
   actions: [],
   time: new Date(),
 });
@@ -30,7 +31,7 @@ const ZennChat = ({ open, onClose }) => {
   const ctx = useContext(AppContext);
   const { formatMoney } = ctx;
   const navigate = useNavigate();
-  const [messages, setMessages] = useState(() => [makeWelcome()]);
+  const [messages, setMessages] = useState(() => [makeWelcome(getFirstName(ctx.profile?.name))]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const [suggestions, setSuggestions] = useState(ZENN_SUGGESTIONS);
@@ -122,7 +123,7 @@ const ZennChat = ({ open, onClose }) => {
   const clearChat = () => {
     window.clearTimeout(timerRef.current);
     setTyping(false);
-    setMessages([makeWelcome()]);
+    setMessages([makeWelcome(getFirstName(ctx.profile?.name))]);
     setSuggestions(ZENN_SUGGESTIONS);
     setShowSuggestions(true);
     lastIntentRef.current = null;

@@ -7,6 +7,7 @@ import WorkHoursPage from "./pages/WorkHoursPage";
 import StatsPage from "./pages/StatsPage";
 import HelpPage from "./pages/HelpPage";
 import ContactPage from "./pages/ContactPage";
+import ProfilePage from "./pages/ProfilePage";
 import MonthlyEarningsPrompt from "./components/MonthlyEarningsPrompt";
 import { ThemeProvider } from "./context/ThemeProvider";
 
@@ -22,6 +23,7 @@ const App = () => {
             <Route path="/work-hours" element={<WorkHoursPage />} />
             <Route path="/help" element={<HelpPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Routes>
       </AppProvider>

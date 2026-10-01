@@ -55,9 +55,14 @@ const FEATURES = [
     body: "Reset Stats deletes all your expenses and income — including past months on All Stats — and your monthly payment. Your work hours are not touched. You don't need it for a new month; use it only to start over.",
   },
   {
+    title: "Profile & backup",
+    icon: "fa-user-gear",
+    body: "Open Manage profile from the gear menu. Set your name, email and avatar, your hourly rate and monthly income, whether new entries default to cash or card, and light or dark mode. You can also download a backup of all your data, restore one, or delete everything.",
+  },
+  {
     title: "Your data stays yours",
     icon: "fa-lock",
-    body: "Everything is saved in your own browser. No account, no sign-up, and nothing is uploaded anywhere.",
+    body: "Everything is saved in your own browser. No account, no sign-up, and nothing is uploaded anywhere — download a backup from your profile to keep a copy.",
   },
 ];
 
@@ -76,7 +81,7 @@ const FAQ = [
   },
   {
     q: "Will I lose my data?",
-    a: "Data lives in this browser's storage, so clearing your browser data or switching device will start you fresh. Reset Stats also deletes your income and expense history.",
+    a: "Data lives in this browser's storage, so clearing your browser data or switching device starts you fresh — unless you download a backup from Manage profile and restore it. Reset Stats also deletes your income and expense history.",
   },
 ];
 
