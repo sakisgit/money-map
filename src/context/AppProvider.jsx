@@ -6,6 +6,7 @@ import { useToday } from "../hooks/useToday";
 import {
   syncWorkArchive,
   readWorkArchive,
+  migrateDayStatuses,
   getArchivedMonths,
   buildWorkMonths,
 } from "../utils/workArchive";
@@ -76,7 +77,7 @@ const readWorkDayStatus = () => {
     {}
   );
   return parsed && typeof parsed === "object" && !Array.isArray(parsed)
-    ? parsed
+    ? migrateDayStatuses(parsed)
     : {};
 };
 
@@ -166,7 +167,7 @@ export const AppProvider = ({ children }) => {
       !Array.isArray(parsedWorkDayStatus)
     ) {
       setWorkDayStatus((prev) =>
-        Object.keys(prev).length > 0 ? prev : parsedWorkDayStatus
+        Object.keys(prev).length > 0 ? prev : migrateDayStatuses(parsedWorkDayStatus)
       );
     }
 
@@ -219,7 +220,7 @@ export const AppProvider = ({ children }) => {
     localStorage.setItem("workDayStatus", JSON.stringify(workDayStatus));
   }, [workDayStatus, isHydrated]);
 
-  // --- Keep a full copy of every month (hours + rest/vacation/holiday days) ---
+  // --- Keep a full copy of every month (hours + rest/vacation days) ---
   // Runs whenever work data changes, so a month is preserved before anything
   // clears it (payment, month rollover). Shifts and marks the user deletes are
   // dropped from the copy too; shifts cleared by applying them as payment are
@@ -263,7 +264,7 @@ export const AppProvider = ({ children }) => {
     setWorkArchive(syncWorkArchive([entry], {}));
   }, []);
 
-  /** Clear a day's rest/vacation/holiday mark that only exists in the archive. */
+  /** Clear a day's rest/vacation mark that only exists in the archive. */
   const clearArchivedDay = useCallback((dateKey) => {
     setWorkArchive(syncWorkArchive([], {}, { ids: [], dateKeys: [dateKey] }));
   }, []);

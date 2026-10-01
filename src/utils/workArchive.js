@@ -2,9 +2,6 @@ import { getCurrentMonthKey } from "./dateKey";
 
 const STORAGE_KEY = "workArchive";
 
-/** Statuses a calendar day can carry when no shift was worked. */
-export const NON_WORKING_STATUSES = ["off", "vacation", "holiday"];
-
 const monthOf = (dateKey) =>
   typeof dateKey === "string" && dateKey.length >= 7 ? dateKey.slice(0, 7) : null;
 
@@ -16,13 +13,31 @@ const safeParse = (value, fallback) => {
   }
 };
 
+/** Holidays were removed as a day type; any saved ones count as days off. */
+export const migrateDayStatuses = (days) => {
+  if (!days || typeof days !== "object") return days;
+  let changed = false;
+  const next = {};
+  for (const [dateKey, status] of Object.entries(days)) {
+    if (status === "holiday") changed = true;
+    next[dateKey] = status === "holiday" ? "off" : status;
+  }
+  return changed ? next : days;
+};
+
 /** Every month kept in localStorage, keyed by "YYYY-MM". */
 export const readWorkArchive = () => {
   if (typeof localStorage === "undefined") return {};
   const parsed = safeParse(localStorage.getItem(STORAGE_KEY), {});
-  return parsed && typeof parsed === "object" && !Array.isArray(parsed)
-    ? parsed
-    : {};
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+  return Object.fromEntries(
+    Object.entries(parsed).map(([key, month]) => [
+      key,
+      month?.workDayStatus
+        ? { ...month, workDayStatus: migrateDayStatuses(month.workDayStatus) }
+        : month,
+    ])
+  );
 };
 
 const writeWorkArchive = (archive) => {
@@ -30,7 +45,7 @@ const writeWorkArchive = (archive) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(archive));
 };
 
-/** Totals for one month, from its shifts and its rest/vacation/holiday days. */
+/** Totals for one month, from its shifts and its rest/vacation days. */
 export const summarizeMonth = (hours, workDayStatus) => {
   const totalHours = hours.reduce((sum, e) => sum + (Number(e?.hours) || 0), 0);
   const earnings = hours.reduce(
@@ -49,7 +64,6 @@ export const summarizeMonth = (hours, workDayStatus) => {
     workedDays: workedDays.size,
     daysOff: statuses.filter((s) => s === "off").length,
     vacationDays: statuses.filter((s) => s === "vacation").length,
-    holidays: statuses.filter((s) => s === "holiday").length,
   };
 };
 
@@ -106,7 +120,7 @@ const groupByMonth = (hoursList, workDayStatus) => {
  * live lists (applying hours as payment, a new month starting).
  *
  * `removed` lists what the user deliberately deleted since the last sync:
- * shift ids and dates whose rest/vacation/holiday mark was cleared. Those are
+ * shift ids and dates whose rest/vacation mark was cleared. Those are
  * dropped from the archive too, so a deletion does not come back.
  */
 export const syncWorkArchive = (
@@ -223,7 +237,6 @@ export const sumMonths = (months) =>
       workedDays: acc.workedDays + (m.workedDays || 0),
       daysOff: acc.daysOff + (m.daysOff || 0),
       vacationDays: acc.vacationDays + (m.vacationDays || 0),
-      holidays: acc.holidays + (m.holidays || 0),
     }),
     {
       totalHours: 0,
@@ -232,7 +245,6 @@ export const sumMonths = (months) =>
       workedDays: 0,
       daysOff: 0,
       vacationDays: 0,
-      holidays: 0,
     }
   );
 

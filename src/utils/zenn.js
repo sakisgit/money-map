@@ -203,7 +203,6 @@ const workFor = (s, period) => {
     averageRate: totalHours > 0 ? earnings / totalHours : 0,
     daysOff: count("off"),
     vacationDays: count("vacation"),
-    holidays: count("holiday"),
   };
 };
 
@@ -249,7 +248,7 @@ const INTENTS = [
       text: [
         "Here's what I can answer:",
         "• Money: balance, spending, income, biggest expense, cash vs card",
-        "• Work: hours, earnings, days worked, rest days, vacations, holidays",
+        "• Work: hours, earnings, days worked, rest days, vacations",
         "• Time: add a period to any question — \"in August\", \"last month\", \"this week\", \"2026\", \"all time\"",
         "• Planning: upcoming days off, your best month",
         "• How-tos: logging hours, adding expenses, setting payment",
@@ -263,7 +262,7 @@ const INTENTS = [
     phrases: ["what is money map", "what is this app", "what does this app do", "about the app", "who are you", "what are you"],
     words: [],
     reply: () => ({
-      text: "Money Map tracks the money you earn and spend each month, plus the hours you work, your days off, vacations and holidays. Every month is saved, so you can look back at any of them on the calendar or on All Stats.",
+      text: "Money Map tracks the money you earn and spend each month, plus the hours you work, your days off and vacations. Every month is saved, so you can look back at any of them on the calendar or on All Stats.",
       actions: [STATS_LINK],
     }),
     next: ["help", "summary"],
@@ -278,14 +277,14 @@ const INTENTS = [
       const p = period ?? parsePeriod("this month", s.today);
       const w = workFor(s, p);
       const mo = moneyFor(s, p);
-      const nothing = w.shiftCount === 0 && w.daysOff + w.vacationDays + w.holidays === 0 && mo.income.length + mo.loss.length === 0;
+      const nothing = w.shiftCount === 0 && w.daysOff + w.vacationDays === 0 && mo.income.length + mo.loss.length === 0;
       if (nothing)
         return { text: `I have nothing recorded for ${p.label}. Pick another month on the calendar or ask about "all time".`, actions: [STATS_LINK] };
       return {
         text: [
           `Here's ${p.label}:`,
           `• Worked ${hours(w.totalHours)} over ${plural(w.workedDays, "day")} (${plural(w.shiftCount, "shift")}) — ${money(w.earnings, f)}`,
-          `• Rest ${w.daysOff} · Vacation ${w.vacationDays} · Holidays ${w.holidays}`,
+          `• Rest ${w.daysOff} · Vacation ${w.vacationDays}`,
           `• Expenses ${money(mo.totalLoss, f)} · Extra income ${money(mo.totalIncome, f)}`,
         ].join("\n"),
         actions: [STATS_LINK],
@@ -438,8 +437,7 @@ const INTENTS = [
           `Non-working days ${periodWord(p)}:`,
           `• Rest days: ${w.daysOff}`,
           `• Vacation days: ${w.vacationDays}`,
-          `• Holidays: ${w.holidays}`,
-          "Tip: on the calendar, tap a day → Cancel marks Rest; tap again for Vacation, then Holiday.",
+          "Tip: on the calendar, tap a day → Cancel marks Rest; tap again for Vacation.",
         ].join("\n"),
       };
     },
@@ -448,16 +446,16 @@ const INTENTS = [
   {
     id: "upcoming",
     icon: "fa-plane-departure",
-    phrases: ["next vacation", "next holiday", "upcoming", "coming up", "planned days", "next day off"],
+    phrases: ["next vacation", "upcoming", "coming up", "planned days", "next day off"],
     words: ["upcoming", "planned", "plans"],
     reply: (s) => {
       const todayKey = toLocalDateKey(s.today);
-      const LABEL = { off: "Rest day", vacation: "Vacation", holiday: "Holiday" };
+      const LABEL = { off: "Rest day", vacation: "Vacation" };
       const ahead = Object.entries(s.allDays)
         .filter(([dateKey, status]) => dateKey >= todayKey && LABEL[status])
         .sort(([a], [b]) => a.localeCompare(b));
       if (ahead.length === 0)
-        return { text: "Nothing planned yet. Open a future month on the calendar and tap days to mark rest, vacation or holidays." };
+        return { text: "Nothing planned yet. Open a future month on the calendar and tap days to mark rest or vacation." };
       const lines = ahead.slice(0, 5).map(([dateKey, status]) => `• ${formatDateKeyDisplay(dateKey)} — ${LABEL[status]}`);
       if (ahead.length > 5) lines.push(`…and ${ahead.length - 5} more.`);
       return { text: [`Coming up (${plural(ahead.length, "day")}):`, ...lines].join("\n") };
@@ -499,7 +497,7 @@ const INTENTS = [
       return {
         text: [
           "Your latest months:",
-          ...months.map((m) => `• ${formatMonthKey(m.monthKey)}: ${hours(m.totalHours)}, ${money(m.earnings, f)}, ${m.daysOff} rest · ${m.vacationDays} vacation · ${m.holidays || 0} holidays`),
+          ...months.map((m) => `• ${formatMonthKey(m.monthKey)}: ${hours(m.totalHours)}, ${money(m.earnings, f)}, ${m.daysOff} rest · ${m.vacationDays} vacation`),
         ].join("\n"),
         actions: [STATS_LINK],
       };

@@ -67,7 +67,6 @@ const PeriodRows = ({ totals, formatMoney, withAverage = false }) => (
     )}
     <MonthRow icon="fa-bed" label="Rest days" value={totals.daysOff} />
     <MonthRow icon="fa-umbrella-beach" label="Vacation days" value={totals.vacationDays} />
-    <MonthRow icon="fa-star" label="Holidays" value={totals.holidays} />
   </ul>
 );
 
@@ -120,7 +119,6 @@ const StatsPage = () => {
       averageShift: safeHours.length ? hours / safeHours.length : 0,
       daysOff: statuses.filter((s) => s === "off").length,
       vacationDays: statuses.filter((s) => s === "vacation").length,
-      holidays: statuses.filter((s) => s === "holiday").length,
     };
   }, [safeHours, totalHours, workHoursTotalEarnings, workDayStatus]);
 
@@ -575,8 +573,7 @@ const StatsPage = () => {
 
         {work.shifts === 0 &&
         work.daysOff === 0 &&
-        work.vacationDays === 0 &&
-        work.holidays === 0 ? (
+        work.vacationDays === 0 ? (
           <div className="card shadow-sm">
             <div className="card-body text-center py-4">
               <p className="mb-2">No work hours logged yet.</p>
@@ -618,7 +615,6 @@ const StatsPage = () => {
               label="Vacation days"
               value={work.vacationDays}
             />
-            <StatTile icon="fa-star" label="Holidays" value={work.holidays} />
           </div>
         )}
       </section>

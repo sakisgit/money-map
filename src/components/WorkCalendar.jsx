@@ -26,22 +26,18 @@ const STATUS_CLASSES = {
   work: "status-work",
   off: "status-off",
   vacation: "status-vacation",
-  holiday: "status-holiday",
-  weekend: "status-weekend",
 };
 
 const STATUS_LABELS = {
   work: "Worked",
   off: "Rest day",
   vacation: "Vacation",
-  holiday: "Holiday",
 };
 
 // Tapping a marked day moves it to the next mark; the last one clears it.
 const NEXT_STATUS = {
   off: "vacation",
-  vacation: "holiday",
-  holiday: null,
+  vacation: null,
 };
 
 const LEGEND_ITEMS = [
@@ -59,16 +55,6 @@ const LEGEND_ITEMS = [
     status: "vacation",
     label: "Vacation",
     hint: "Tap a Rest day to mark vacation",
-  },
-  {
-    status: "holiday",
-    label: "Holiday",
-    hint: "Tap a Vacation day to mark it a holiday",
-  },
-  {
-    status: "weekend",
-    label: "Weekend",
-    hint: "Saturday and Sunday with nothing logged",
   },
 ];
 
@@ -136,7 +122,7 @@ const startOfLocalDay = (d) =>
   new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
 const getManualStatus = (status) =>
-  status === "off" || status === "vacation" || status === "holiday" ? status : null;
+  status === "off" || status === "vacation" ? status : null;
 
 const WorkCalendar = () => {
   const {
@@ -165,7 +151,7 @@ const WorkCalendar = () => {
 
   const monthIndex = (d) => d.getFullYear() * 12 + d.getMonth();
 
-  // Vacations and holidays can be planned up to two years ahead, so the
+  // Vacations can be planned up to two years ahead, so the
   // calendar can show those months too.
   const lastMonthStart = useMemo(() => {
     const max = new Date(`${getVacationDateMax(today)}T00:00:00`);
@@ -328,7 +314,6 @@ const WorkCalendar = () => {
       ).size,
       off: statusValues.filter((status) => status === "off").length,
       vacation: vacationDates.size,
-      holiday: statusValues.filter((status) => status === "holiday").length,
     };
 
     return {
@@ -486,16 +471,14 @@ const WorkCalendar = () => {
     openQuickShift(dateKey);
   };
 
-  const getStatusForDate = (dateKey, date) => {
+  const getStatusForDate = (dateKey) => {
     const manual = getManualStatus(dayInfo.statuses[dateKey]);
     if (manual === "vacation" || dayInfo.paidVacation[dateKey]) {
       return "vacation";
     }
     if (workedDays.has(dateKey)) return "work";
     if (quickShift?.dateKey === dateKey && !quickShift.entry) return "work";
-    if (manual) return manual;
-    const weekday = date.getDay();
-    return weekday === 0 || weekday === 6 ? "weekend" : undefined;
+    return manual ?? undefined;
   };
 
   const goPrevMonth = () => {
@@ -679,11 +662,6 @@ const WorkCalendar = () => {
             <i className="legend-dot status-vacation" aria-hidden></i>
             <strong>{monthlyStats.dayCounts.vacation}</strong> vacation
           </li>
-          <li className="calendar-day-count calendar-day-count--holiday">
-            <i className="legend-dot status-holiday" aria-hidden></i>
-            <strong>{monthlyStats.dayCounts.holiday}</strong>{" "}
-            {monthlyStats.dayCounts.holiday === 1 ? "holiday" : "holidays"}
-          </li>
         </ul>
       </div>
 
@@ -705,8 +683,8 @@ const WorkCalendar = () => {
           <i className="fa-solid fa-info-circle calendar-legend-note__icon" aria-hidden></i>
           <span>
             {isFutureMonth
-              ? "Tap a day to plan it: Rest → Vacation → Holiday → clear."
-              : "Tap an empty day to log hours (Cancel = Rest). Tap Rest → Vacation → Holiday → clear."}
+              ? "Tap a day to plan it: Rest → Vacation → clear."
+              : "Tap an empty day to log hours (Cancel = Rest). Tap Rest → Vacation → clear."}
           </span>
         </p>
       </div>
@@ -733,7 +711,7 @@ const WorkCalendar = () => {
           }
 
           const dateKey = toDateKey(cell.date);
-          const status = getStatusForDate(dateKey, cell.date);
+          const status = getStatusForDate(dateKey);
           const statusClass = status ? STATUS_CLASSES[status] : "";
           const isPaidVacationDay = Boolean(dayInfo.paidVacation[dateKey]);
           const dayHours = (dayInfo.shifts[dateKey] ?? []).reduce(
@@ -741,16 +719,13 @@ const WorkCalendar = () => {
             0
           );
           const isToday = dateKey === toDateKey(today);
-          const statusTitle =
-            status && status !== "weekend"
-              ? isPaidVacationDay
-                ? "Paid vacation"
-                : status === "work" && dayHours > 0
-                  ? `Worked ${dayHours.toFixed(2)} h`
-                  : STATUS_LABELS[status]
-              : status === "weekend"
-                ? "Weekend"
-                : "No entry";
+          const statusTitle = status
+            ? isPaidVacationDay
+              ? "Paid vacation"
+              : status === "work" && dayHours > 0
+                ? `Worked ${dayHours.toFixed(2)} h`
+                : STATUS_LABELS[status]
+            : "No entry";
 
           return (
             <button
