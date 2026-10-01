@@ -3,7 +3,13 @@ import { useContext, useState, useEffect } from "react";
 import { AppContext } from "../context/AppContext";
 
 const Stats = () => {
-  const { incomeItems, lossItems, payment, formatMoney } = useContext(AppContext);
+  // This month only — earlier months are on the All Stats page.
+  const {
+    monthIncomeItems: incomeItems,
+    monthLossItems: lossItems,
+    payment,
+    formatMoney,
+  } = useContext(AppContext);
   const [progressMessage, setProgressMessage] = useState(null);
   const [lastProgressLevel, setLastProgressLevel] = useState(0);
 

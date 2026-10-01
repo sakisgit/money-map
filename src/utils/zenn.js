@@ -164,9 +164,12 @@ const amount = (item) => Number(item?.amount) || 0;
 const sum = (list, pick) => list.reduce((total, item) => total + pick(item), 0);
 
 const moneyFor = (s, period) => {
-  // Entries without a date only count when no period is asked for.
-  const income = s.income.filter((i) => inPeriod(i?.dateKey, period));
-  const loss = s.loss.filter((i) => inPeriod(i?.dateKey, period));
+  // Money questions default to this month, like the Home page. Entries saved
+  // without a date count toward the current month.
+  const p = period ?? parsePeriod("this month", s.today);
+  const todayKey = toLocalDateKey(s.today);
+  const income = s.income.filter((i) => inPeriod(i?.dateKey ?? todayKey, p));
+  const loss = s.loss.filter((i) => inPeriod(i?.dateKey ?? todayKey, p));
   const totalIncome = sum(income, amount);
   const totalLoss = sum(loss, amount);
   const byMethod = (method) =>
@@ -206,7 +209,7 @@ const workFor = (s, period) => {
 
 const periodWord = (period) =>
   !period
-    ? "so far"
+    ? "this month"
     : period.kind === "all"
       ? "overall"
       : period.kind === "day" || period.kind === "week"

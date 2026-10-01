@@ -11,7 +11,7 @@ import MoneyListItem from "./MoneyListItem";
 
 const AddMoneyProfit = () => {
   const { 
-    incomeItems, setIncomeItems, 
+    incomeItems, monthIncomeItems, setIncomeItems, 
     filterProfit, formatMoney 
   } = useContext(AppContext);
 
@@ -25,8 +25,9 @@ const AddMoneyProfit = () => {
   const { showGif } = useGiphyGif();
   const fullDate = useFullDate();
 
-  // Calculate filtered items first (case-insensitive)
-  const filteredItems = incomeItems.filter(item =>
+  // Only this month's entries; earlier months live on the All Stats page.
+  // Search is case-insensitive.
+  const filteredItems = monthIncomeItems.filter(item =>
     item.text.toLowerCase().includes(filterProfit.toLowerCase())
   );
 

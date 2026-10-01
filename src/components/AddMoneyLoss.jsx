@@ -11,7 +11,7 @@ import MoneyListItem from "./MoneyListItem";
 
 const AddMoneyLoss = () => {
   const { 
-    lossItems, setLossItems, 
+    lossItems, monthLossItems, setLossItems, 
     filterLoss, payment, 
     formatMoney
   } = useContext(AppContext);
@@ -26,8 +26,9 @@ const AddMoneyLoss = () => {
 
   const { showGif } = useGiphyGif();
 
-  // Calculate filtered items first (case-insensitive)
-  const filteredItems = lossItems.filter(item =>
+  // Only this month's entries; earlier months live on the All Stats page.
+  // Search is case-insensitive.
+  const filteredItems = monthLossItems.filter(item =>
     item.text.toLowerCase().includes(filterLoss.toLowerCase())
   );
 

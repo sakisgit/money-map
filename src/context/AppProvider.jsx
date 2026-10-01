@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { AppContext } from "./AppContext";
 import { getPreviousMonthKey, toLocalDateKey } from "../utils/dateKey";
+import { filterCurrentMonth } from "../utils/moneyMonth";
+import { useToday } from "../hooks/useToday";
 import {
   syncWorkArchive,
   readWorkArchive,
@@ -98,6 +100,25 @@ export const AppProvider = ({ children }) => {
   const [isHydrated, setIsHydrated] = useState(false);
   const [workArchive, setWorkArchive] = useState(readWorkArchive);
 
+  // Today's date, kept current (also across midnight while the app is open),
+  // so the Home page switches to the new month on its own.
+  const { today } = useToday();
+  const monthStamp = `${today.getFullYear()}-${today.getMonth()}`;
+
+  // Income and expenses are kept forever (All Stats shows every month), but
+  // the Home page lists and totals only cover the current month.
+  const monthIncomeItems = useMemo(
+    () => filterCurrentMonth(incomeItems, today),
+    // monthStamp changes only when the month does.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [incomeItems, monthStamp]
+  );
+  const monthLossItems = useMemo(
+    () => filterCurrentMonth(lossItems, today),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [lossItems, monthStamp]
+  );
+
   // --- Format Helper ---
   const formatMoney = (num) => {
     const n = Number(num);
@@ -161,22 +182,24 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     if (!isHydrated) return;
     localStorage.setItem("incomeItems", JSON.stringify(incomeItems));
-    const total = incomeItems.reduce(
-      (sum, item) => sum + (Number(item?.amount) || 0),
-      0
-    );
-    setTotalIncome(total);
   }, [incomeItems, isHydrated]);
+
+  useEffect(() => {
+    setTotalIncome(
+      monthIncomeItems.reduce((sum, item) => sum + (Number(item?.amount) || 0), 0)
+    );
+  }, [monthIncomeItems]);
 
   useEffect(() => {
     if (!isHydrated) return;
     localStorage.setItem("lossItems", JSON.stringify(lossItems));
-    const total = lossItems.reduce(
-      (sum, item) => sum + (Number(item?.amount) || 0),
-      0
-    );
-    setTotalLoss(total);
   }, [lossItems, isHydrated]);
+
+  useEffect(() => {
+    setTotalLoss(
+      monthLossItems.reduce((sum, item) => sum + (Number(item?.amount) || 0), 0)
+    );
+  }, [monthLossItems]);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -325,8 +348,10 @@ export const AppProvider = ({ children }) => {
   // --- Context Value ---
   const contextValue = {
     // HomePage
-    incomeItems, setIncomeItems,
+    incomeItems, setIncomeItems, // every entry ever (All Stats)
     lossItems, setLossItems,
+    monthIncomeItems, // this month only (Home page)
+    monthLossItems,
     payment, setPayment,
     filterLoss, setFilterLoss,
     filterProfit, setFilterProfit,
