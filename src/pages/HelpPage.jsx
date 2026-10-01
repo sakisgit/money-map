@@ -57,19 +57,28 @@ const FEATURES = [
   {
     title: "Profile & backup",
     icon: "fa-user-gear",
-    body: "Open Manage profile from the gear menu. Set your name, email and avatar, your hourly rate and monthly income, whether new entries default to cash or card, and light or dark mode. You can also download a backup of all your data, restore one, or delete everything.",
+    body: "Open Manage profile from the gear menu. Set your name, email and avatar, your hourly rate and monthly income, whether new entries default to cash or card, and light or dark mode. You can also download a backup of all your data, restore one, or delete everything. The Account section lets you create an account or sign in.",
   },
   {
     title: "Your data stays yours",
     icon: "fa-lock",
-    body: "Everything is saved in your own browser. No account, no sign-up, and nothing is uploaded anywhere — download a backup from your profile to keep a copy.",
+    body: "Everything is saved in your own browser and nothing is uploaded anywhere. Download a backup from your profile to keep a copy.",
+  },
+  {
+    title: "Optional account",
+    icon: "fa-user-shield",
+    body: "Money Map works without an account. If you share the device, create one from the gear menu (Sign in or create account): it adds a password and keeps your data separate. Sign in with your email or name; signing out brings back the data you use without an account. Accounts live only on this device and passwords are stored as a secure hash.",
   },
 ];
 
 const FAQ = [
   {
     q: "Do I need an account?",
-    a: "No. Money Map works straight away and keeps your data on this device.",
+    a: "No. Money Map works straight away. An account is optional — create one from the gear menu if you want a password and your own separate data on a shared device. It stays on this device and nothing is sent anywhere.",
+  },
+  {
+    q: "I forgot my password. What now?",
+    a: "Because accounts live only on this device, a password can't be reset by email. If you downloaded a backup, create a new account and use Restore backup on your profile to get your data back. You can always keep using Money Map without an account.",
   },
   {
     q: "What happens at the start of a new month?",

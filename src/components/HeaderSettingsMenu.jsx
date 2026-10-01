@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeContext";
 import { AppContext } from "../context/AppContext";
+import { AuthContext } from "../context/AuthContext";
 import ProfileAvatar from "./ProfileAvatar";
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
 
@@ -11,6 +12,7 @@ const HeaderSettingsMenu = ({ open, onToggle, onClose }) => {
   const panelRef = useRef(null);
   const { theme, toggleTheme } = useContext(ThemeContext);
   const { profile } = useContext(AppContext);
+  const { account, signOut } = useContext(AuthContext);
   const navigate = useNavigate();
   const isLight = theme === "light";
   const [panelStyle, setPanelStyle] = useState({});
@@ -135,6 +137,34 @@ const HeaderSettingsMenu = ({ open, onToggle, onClose }) => {
             <i className="fa-solid fa-user-gear" aria-hidden></i>
             <span>Manage profile</span>
           </button>
+
+          {account ? (
+            <button
+              type="button"
+              role="menuitem"
+              className="header-settings__item header-settings__item--danger"
+              onClick={() => {
+                onClose();
+                signOut();
+              }}
+            >
+              <i className="fa-solid fa-arrow-right-from-bracket" aria-hidden></i>
+              <span>Sign out</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              role="menuitem"
+              className="header-settings__item"
+              onClick={() => {
+                onClose();
+                navigate("/login");
+              }}
+            >
+              <i className="fa-solid fa-right-to-bracket" aria-hidden></i>
+              <span>Sign in or create account</span>
+            </button>
+          )}
         </div>
       </>,
       document.body

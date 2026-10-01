@@ -1,8 +1,10 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { AppContext } from "../context/AppContext";
 import { ThemeContext } from "../context/ThemeContext";
+import { AuthContext } from "../context/AuthContext";
+import { PASSWORD_MIN } from "../utils/auth";
 import ProfileAvatar from "../components/ProfileAvatar";
 import { PAYMENT_METHODS } from "../utils/paymentMethod";
 import {
@@ -37,6 +39,8 @@ const ProfilePage = () => {
     formatMoney,
   } = useContext(AppContext);
   const { theme, toggleTheme } = useContext(ThemeContext);
+  const { account, updateAccount, changePassword, signOut, deleteAccount } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   // --- Your profile ---
   const [name, setName] = useState(profile.name);
@@ -46,7 +50,15 @@ const ProfilePage = () => {
 
   const saveProfile = (event) => {
     event.preventDefault();
-    if (email.trim() && !EMAIL_RE.test(email.trim())) {
+    if (account) {
+      // Signed in: name and email are also how you sign in, so the account changes too.
+      try {
+        updateAccount({ name, email });
+      } catch (error) {
+        fail(error.message);
+        return;
+      }
+    } else if (email.trim() && !EMAIL_RE.test(email.trim())) {
       fail("Please enter a valid email address, or leave it empty.");
       return;
     }
@@ -119,7 +131,9 @@ const ProfilePage = () => {
       const { isConfirmed } = await Swal.fire({
         icon: "warning",
         title: "Restore this backup?",
-        text: `It was made on ${when}. Everything currently in Money Map on this device will be replaced.`,
+        text: account
+          ? `It was made on ${when}. Everything in this account will be replaced. You stay signed in as ${account.email}.`
+          : `It was made on ${when}. Everything currently in Money Map on this device will be replaced.`,
         showCancelButton: true,
         confirmButtonText: "Restore",
         cancelButtonText: "Cancel",
@@ -136,7 +150,9 @@ const ProfilePage = () => {
     const { isConfirmed } = await Swal.fire({
       icon: "warning",
       title: "Delete all data?",
-      html: "This removes your profile, every expense and income, all work hours and your whole history from this browser. <b>It can't be undone.</b><br><br>Type <b>DELETE</b> to confirm.",
+      html: `This removes every expense and income, all work hours, your whole history and your settings${
+        account ? " from this account. You stay signed in." : " from this browser."
+      } <b>It can't be undone.</b><br><br>Type <b>DELETE</b> to confirm.`,
       input: "text",
       inputPlaceholder: "DELETE",
       showCancelButton: true,
@@ -156,6 +172,54 @@ const ProfilePage = () => {
     window.location.reload();
   };
 
+  // --- Account ---
+  const [pw, setPw] = useState({ current: "", next: "", repeat: "" });
+  const [pwBusy, setPwBusy] = useState(false);
+
+  const savePassword = async (event) => {
+    event.preventDefault();
+    if (pw.next !== pw.repeat) {
+      fail("The two new passwords don't match.");
+      return;
+    }
+    setPwBusy(true);
+    try {
+      await changePassword(pw.current, pw.next);
+      setPw({ current: "", next: "", repeat: "" });
+      toast("Password changed");
+    } catch (error) {
+      fail(error.message);
+    } finally {
+      setPwBusy(false);
+    }
+  };
+
+  const confirmDeleteAccount = async () => {
+    const { isConfirmed, value } = await Swal.fire({
+      icon: "warning",
+      title: "Delete your account?",
+      html: "Your account <b>and all of its data</b> will be removed from this device. Download a backup first if you might want it later.<br><br>Enter your password to confirm.",
+      input: "password",
+      inputPlaceholder: "Password",
+      inputAttributes: { autocomplete: "current-password" },
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Delete account",
+      cancelButtonText: "Cancel",
+      showLoaderOnConfirm: true,
+      preConfirm: async (password) => {
+        try {
+          await deleteAccount(password);
+          return true;
+        } catch (error) {
+          Swal.showValidationMessage(error.message);
+          return false;
+        }
+      },
+    });
+    if (isConfirmed && value) Swal.close();
+  };
+
   const firstName = getFirstName(profile.name);
 
   return (
@@ -165,7 +229,9 @@ const ProfilePage = () => {
         <div className="profile-hero__text">
           <h1 className="profile-hero__title">{firstName ? `Hi, ${firstName}` : "Your profile"}</h1>
           <p className="profile-hero__lead">
-            Your details, defaults and data. Everything is saved in this browser only — there is no account.
+            {account
+              ? `Signed in as ${account.email}. Your account and data live on this device only.`
+              : "Your details, defaults and data. Everything is saved in this browser — no account needed."}
           </p>
         </div>
       </header>
@@ -226,10 +292,14 @@ const ProfilePage = () => {
                     autoComplete="name"
                     onChange={(e) => setName(e.target.value)}
                   />
-                  <p className="profile-hint">Zenn greets you by name, and it fills in the Contact form.</p>
+                  <p className="profile-hint">
+                    {account ? "You can sign in with it. Zenn also greets you by name." : "Zenn greets you by name, and it fills in the Contact form."}
+                  </p>
                 </div>
                 <div className="mb-3">
-                  <label className="form-label" htmlFor="profile-email">Email <span className="profile-optional">(optional)</span></label>
+                  <label className="form-label" htmlFor="profile-email">
+                    Email {!account && <span className="profile-optional">(optional)</span>}
+                  </label>
                   <input
                     id="profile-email"
                     type="email"
@@ -240,7 +310,9 @@ const ProfilePage = () => {
                     autoComplete="email"
                     onChange={(e) => setEmail(e.target.value)}
                   />
-                  <p className="profile-hint">Only used to fill in the Contact form for you.</p>
+                  <p className="profile-hint">
+                    {account ? "You can sign in with it, and it fills in the Contact form." : "Only used to fill in the Contact form for you."}
+                  </p>
                 </div>
                 <button type="submit" className="btn btn-primary fw-bold" disabled={!profileDirty}>
                   Save profile
@@ -342,6 +414,76 @@ const ProfilePage = () => {
           </section>
         </div>
 
+        {/* Account */}
+        <div className="col-12">
+          <section className="card shadow-sm profile-card">
+            <div className="card-body">
+              <h2 className="profile-card__title">
+                <i className="fa-solid fa-shield-halved" aria-hidden></i>
+                Account
+              </h2>
+              {account ? (
+                <>
+                  <p className="profile-hint mb-3">
+                    Sign in with <b>{account?.email}</b> or <b>{account?.name}</b>. Created{" "}
+                    {account?.createdAt ? new Date(account.createdAt).toLocaleDateString("en-GB") : "on this device"}.
+                  </p>
+
+                  <form className="profile-password" onSubmit={savePassword} noValidate>
+                    <h3 className="profile-subtitle">Change password</h3>
+                    <div className="row g-3">
+                      <div className="col-12 col-md-4">
+                        <label className="form-label" htmlFor="pw-current">Current password</label>
+                        <input id="pw-current" type="password" className="form-control" autoComplete="current-password" value={pw.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} />
+                      </div>
+                      <div className="col-12 col-md-4">
+                        <label className="form-label" htmlFor="pw-next">New password</label>
+                        <input id="pw-next" type="password" className="form-control" autoComplete="new-password" value={pw.next} onChange={(e) => setPw({ ...pw, next: e.target.value })} />
+                        <p className="profile-hint">At least {PASSWORD_MIN} characters.</p>
+                      </div>
+                      <div className="col-12 col-md-4">
+                        <label className="form-label" htmlFor="pw-repeat">Repeat new password</label>
+                        <input id="pw-repeat" type="password" className="form-control" autoComplete="new-password" value={pw.repeat} onChange={(e) => setPw({ ...pw, repeat: e.target.value })} />
+                      </div>
+                    </div>
+                    <button type="submit" className="btn btn-primary fw-bold mt-3" disabled={pwBusy || !pw.current || !pw.next || !pw.repeat}>
+                      {pwBusy ? "Saving…" : "Change password"}
+                    </button>
+                  </form>
+
+                  <div className="profile-actions mt-4">
+                    <button type="button" className="btn btn-outline-primary fw-bold" onClick={signOut}>
+                      <i className="fa-solid fa-arrow-right-from-bracket me-2" aria-hidden></i>
+                      Sign out
+                    </button>
+                    <button type="button" className="btn btn-outline-danger fw-bold" onClick={confirmDeleteAccount}>
+                      <i className="fa-solid fa-user-xmark me-2" aria-hidden></i>
+                      Delete account
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="profile-hint mb-3">
+                    You're using Money Map without an account, and that's fine — everything works. An account is
+                    optional: it gives you a password and keeps your data separate from anyone else using this device.
+                  </p>
+                  <div className="profile-actions">
+                    <button type="button" className="btn btn-primary fw-bold" onClick={() => navigate("/signup?next=/profile")}>
+                      <i className="fa-solid fa-user-plus me-2" aria-hidden></i>
+                      Create account
+                    </button>
+                    <button type="button" className="btn btn-outline-primary fw-bold" onClick={() => navigate("/login?next=/profile")}>
+                      <i className="fa-solid fa-right-to-bracket me-2" aria-hidden></i>
+                      Sign in
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </section>
+        </div>
+
         {/* Your data */}
         <div className="col-12">
           <section className="card shadow-sm profile-card">
@@ -378,7 +520,11 @@ const ProfilePage = () => {
               <div className="profile-danger">
                 <div>
                   <strong>Delete all data</strong>
-                  <p className="profile-hint mb-0">Removes your profile, money entries, work hours and history from this browser.</p>
+                  <p className="profile-hint mb-0">
+                    {account
+                      ? "Empties this account: money entries, work hours, history and settings. The account itself stays."
+                      : "Removes your profile, money entries, work hours and history from this browser."}
+                  </p>
                 </div>
                 <button type="button" className="btn btn-outline-danger fw-bold" onClick={confirmDeleteAll}>
                   <i className="fa-solid fa-trash-can me-2" aria-hidden></i>

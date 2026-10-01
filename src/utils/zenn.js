@@ -564,7 +564,7 @@ const INTENTS = [
     phrases: ["is my data safe", "where is my data", "sign up"],
     words: ["privacy", "private", "cloud", "account", "login", "safe"],
     reply: () => ({
-      text: "There's no account and no server. Everything is saved in this browser, so your data stays on this device — clearing your browser data clears it too.",
+      text: "Your data lives only on this device — there's no server, and nothing is uploaded. You don't need an account; if you want one (a password and your own separate data on a shared device), use Sign in or create account in the gear menu. Clearing your browser data clears everything, so download a backup from your profile now and then.",
     }),
     next: ["help"],
   },
