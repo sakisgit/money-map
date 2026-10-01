@@ -902,6 +902,12 @@ body.dark .payment-method-badge--card {
   border-color: rgba(59, 130, 246, 0.3);
 }
 
+/* Labels on the colored stat cards (Monthly Income, Net Balance…) stay white;
+   the generic ".card-body p" grey is meant for plain white cards. */
+.card.text-white .card-body p {
+  color: rgba(255, 255, 255, 0.92);
+}
+
 /* ---------- Money list item row ---------- */
 .money-list-item {
   display: flex;
@@ -993,7 +999,9 @@ body.dark .payment-method-icon--card {
   border-radius: 0.5rem;
 }
 
-@media (max-width: 575.98px) {
+/* Phones, and tablets where Expenses and Income sit side by side in narrow
+   columns: stack the row so the name always has room. */
+@media (max-width: 991.98px) {
   .money-list-item {
     flex-direction: column;
     align-items: stretch;
@@ -5928,8 +5936,28 @@ body.dark .zenn__input {
   .btn,
   .zenn__chip,
   .form-control,
-  .form-select {
+  .form-select,
+  .header-nav__link,
+  .viz-toggle__btn,
+  .viz-link {
     min-height: 44px;
+  }
+
+  .header-icon-btn,
+  .calendar-nav-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .viz-link {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* The base style pins these to "auto !important" for desktop. */
+  .money-section__add-btn,
+  .money-form__submit-btn {
+    min-height: 44px !important;
   }
 
   .zenn__chip {
@@ -6754,5 +6782,12 @@ body.dark .entries-table .entries-pill--income { color: var(--viz-income); }
   .entries-table__delete {
     width: 44px;
     height: 44px;
+  }
+}
+
+/* Touch screens: chart toggle keeps a finger-sized hit area. */
+@media (hover: none) and (pointer: coarse) {
+  .viz-toggle__btn {
+    min-height: 44px;
   }
 }
