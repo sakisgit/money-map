@@ -538,12 +538,23 @@ const INTENTS = [
     next: ["earnings", "balance"],
   },
   {
+    id: "newmonth",
+    icon: "fa-calendar-plus",
+    phrases: ["new month", "next month starts", "month changes", "start of the month", "end of the month"],
+    words: [],
+    reply: () => ({
+      text: "You don't need to do anything when a month ends. The home page starts the new month empty, and last month's income and expenses stay on All Stats. If you logged work hours, I'll offer on the 1st to set last month's earnings as your payment.",
+      actions: [STATS_LINK],
+    }),
+    next: ["history", "summary"],
+  },
+  {
     id: "howto-reset",
     icon: "fa-rotate",
-    phrases: ["new month", "start over", "delete everything"],
+    phrases: ["start over", "delete everything"],
     words: ["reset", "clear"],
     reply: () => ({
-      text: "Reset Stats on the home page clears your expenses, income and monthly payment. It asks for confirmation first and can't be undone. Your work calendar history is not touched.",
+      text: "Reset Stats on the home page deletes all your expenses and income — including past months on All Stats — and your monthly payment. Your work hours are not touched. It asks first and can't be undone. You don't need it for a new month.",
     }),
     next: ["balance"],
   },

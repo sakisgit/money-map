@@ -48,7 +48,7 @@ const MonthlyEarningsPrompt = () => {
           <p style="${amountStyle}">€${amount}</p>
           <p style="margin:0">
             Apply your ${previousMonthName} work hours as ${previousMonthName} payment?
-            Only ${previousMonthName}'s recorded hours will be cleared.
+            ${previousMonthName}'s hours leave the Work Hours list but stay on the calendar and in All Stats.
           </p>
         `,
         icon: "question",
@@ -69,7 +69,7 @@ const MonthlyEarningsPrompt = () => {
             <p style="margin:0 0 0.5rem;font-size:1.15rem;font-weight:700;color:#198754">€${amount}</p>
             <p style="margin:0">
               Your ${previousMonthName} work hours are now set as payment.
-              ${previousMonthName}'s recorded hours have been cleared.
+              They're still on the calendar and in All Stats.
             </p>
           `,
           timer: 2200,

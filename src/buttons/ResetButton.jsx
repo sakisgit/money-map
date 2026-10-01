@@ -16,7 +16,7 @@ const ResetButton = ({ variant = "header", onMenuClose }) => {
   const handleReset = () => {
     Swal.fire({
       title: "Are you sure?",
-      text: "Do you really want to reset all stats?",
+      text: "This deletes all your expenses and income — including past months on All Stats — and your monthly payment. Work hours are not affected. This can't be undone.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",

@@ -37,7 +37,7 @@ const PaymentDropdown = ({ variant = "header", onMenuClose }) => {
 
     const { isConfirmed } = await Swal.fire({
       title: "Are you sure?",
-      text: "Use your Work Hours total as monthly payment? All recorded hours will be cleared.",
+      text: "Use your Work Hours total as monthly payment? The hours leave the Work Hours list; the calendar and All Stats keep them.",
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -53,7 +53,7 @@ const PaymentDropdown = ({ variant = "header", onMenuClose }) => {
     Swal.fire({
       icon: "success",
       title: "Payment Updated!",
-      text: "Payment set from Work Hours. Recorded hours have been cleared.",
+      text: "Payment set from Work Hours. The calendar and All Stats still show those hours.",
       timer: 1800,
       showConfirmButton: false,
     });
